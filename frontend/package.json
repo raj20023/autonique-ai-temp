@@ -1,0 +1,42 @@
+{
+  "name": "autonique-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -H 0.0.0.0 -p 3000",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "14.0.3",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "typescript": "5.3.2",
+    "@types/node": "20.9.0",
+    "@types/react": "18.2.37",
+    "@types/react-dom": "18.2.15",
+    "tailwindcss": "3.3.5",
+    "autoprefixer": "10.4.16",
+    "postcss": "8.4.31",
+    "axios": "1.6.0",
+    "react-query": "3.39.3",
+    "react-hook-form": "7.47.0",
+    "react-hot-toast": "2.4.1",
+    "lucide-react": "0.292.0",
+    "clsx": "2.0.0",
+    "tailwind-merge": "2.0.0",
+    "@headlessui/react": "1.7.17",
+    "framer-motion": "10.16.4",
+    "react-csv-reader": "4.0.0",
+    "papaparse": "5.4.1",
+    "@types/papaparse": "5.3.14"
+  },
+  "devDependencies": {
+    "eslint": "8.53.0",
+    "eslint-config-next": "14.0.3",
+    "@tailwindcss/forms": "0.5.7",
+    "@tailwindcss/typography": "0.5.10"
+  }
+}

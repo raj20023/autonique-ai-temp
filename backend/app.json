@@ -1,0 +1,49 @@
+{
+  "name": "Autonique.ai Backend",
+  "description": "Instagram Auto-Reply SaaS Backend with Gemini AI",
+  "keywords": ["python", "fastapi", "instagram", "ai", "gemini"],
+  "website": "https://github.com/yourusername/autonique-ai",
+  "repository": "https://github.com/yourusername/autonique-ai",
+  "stack": "heroku-22",
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "addons": [
+    {
+      "plan": "heroku-postgresql:essential-0"
+    }
+  ],
+  "env": {
+    "ENVIRONMENT": {
+      "description": "Application environment",
+      "value": "production"
+    },
+    "DEBUG": {
+      "description": "Debug mode",
+      "value": "False"
+    },
+    "FACEBOOK_APP_ID": {
+      "description": "Facebook App ID"
+    },
+    "FACEBOOK_APP_SECRET": {
+      "description": "Facebook App Secret"
+    },
+    "GOOGLE_API_KEY": {
+      "description": "Google Gemini API Key"
+    },
+    "JWT_SECRET_KEY": {
+      "description": "JWT Secret Key for authentication"
+    },
+    "WEBHOOK_VERIFY_TOKEN": {
+      "description": "Webhook verification token"
+    }
+  }
+}
