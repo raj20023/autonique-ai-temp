@@ -1,33 +1,33 @@
 # Core FastAPI dependencies
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-gunicorn==21.2.0
+fastapi
+uvicorn[standard]
+gunicorn
 
 # Database
-sqlalchemy==2.0.23
-alembic==1.12.1
-psycopg2-binary==2.9.9
+sqlalchemy
+alembic
+psycopg2-binary
 
 # Authentication & Security
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-cryptography==41.0.8
+python-jose[cryptography]
+passlib[bcrypt]
+cryptography
 
 # HTTP & File handling
-httpx==0.25.2
-python-multipart==0.0.6
-requests==2.31.0
+httpx
+python-multipart
+requests
 
 # AI - Lightweight versions
-google-generativeai==0.3.2
-langchain-core==0.1.0
-langchain-google-genai==0.0.6
+google-generativeai
+langchain-core
+langchain-google-genai
 
 # Configuration & Validation
-pydantic[email]==2.5.0
-pydantic-settings==2.1.0
-python-dotenv==1.0.0
+pydantic[email]
+pydantic-settings
+python-dotenv
 
 # Testing (optional - can remove for production)
-pytest==7.4.3
-pytest-asyncio==0.21.1
+pytest
+pytest-asyncio
