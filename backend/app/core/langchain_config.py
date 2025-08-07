@@ -4,9 +4,11 @@ LangChain configuration and utilities for InstaReply
 
 from langchain_google_genai import GoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain, ConversationChain
-from langchain.memory import ConversationBufferWindowMemory
-from langchain.schema import BaseMessage, HumanMessage, SystemMessage
+from langchain_core.runnables import RunnableSequence
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_core.chat_history import BaseChatMessageHistory, InMemoryChatMessageHistory
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from typing import Dict, List, Optional
 import logging
 
@@ -138,70 +140,47 @@ class LangChainManager:
         )
     
     def _init_chains(self):
-        """Initialize LangChain chains"""
-        
-        # Response generation chain
-        self.response_chain = LLMChain(
-            llm=self.llm,
-            prompt=self.response_prompt,
-            verbose=False
-        )
-        
+        """Initialize LangChain chains using modern RunnableSequence"""
+
+        # Response generation chain (modern pattern)
+        self.response_chain = self.response_prompt | self.llm
+
         # Smart response chain
-        self.smart_response_chain = LLMChain(
-            llm=self.llm,
-            prompt=self.smart_response_prompt,
-            verbose=False
-        )
-        
+        self.smart_response_chain = self.smart_response_prompt | self.llm
+
         # Sentiment analysis chain
-        self.sentiment_chain = LLMChain(
-            llm=self.llm,
-            prompt=self.sentiment_prompt,
-            verbose=False
-        )
-        
+        self.sentiment_chain = self.sentiment_prompt | self.llm
+
         # Intent extraction chain
-        self.intent_chain = LLMChain(
-            llm=self.llm,
-            prompt=self.intent_prompt,
-            verbose=False
-        )
+        self.intent_chain = self.intent_prompt | self.llm
         
         # FAQ suggestion chain
-        self.faq_suggestion_chain = LLMChain(
-            llm=self.llm,
-            prompt=self.faq_suggestion_prompt,
-            verbose=False
-        )
-        
+        self.faq_suggestion_chain = self.faq_suggestion_prompt | self.llm
+
         # Conversation summary chain
-        self.summary_chain = LLMChain(
-            llm=self.llm,
-            prompt=self.summary_prompt,
-            verbose=False
-        )
-        
-        # Conversation chain with memory
-        self.conversation_memory = ConversationBufferWindowMemory(
-            k=5,  # Remember last 5 exchanges
-            return_messages=True
-        )
-        
-        self.conversation_chain = ConversationChain(
-            llm=self.llm,
-            memory=self.conversation_memory,
-            verbose=False
-        )
+        self.summary_chain = self.summary_prompt | self.llm
+
+        # Modern conversation chain with message history
+        self.conversation_history = InMemoryChatMessageHistory()
+
+        # Create conversation prompt with message history
+        conversation_prompt = ChatPromptTemplate.from_messages([
+            ("system", "You are a helpful AI assistant for Instagram customer service."),
+            MessagesPlaceholder(variable_name="history"),
+            ("human", "{input}")
+        ])
+
+        # Create conversation chain with history
+        self.conversation_chain = conversation_prompt | self.llm
     
     async def generate_response(self, user_message: str, faq_answer: str) -> str:
         """Generate personalized response from FAQ"""
         try:
-            response = await self.response_chain.arun(
-                user_message=user_message,
-                faq_answer=faq_answer
-            )
-            return response.strip()
+            response = await self.response_chain.ainvoke({
+                "user_message": user_message,
+                "faq_answer": faq_answer
+            })
+            return response.content.strip() if hasattr(response, 'content') else str(response).strip()
         except Exception as e:
             logger.error(f"Error generating response: {e}")
             return faq_answer
@@ -209,11 +188,11 @@ class LangChainManager:
     async def generate_smart_response(self, user_message: str, context: str = "") -> str:
         """Generate smart response without FAQ"""
         try:
-            response = await self.smart_response_chain.arun(
-                user_message=user_message,
-                context=context
-            )
-            return response.strip()
+            response = await self.smart_response_chain.ainvoke({
+                "user_message": user_message,
+                "context": context
+            })
+            return response.content.strip() if hasattr(response, 'content') else str(response).strip()
         except Exception as e:
             logger.error(f"Error generating smart response: {e}")
             return "Thank you for your message. We'll get back to you soon!"
@@ -221,9 +200,10 @@ class LangChainManager:
     async def analyze_sentiment(self, text: str) -> Dict:
         """Analyze sentiment of text"""
         try:
-            result = await self.sentiment_chain.arun(text=text)
+            result = await self.sentiment_chain.ainvoke({"text": text})
+            result_text = result.content if hasattr(result, 'content') else str(result)
             import json
-            return json.loads(result.strip())
+            return json.loads(result_text.strip())
         except Exception as e:
             logger.error(f"Error analyzing sentiment: {e}")
             return {
@@ -236,7 +216,8 @@ class LangChainManager:
     async def extract_intent(self, text: str) -> str:
         """Extract intent from text"""
         try:
-            intent = await self.intent_chain.arun(text=text)
+            result = await self.intent_chain.ainvoke({"text": text})
+            intent = result.content if hasattr(result, 'content') else str(result)
             return intent.strip().lower()
         except Exception as e:
             logger.error(f"Error extracting intent: {e}")
@@ -246,9 +227,10 @@ class LangChainManager:
         """Generate FAQ suggestion from similar messages"""
         try:
             messages_text = "\n".join([f"- {msg}" for msg in messages])
-            result = await self.faq_suggestion_chain.arun(messages=messages_text)
+            result = await self.faq_suggestion_chain.ainvoke({"messages": messages_text})
+            result_text = result.content if hasattr(result, 'content') else str(result)
             import json
-            return json.loads(result.strip())
+            return json.loads(result_text.strip())
         except Exception as e:
             logger.error(f"Error suggesting FAQ: {e}")
             return None
@@ -256,7 +238,8 @@ class LangChainManager:
     async def summarize_conversation(self, conversation: str) -> str:
         """Summarize a conversation"""
         try:
-            summary = await self.summary_chain.arun(conversation=conversation)
+            result = await self.summary_chain.ainvoke({"conversation": conversation})
+            summary = result.content if hasattr(result, 'content') else str(result)
             return summary.strip()
         except Exception as e:
             logger.error(f"Error summarizing conversation: {e}")
