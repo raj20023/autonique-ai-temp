@@ -2,7 +2,8 @@ import type { AppProps } from 'next/app';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { Toaster } from 'react-hot-toast';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Head from 'next/head';
 import '@/styles/globals.css';
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -15,8 +16,25 @@ export default function App({ Component, pageProps }: AppProps) {
     },
   }));
 
+  // Force HTTPS redirect on client side
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.protocol === 'http:' && process.env.NODE_ENV === 'production') {
+      window.location.replace(window.location.href.replace('http:', 'https:'));
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
+      <Head>
+        {/* Force HTTPS */}
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            if (location.protocol === 'http:' && location.hostname !== 'localhost') {
+              location.replace('https:' + window.location.href.substring(window.location.protocol.length));
+            }
+          `
+        }} />
+      </Head>
       <Component {...pageProps} />
       <Toaster
         position="top-right"

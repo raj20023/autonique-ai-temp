@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     
     # CORS
-    ALLOWED_ORIGINS: Union[str, List[str]] = "http://localhost:3000"
+    ALLOWED_ORIGINS: Union[str, List[str]] = "http://localhost:3000,https://autonique.in,https://www.autonique.in"
 
     @field_validator('ALLOWED_ORIGINS')
     @classmethod

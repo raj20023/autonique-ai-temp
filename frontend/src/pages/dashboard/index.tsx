@@ -82,11 +82,11 @@ export default function DashboardPage() {
       <DashboardLayout title="Dashboard">
         <div className="space-y-8">
           {/* Welcome Section */}
-          <div className="bg-gradient-to-r from-primary-600 to-purple-600 rounded-lg p-6 text-white">
-            <h1 className="text-2xl font-bold mb-2">
+          <div className="bg-gradient-to-r from-brand-950 to-accent-500 rounded-2xl p-8 text-white shadow-2xl">
+            <h1 className="text-3xl font-bold mb-3">
               Welcome back, {user?.name}! 👋
             </h1>
-            <p className="text-blue-100">
+            <p className="text-white/90 text-lg">
               Your Instagram auto-reply system is ready to help your customers 24/7.
             </p>
           </div>

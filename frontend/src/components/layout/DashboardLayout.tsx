@@ -13,6 +13,7 @@ import {
   User
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import Logo from '@/components/ui/Logo';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -36,40 +37,54 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-accent-50">
       {/* Mobile sidebar */}
       <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
         <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
-        <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white shadow-xl">
-          <div className="flex h-16 items-center justify-between px-4">
-            <div className="flex items-center space-x-2">
-              <Instagram className="h-6 w-6 text-instagram-500" />
-              <span className="text-lg font-bold text-gradient">InstaReply</span>
+        <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-gradient-to-b from-brand-950 to-brand-800 shadow-xl">
+          <div className="flex h-20 items-center justify-between px-4">
+            <div className="flex items-center space-x-3">
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-2 shadow-lg">
+                <img
+                  src="/logo.png"
+                  alt="Autonique.ai Logo"
+                  className="h-10 w-10"
+                  onError={(e) => {
+                    // Fallback to a visible icon if logo fails to load
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling.style.display = 'flex';
+                  }}
+                />
+                <div className="h-10 w-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg" style={{display: 'none'}}>
+                  <span className="text-brand-950 font-bold text-lg">A</span>
+                </div>
+              </div>
+              <span className="text-xl font-bold text-white">Autonique.ai</span>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-white/70 hover:text-white"
             >
               <X className="h-6 w-6" />
             </button>
           </div>
           <nav className="flex-1 px-4 py-4">
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {navigation.map((item) => {
                 const isActive = router.pathname === item.href;
                 return (
                   <li key={item.name}>
                     <Link
                       href={item.href}
-                      className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                      className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                         isActive
-                          ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-700'
-                          : 'text-gray-700 hover:bg-gray-100'
+                          ? 'bg-white/20 text-white border-r-4 border-accent-500 shadow-lg'
+                          : 'text-white/80 hover:bg-white/10 hover:text-white'
                       }`}
                       onClick={() => setSidebarOpen(false)}
                     >
                       <item.icon className="h-5 w-5" />
-                      <span>{item.name}</span>
+                      <span className="font-medium">{item.name}</span>
                     </Link>
                   </li>
                 );
@@ -80,94 +95,108 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
       </div>
 
       {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex flex-col flex-grow bg-white border-r border-gray-200">
-          <div className="flex h-16 items-center px-4">
-            <div className="flex items-center space-x-2">
-              <Instagram className="h-6 w-6 text-instagram-500" />
-              <span className="text-lg font-bold text-gradient">InstaReply</span>
+      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col">
+        <div className="flex flex-col flex-grow bg-gradient-to-b from-brand-950 to-brand-800 shadow-2xl">
+          <div className="flex h-20 items-center px-6">
+            <div className="flex items-center space-x-4">
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 shadow-lg">
+                <img
+                  src="/logo.png"
+                  alt="Autonique.ai Logo"
+                  className="h-12 w-12"
+                  onError={(e) => {
+                    // Fallback to a visible icon if logo fails to load
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling.style.display = 'flex';
+                  }}
+                />
+                <div className="h-12 w-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg" style={{display: 'none'}}>
+                  <span className="text-brand-950 font-bold text-xl">A</span>
+                </div>
+              </div>
+              <span className="text-2xl font-bold text-white">Autonique.ai</span>
             </div>
           </div>
-          <nav className="flex-1 px-4 py-4">
-            <ul className="space-y-2">
+          <nav className="flex-1 px-6 py-6">
+            <ul className="space-y-3">
               {navigation.map((item) => {
                 const isActive = router.pathname === item.href;
                 return (
                   <li key={item.name}>
                     <Link
                       href={item.href}
-                      className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                      className={`flex items-center space-x-4 px-4 py-4 rounded-xl transition-all duration-200 ${
                         isActive
-                          ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-700'
-                          : 'text-gray-700 hover:bg-gray-100'
+                          ? 'bg-white/20 text-white border-r-4 border-accent-500 shadow-lg'
+                          : 'text-white/80 hover:bg-white/10 hover:text-white'
                       }`}
                     >
-                      <item.icon className="h-5 w-5" />
-                      <span>{item.name}</span>
+                      <item.icon className="h-6 w-6" />
+                      <span className="font-medium text-lg">{item.name}</span>
                     </Link>
                   </li>
                 );
               })}
             </ul>
           </nav>
-          
+
           {/* User section */}
-          <div className="border-t border-gray-200 p-4">
-            <div className="flex items-center space-x-3 mb-3">
-              <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                <User className="h-4 w-4 text-primary-600" />
+          <div className="border-t border-white/20 p-6">
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-accent-500 to-yellow-400 rounded-full flex items-center justify-center shadow-lg">
+                <User className="h-6 w-6 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-lg font-semibold text-white truncate">
                   {user?.name || 'User'}
                 </p>
-                <p className="text-xs text-gray-500 truncate">
+                <p className="text-sm text-white/70 truncate">
                   {user?.email || 'No email'}
                 </p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="flex items-center space-x-3 w-full px-4 py-3 text-white/80 hover:bg-white/10 hover:text-white rounded-xl transition-all duration-200"
             >
-              <LogOut className="h-4 w-4" />
-              <span>Sign out</span>
+              <LogOut className="h-5 w-5" />
+              <span className="font-medium">Sign out</span>
             </button>
           </div>
         </div>
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-64">
+      <div className="lg:pl-72">
         {/* Top bar */}
-        <div className="sticky top-0 z-40 bg-white border-b border-gray-200">
-          <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center space-x-4">
+        <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-200/50 shadow-sm">
+          <div className="flex h-20 items-center justify-between px-6 sm:px-8 lg:px-10">
+            <div className="flex items-center space-x-6">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="text-gray-400 hover:text-gray-600 lg:hidden"
+                className="text-brand-950 hover:text-brand-800 lg:hidden"
               >
-                <Menu className="h-6 w-6" />
+                <Menu className="h-7 w-7" />
               </button>
               {title && (
-                <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
+                <h1 className="text-2xl font-bold text-brand-950">{title}</h1>
               )}
             </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="hidden sm:flex items-center space-x-2">
-                <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                  <User className="h-4 w-4 text-primary-600" />
+
+            <div className="flex items-center space-x-6">
+              <div className="hidden sm:flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-accent-500 to-yellow-400 rounded-full flex items-center justify-center shadow-lg">
+                  <User className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-lg font-semibold text-brand-950">
                   {user?.name || 'User'}
                 </span>
               </div>
               <button
                 onClick={handleLogout}
-                className="text-gray-400 hover:text-gray-600 lg:hidden"
+                className="text-brand-950 hover:text-brand-800 lg:hidden"
               >
-                <LogOut className="h-5 w-5" />
+                <LogOut className="h-6 w-6" />
               </button>
             </div>
           </div>

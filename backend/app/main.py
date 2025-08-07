@@ -67,7 +67,13 @@ app = FastAPI(
 # Security middleware
 app.add_middleware(
     TrustedHostMiddleware,
-    allowed_hosts=["*"] if settings.DEBUG else ["yourdomain.com", "*.yourdomain.com"]
+    allowed_hosts=["*"] if settings.DEBUG else [
+        "autonique.in",
+        "*.autonique.in",
+        "www.autonique.in",
+        "localhost",
+        "127.0.0.1"
+    ]
 )
 
 # CORS middleware

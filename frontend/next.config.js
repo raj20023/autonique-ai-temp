@@ -5,6 +5,48 @@ const nextConfig = {
   images: {
     domains: ['graph.facebook.com', 'scontent.cdninstagram.com'],
   },
+  async redirects() {
+    return [
+      // Force HTTPS redirect for any HTTP request
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'header',
+            key: 'x-forwarded-proto',
+            value: 'http',
+          },
+        ],
+        destination: 'https://autonique.in/:path*',
+        permanent: true,
+      },
+      // Redirect www to non-www
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'www.autonique.in',
+          },
+        ],
+        destination: 'https://autonique.in/:path*',
+        permanent: true,
+      },
+      // Catch-all HTTP redirect (additional safety)
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'header',
+            key: 'x-forwarded-proto',
+            value: '(?!https).*',
+          },
+        ],
+        destination: 'https://autonique.in/:path*',
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     // Only add rewrites if API URL is available
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
