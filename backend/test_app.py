@@ -1,24 +1,50 @@
 """
-Minimal FastAPI app for testing Railway deployment
+Ultra-minimal test app
 """
-from fastapi import FastAPI
 import os
+import sys
 
-app = FastAPI(title="Test App")
+print("=== STARTING TEST APP ===")
+print(f"Python version: {sys.version}")
+print(f"PORT env var: {os.getenv('PORT', 'NOT SET')}")
 
-@app.get("/")
-def root():
-    return {"message": "Test app is running", "port": os.getenv("PORT", "8000")}
+try:
+    from fastapi import FastAPI
+    print("✅ FastAPI imported successfully")
 
-@app.get("/health")
-def health():
-    return {"status": "healthy"}
+    app = FastAPI()
 
-@app.get("/ping")
-def ping():
-    return {"ping": "pong"}
+    @app.get("/")
+    def root():
+        return {
+            "status": "working",
+            "port": os.getenv("PORT"),
+            "env_vars": {k: v for k, v in os.environ.items() if not k.startswith("_")}
+        }
 
-if __name__ == "__main__":
-    import uvicorn
-    port = int(os.getenv("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    @app.get("/ping")
+    def ping():
+        return {"ping": "pong"}
+
+    @app.get("/debug")
+    def debug():
+        return {
+            "port": os.getenv("PORT"),
+            "railway_env": os.getenv("RAILWAY_ENVIRONMENT"),
+            "python_path": sys.path,
+            "cwd": os.getcwd()
+        }
+
+    print("✅ FastAPI app created successfully")
+
+    if __name__ == "__main__":
+        import uvicorn
+        port = int(os.getenv("PORT", 8000))
+        print(f"🚀 Starting uvicorn on port {port}")
+        uvicorn.run(app, host="0.0.0.0", port=port)
+
+except Exception as e:
+    print(f"❌ ERROR: {e}")
+    import traceback
+    traceback.print_exc()
+    sys.exit(1)
