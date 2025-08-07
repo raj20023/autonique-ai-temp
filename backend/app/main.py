@@ -33,21 +33,27 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting Autonique.ai API...")
 
-    # Create database tables
-    Base.metadata.create_all(bind=engine)
+    # Skip database operations during startup to avoid blocking
+    logger.info("Skipping database initialization during startup")
 
     # Start background cache cleanup task
-    cleanup_task = asyncio.create_task(cache_cleanup_task())
+    try:
+        cleanup_task = asyncio.create_task(cache_cleanup_task())
+        logger.info("Cache cleanup task started")
+    except Exception as e:
+        logger.warning(f"Could not start cache cleanup task: {e}")
+        cleanup_task = None
 
     yield
 
     # Shutdown
     logger.info("Shutting down Autonique.ai API...")
-    cleanup_task.cancel()
-    try:
-        await cleanup_task
-    except asyncio.CancelledError:
-        pass
+    if cleanup_task:
+        cleanup_task.cancel()
+        try:
+            await cleanup_task
+        except asyncio.CancelledError:
+            pass
 
 app = FastAPI(
     title="Autonique.ai API",
@@ -96,18 +102,33 @@ app.include_router(api_router, prefix="/api/v1")
 
 @app.get("/")
 async def root():
+    """Simple root endpoint for health checks"""
     return {
         "message": "Autonique.ai API",
         "version": "1.0.0",
         "status": "running"
     }
 
+@app.get("/ping")
+async def ping():
+    """Ultra-simple ping endpoint"""
+    return {"ping": "pong"}
+
 @app.get("/health")
 async def health_check():
-    return {
-        "status": "healthy",
-        "timestamp": time.time()
-    }
+    """Health check endpoint that doesn't depend on database"""
+    try:
+        return {
+            "status": "healthy",
+            "timestamp": time.time(),
+            "service": "autonique-backend"
+        }
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "error": str(e),
+            "timestamp": time.time()
+        }
 
 @app.get("/test")
 async def test_endpoint():
@@ -128,6 +149,16 @@ async def webhook_test():
         "verify_token": settings.WEBHOOK_VERIFY_TOKEN,
         "status": "ready"
     }
+
+@app.post("/init-db")
+async def init_database():
+    """Initialize database tables manually"""
+    try:
+        from app.core.database import engine, Base
+        Base.metadata.create_all(bind=engine)
+        return {"status": "success", "message": "Database initialized"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
 port = int(os.environ.get("PORT", 8000))
 
