@@ -16,9 +16,13 @@ export default function App({ Component, pageProps }: AppProps) {
     },
   }));
 
-  // Force HTTPS redirect on client side
+  // Force HTTPS redirect on client side (excluding health checks)
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.location.protocol === 'http:' && process.env.NODE_ENV === 'production') {
+    if (typeof window !== 'undefined' &&
+        window.location.protocol === 'http:' &&
+        process.env.NODE_ENV === 'production' &&
+        !window.location.pathname.includes('/health') &&
+        !window.location.hostname.includes('localhost')) {
       window.location.replace(window.location.href.replace('http:', 'https:'));
     }
   }, []);
@@ -29,7 +33,9 @@ export default function App({ Component, pageProps }: AppProps) {
         {/* Force HTTPS */}
         <script dangerouslySetInnerHTML={{
           __html: `
-            if (location.protocol === 'http:' && location.hostname !== 'localhost') {
+            if (location.protocol === 'http:' &&
+                location.hostname !== 'localhost' &&
+                !location.pathname.includes('/health')) {
               location.replace('https:' + window.location.href.substring(window.location.protocol.length));
             }
           `

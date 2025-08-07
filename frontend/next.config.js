@@ -7,9 +7,9 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      // Force HTTPS redirect for any HTTP request
+      // Force HTTPS redirect for any HTTP request (excluding health checks)
       {
-        source: '/:path*',
+        source: '/((?!health|api/health).*)',
         has: [
           {
             type: 'header',
@@ -20,26 +20,13 @@ const nextConfig = {
         destination: 'https://autonique.in/:path*',
         permanent: true,
       },
-      // Redirect www to non-www
+      // Redirect www to non-www (excluding health checks)
       {
-        source: '/:path*',
+        source: '/((?!health|api/health).*)',
         has: [
           {
             type: 'host',
             value: 'www.autonique.in',
-          },
-        ],
-        destination: 'https://autonique.in/:path*',
-        permanent: true,
-      },
-      // Catch-all HTTP redirect (additional safety)
-      {
-        source: '/:path*',
-        has: [
-          {
-            type: 'header',
-            key: 'x-forwarded-proto',
-            value: '(?!https).*',
           },
         ],
         destination: 'https://autonique.in/:path*',
