@@ -7,31 +7,7 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      // Force HTTPS redirect for any HTTP request (excluding health checks)
-      {
-        source: '/((?!health|api/health).*)',
-        has: [
-          {
-            type: 'header',
-            key: 'x-forwarded-proto',
-            value: 'http',
-          },
-        ],
-        destination: 'https://autonique.in/:path*',
-        permanent: true,
-      },
-      // Redirect www to non-www (excluding health checks)
-      {
-        source: '/((?!health|api/health).*)',
-        has: [
-          {
-            type: 'host',
-            value: 'www.autonique.in',
-          },
-        ],
-        destination: 'https://autonique.in/:path*',
-        permanent: true,
-      },
+      // No redirects for now - let both domains work
     ];
   },
   async rewrites() {

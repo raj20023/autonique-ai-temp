@@ -8,19 +8,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Force HTTPS redirect
-  const protocol = request.headers.get('x-forwarded-proto') || 'https';
-  const host = request.headers.get('host');
-
-  // Only redirect in production and not for localhost
-  if (protocol === 'http' && process.env.NODE_ENV === 'production' && host && !host.includes('localhost')) {
-    return NextResponse.redirect(`https://${host}${request.nextUrl.pathname}${request.nextUrl.search}`, 301);
-  }
-
-  // Optional: Redirect www to non-www (or vice versa)
-  if (host === 'www.autonique.in') {
-    return NextResponse.redirect(`https://autonique.in${request.nextUrl.pathname}${request.nextUrl.search}`, 301);
-  }
+  // No redirects for now - let both domains work
 
   return NextResponse.next();
 }
