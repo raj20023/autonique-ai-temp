@@ -110,9 +110,14 @@ async def root():
     }
 
 @app.get("/ping")
-async def ping():
+def ping():
     """Ultra-simple ping endpoint"""
     return {"ping": "pong"}
+
+@app.get("/ready")
+def ready():
+    """Readiness check"""
+    return {"status": "ready"}
 
 @app.get("/health")
 async def health_check():
