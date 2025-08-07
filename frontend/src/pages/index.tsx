@@ -49,11 +49,12 @@ const benefits = [
 export default function HomePage() {
   const router = useRouter();
 
-  useEffect(() => {
-    if (isAuthenticated()) {
-      router.push('/dashboard');
-    }
-  }, [router]);
+  // Temporarily disable auth check to debug
+  // useEffect(() => {
+  //   if (isAuthenticated()) {
+  //     router.push('/dashboard');
+  //   }
+  // }, [router]);
 
   const handleGetStarted = () => {
     router.push('/auth/login');
