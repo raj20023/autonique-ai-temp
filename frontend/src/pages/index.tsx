@@ -82,7 +82,8 @@ export default function HomePage() {
                     onError={(e) => {
                       // Fallback to a visible icon if logo fails to load
                       e.currentTarget.style.display = 'none';
-                      e.currentTarget.nextElementSibling.style.display = 'flex';
+                      const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'flex';
                     }}
                   />
                   <div className="h-12 w-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg" style={{display: 'none'}}>
@@ -127,7 +128,8 @@ export default function HomePage() {
                   onError={(e) => {
                     // Fallback to a visible icon if logo fails to load
                     e.currentTarget.style.display = 'none';
-                    e.currentTarget.nextElementSibling.style.display = 'flex';
+                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                    if (fallback) fallback.style.display = 'flex';
                   }}
                 />
                 <div className="h-20 w-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-2xl mx-auto" style={{display: 'none'}}>
@@ -200,7 +202,8 @@ export default function HomePage() {
                     className="h-12 w-12"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
-                      e.currentTarget.nextElementSibling.style.display = 'flex';
+                      const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'flex';
                     }}
                   />
                   <div className="h-12 w-12 bg-white rounded-xl flex items-center justify-center shadow-lg" style={{display: 'none'}}>
@@ -258,7 +261,8 @@ export default function HomePage() {
                       className="h-12 w-12"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
-                        e.currentTarget.nextElementSibling.style.display = 'flex';
+                        const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = 'flex';
                       }}
                     />
                     <div className="h-12 w-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg" style={{display: 'none'}}>
@@ -374,7 +378,8 @@ export default function HomePage() {
                     onError={(e) => {
                       // Fallback to a visible icon if logo fails to load
                       e.currentTarget.style.display = 'none';
-                      e.currentTarget.nextElementSibling.style.display = 'flex';
+                      const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'flex';
                     }}
                   />
                   <div className="h-10 w-10 bg-white rounded-xl flex items-center justify-center shadow-lg" style={{display: 'none'}}>
