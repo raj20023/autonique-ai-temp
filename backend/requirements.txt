@@ -18,15 +18,25 @@ httpx
 python-multipart
 requests
 
-# AI - Lightweight versions
+# AI - Complete LangChain dependencies
 google-generativeai
+langchain
 langchain-core
 langchain-google-genai
+langchain-community
+
+# ML/Math dependencies
+numpy
+scikit-learn
 
 # Configuration & Validation
 pydantic[email]
 pydantic-settings
 python-dotenv
+
+# Additional dependencies that might be needed
+typing-extensions
+email-validator
 
 # Testing (optional - can remove for production)
 pytest
