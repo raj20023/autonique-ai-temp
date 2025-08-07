@@ -5,11 +5,6 @@ const nextConfig = {
   images: {
     domains: ['graph.facebook.com', 'scontent.cdninstagram.com'],
   },
-  async redirects() {
-    return [
-      // No redirects for now - let both domains work
-    ];
-  },
   async rewrites() {
     // Only add rewrites if API URL is available
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -29,10 +24,6 @@ const nextConfig = {
         destination: `${apiUrl}/:path*`,
       },
     ];
-  },
-  // Ensure proper host binding
-  experimental: {
-    serverComponentsExternalPackages: [],
   },
 }
 
