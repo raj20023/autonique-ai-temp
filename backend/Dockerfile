@@ -9,8 +9,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Make startup script executable
-RUN chmod +x start.sh
+# Make Python startup script executable
+RUN chmod +x railway_start.py
 
-# Use the startup script
-CMD ["./start.sh"]
+# Use Python startup script (more reliable than shell)
+CMD ["python", "railway_start.py"]
