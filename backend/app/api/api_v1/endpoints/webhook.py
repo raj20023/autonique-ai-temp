@@ -17,6 +17,16 @@ from app.core.security import decrypt_token
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+@router.get("/test")
+async def test_webhook_config():
+    """Test webhook configuration"""
+    return {
+        "webhook_verify_token": settings.WEBHOOK_VERIFY_TOKEN,
+        "webhook_verify_token_length": len(settings.WEBHOOK_VERIFY_TOKEN),
+        "facebook_app_id": settings.FACEBOOK_APP_ID,
+        "status": "webhook_config_loaded"
+    }
+
 @router.get("/")
 async def verify_webhook(
     request: Request,
@@ -27,13 +37,22 @@ async def verify_webhook(
     """Verify webhook subscription with Facebook"""
     logger.info(f"Webhook verification request: mode={hub_mode}, token={hub_token}, challenge={hub_challenge}")
     logger.info(f"Request headers: {dict(request.headers)}")
+    logger.info(f"Expected token: {settings.WEBHOOK_VERIFY_TOKEN}")
+    logger.info(f"Token match: {hub_token == settings.WEBHOOK_VERIFY_TOKEN}")
 
     if hub_mode == "subscribe" and hub_token == settings.WEBHOOK_VERIFY_TOKEN:
         logger.info("Webhook verified successfully")
-        return int(hub_challenge)
+        return int(hub_challenge) if hub_challenge else 0
     else:
         logger.error(f"Webhook verification failed. Expected token: {settings.WEBHOOK_VERIFY_TOKEN}, Got: {hub_token}")
-        raise HTTPException(status_code=403, detail="Forbidden")
+        # Return more detailed error for debugging
+        return {
+            "error": "Webhook verification failed",
+            "expected_token": settings.WEBHOOK_VERIFY_TOKEN,
+            "received_token": hub_token,
+            "mode": hub_mode,
+            "challenge": hub_challenge
+        }
 
 @router.post("/")
 async def handle_webhook(request: Request):

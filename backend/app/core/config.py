@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
     # Webhook
-    WEBHOOK_VERIFY_TOKEN: str
+    WEBHOOK_VERIFY_TOKEN: str = "instareply_webhook_2024_secure_token_xyz789"
     
     # Simple caching (no Redis)
     ENABLE_CACHING: bool = True
