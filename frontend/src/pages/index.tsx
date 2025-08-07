@@ -389,9 +389,20 @@ export default function HomePage() {
                 </div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-accent-500 to-yellow-400 bg-clip-text text-transparent">Autonique.ai</span>
               </div>
-              <p className="text-white/70 text-sm">
-                © 2024 Autonique.ai. All rights reserved.
-              </p>
+
+              <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8">
+                <div className="flex items-center space-x-6">
+                  <a href="/privacy" className="text-white/70 hover:text-white text-sm transition-colors">
+                    Privacy Policy
+                  </a>
+                  <a href="/terms" className="text-white/70 hover:text-white text-sm transition-colors">
+                    Terms of Service
+                  </a>
+                </div>
+                <p className="text-white/70 text-sm">
+                  © 2024 Autonique.ai. All rights reserved.
+                </p>
+              </div>
             </div>
           </div>
         </footer>

@@ -18,9 +18,19 @@ export default function LoginPage() {
     const appId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID;
     const redirectUri = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/auth/callback`;
     const scope = 'pages_show_list,pages_messaging,instagram_basic,instagram_manage_messages';
-    
+
+    // Debug logging
+    console.log('Facebook App ID:', appId);
+    console.log('Redirect URI:', redirectUri);
+
+    if (!appId) {
+      alert('Facebook App ID is not configured. Please check your environment variables.');
+      return;
+    }
+
     const loginUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&response_type=code`;
-    
+
+    console.log('Login URL:', loginUrl);
     window.location.href = loginUrl;
   };
 
@@ -100,7 +110,14 @@ export default function LoginPage() {
 
             {/* Disclaimer */}
             <p className="text-xs text-gray-500 text-center mt-6">
-              By continuing, you agree to our Terms of Service and Privacy Policy. 
+              By continuing, you agree to our{' '}
+              <a href="/terms" target="_blank" className="text-blue-600 hover:text-blue-800 underline">
+                Terms of Service
+              </a>{' '}
+              and{' '}
+              <a href="/privacy" target="_blank" className="text-blue-600 hover:text-blue-800 underline">
+                Privacy Policy
+              </a>.
               We only access the data necessary to provide our service.
             </p>
           </motion.div>

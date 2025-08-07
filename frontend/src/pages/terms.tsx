@@ -1,4 +1,6 @@
 import Head from 'next/head';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 
 export default function TermsPage() {
   return (
@@ -6,9 +8,16 @@ export default function TermsPage() {
       <Head>
         <title>Terms of Service - Autonique.ai</title>
       </Head>
-      
+
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Navigation */}
+          <div className="mb-8">
+            <Link href="/" className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-800 transition-colors">
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back to Home</span>
+            </Link>
+          </div>
           <div className="bg-white rounded-lg shadow p-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-8">Terms of Service</h1>
             
