@@ -29,7 +29,22 @@ export default function CallbackPage() {
 
         setMessage('Exchanging authorization code...');
 
-        const redirectUri = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/auth/callback`;
+        // Force production URL since Railway env vars aren't working
+        const redirectUri = 'https://www.autonique.in/auth/callback';
+
+        console.log('=== Callback Debug ===');
+        console.log('Code:', code);
+        console.log('Redirect URI:', redirectUri);
+        console.log('API Base URL:', 'https://api.autonique.in');
+
+        // Test API connectivity first
+        try {
+          const healthCheck = await fetch('https://api.autonique.in/test');
+          console.log('API Health Check:', healthCheck.status);
+        } catch (healthError) {
+          console.error('API Health Check Failed:', healthError);
+        }
+
         const response = await authApi.handleCallback(code as string, redirectUri);
 
         setMessage('Setting up your account...');

@@ -15,9 +15,9 @@ export default function LoginPage() {
   }, [router]);
 
   const handleFacebookLogin = () => {
-    // Get environment variables with fallbacks
-    const appId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID || '2032087817551720'; // Your app ID as fallback
-    const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'https://www.autonique.in';
+    // Force production values since Railway env vars aren't working
+    const appId = '2032087817551720';
+    const frontendUrl = 'https://www.autonique.in';
     const redirectUri = `${frontendUrl}/auth/callback`;
     const scope = 'pages_show_list,pages_messaging,instagram_basic,instagram_manage_messages';
 
@@ -33,16 +33,9 @@ export default function LoginPage() {
     console.log('Frontend URL (with fallback):', frontendUrl);
     console.log('Redirect URI:', redirectUri);
 
-    if (!appId || appId === 'undefined') {
-      alert(`Facebook App ID is not configured properly.
-
-Environment Variables:
-- NEXT_PUBLIC_FACEBOOK_APP_ID: ${process.env.NEXT_PUBLIC_FACEBOOK_APP_ID}
-- NEXT_PUBLIC_FRONTEND_URL: ${process.env.NEXT_PUBLIC_FRONTEND_URL}
-
-Please check your Railway environment variables and redeploy.`);
-      return;
-    }
+    // Skip validation for now since we have fallbacks
+    console.log('Using App ID:', appId);
+    console.log('Using Frontend URL:', frontendUrl);
 
     const loginUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&response_type=code`;
 

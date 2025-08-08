@@ -1,7 +1,8 @@
 import axios, { AxiosResponse } from 'axios';
 import { AuthToken, User, Page, FAQ, Message, FAQCreateData, FAQUpdateData } from '@/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// Force production API URL since Railway env vars aren't working
+const API_BASE_URL = 'https://api.autonique.in';
 
 // Create axios instance
 const api = axios.create({
