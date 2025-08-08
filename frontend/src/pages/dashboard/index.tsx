@@ -168,6 +168,18 @@ export default function DashboardPage() {
             />
           </div>
 
+          {/* Debug Info (temporary) */}
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+            <h3 className="text-sm font-medium text-yellow-900 mb-2">Debug Info</h3>
+            <div className="text-xs text-yellow-800 space-y-1">
+              <p>Pages loaded: {pages ? `Yes (${pages.length} pages)` : 'No'}</p>
+              <p>Webhook pages: {webhookPages}</p>
+              <p>Active FAQs: {activeFAQs}</p>
+              <p>User logged in: {isLoggedIn ? 'Yes' : 'No'}</p>
+              <p>Should show webhook button: {webhookPages === 0 ? 'Yes' : 'No'}</p>
+            </div>
+          </div>
+
           {/* Quick Actions & Status */}
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Quick Actions */}
@@ -246,9 +258,15 @@ export default function DashboardPage() {
                     }`}>
                       {webhookPages > 0 ? 'Active' : 'Setup Required'}
                     </span>
-                    {webhookPages === 0 && pages && pages.length > 0 && (
+                    {webhookPages === 0 && (
                       <button
-                        onClick={() => subscribeWebhookMutation.mutate(pages[0].id)}
+                        onClick={() => {
+                          if (pages && pages.length > 0) {
+                            subscribeWebhookMutation.mutate(pages[0].id);
+                          } else {
+                            toast.error('No Instagram pages found. Please reconnect your account.');
+                          }
+                        }}
                         disabled={subscribeWebhookMutation.isLoading}
                         className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 disabled:opacity-50"
                       >
