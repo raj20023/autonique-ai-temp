@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
@@ -47,12 +47,28 @@ export default function DashboardPage() {
   const router = useRouter();
   const { user, isLoggedIn } = useAuth();
   const queryClient = useQueryClient();
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated()) {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (isClient && !isAuthenticated()) {
       router.push('/auth/login');
     }
-  }, [router]);
+  }, [isClient, router]);
+
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   const { data: pages } = useQuery(
     'pages',
