@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { useQuery } from 'react-query';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { motion } from 'framer-motion';
 import {
   MessageSquare,
@@ -17,6 +17,7 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { pagesApi, faqApi } from '@/utils/api';
 import { isAuthenticated } from '@/utils/auth';
+import toast from 'react-hot-toast';
 
 const StatCard = ({ title, value, icon: Icon, color, change }: any) => (
   <motion.div
@@ -45,6 +46,7 @@ const StatCard = ({ title, value, icon: Icon, color, change }: any) => (
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isLoggedIn } = useAuth();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -52,16 +54,29 @@ export default function DashboardPage() {
     }
   }, [router]);
 
-  const { data: pages, isLoading: pagesLoading } = useQuery(
+  const { data: pages } = useQuery(
     'pages',
     () => pagesApi.getPages().then(res => res.data),
     { enabled: isLoggedIn }
   );
 
-  const { data: faqs, isLoading: faqsLoading } = useQuery(
+  const { data: faqs } = useQuery(
     'faqs',
     () => faqApi.getFAQs().then(res => res.data),
     { enabled: isLoggedIn }
+  );
+
+  const subscribeWebhookMutation = useMutation(
+    (pageId: number) => pagesApi.subscribeWebhook(pageId),
+    {
+      onSuccess: () => {
+        toast.success('Webhook subscription activated!');
+        queryClient.invalidateQueries('pages');
+      },
+      onError: (error: any) => {
+        toast.error(error.response?.data?.detail || 'Failed to subscribe to webhooks');
+      }
+    }
   );
 
   if (!isLoggedIn) {
@@ -195,11 +210,22 @@ export default function DashboardPage() {
                     )}
                     <span className="text-gray-900">Webhook Subscription</span>
                   </div>
-                  <span className={`text-sm font-medium ${
-                    webhookPages > 0 ? 'text-green-600' : 'text-orange-600'
-                  }`}>
-                    {webhookPages > 0 ? 'Active' : 'Setup Required'}
-                  </span>
+                  <div className="flex items-center space-x-2">
+                    <span className={`text-sm font-medium ${
+                      webhookPages > 0 ? 'text-green-600' : 'text-orange-600'
+                    }`}>
+                      {webhookPages > 0 ? 'Active' : 'Setup Required'}
+                    </span>
+                    {webhookPages === 0 && pages && pages.length > 0 && (
+                      <button
+                        onClick={() => subscribeWebhookMutation.mutate(pages[0].id)}
+                        disabled={subscribeWebhookMutation.isLoading}
+                        className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 disabled:opacity-50"
+                      >
+                        {subscribeWebhookMutation.isLoading ? 'Setting up...' : 'Setup'}
+                      </button>
+                    )}
+                  </div>
                 </div>
                 
                 <div className="flex items-center justify-between">
@@ -211,11 +237,21 @@ export default function DashboardPage() {
                     )}
                     <span className="text-gray-900">FAQ Database</span>
                   </div>
-                  <span className={`text-sm font-medium ${
-                    activeFAQs > 0 ? 'text-green-600' : 'text-orange-600'
-                  }`}>
-                    {activeFAQs > 0 ? `${activeFAQs} FAQs` : 'No FAQs'}
-                  </span>
+                  <div className="flex items-center space-x-2">
+                    <span className={`text-sm font-medium ${
+                      activeFAQs > 0 ? 'text-green-600' : 'text-orange-600'
+                    }`}>
+                      {activeFAQs > 0 ? `${activeFAQs} FAQs` : 'No FAQs'}
+                    </span>
+                    {activeFAQs === 0 && (
+                      <button
+                        onClick={() => router.push('/dashboard/faqs')}
+                        className="text-xs bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700"
+                      >
+                        Add FAQs
+                      </button>
+                    )}
+                  </div>
                 </div>
                 
                 <div className="flex items-center justify-between">
