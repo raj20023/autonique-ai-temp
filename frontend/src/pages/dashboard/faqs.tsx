@@ -6,10 +6,8 @@ import { motion } from 'framer-motion';
 import {
   MessageSquare,
   Plus,
-  Edit,
   Trash2,
   CheckCircle,
-  XCircle,
   Upload
 } from 'lucide-react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -25,34 +23,11 @@ export default function FAQsPage() {
   const [newFAQ, setNewFAQ] = useState({ question: '', answer: '' });
   const [isClient, setIsClient] = useState(false);
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (isClient && !isAuthenticated()) {
-      router.push('/auth/login');
-    }
-  }, [isClient, router]);
-
-  if (!isClient) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated()) {
-    return null;
-  }
-
+  // Always call hooks at the top level
   const { data: faqs, isLoading } = useQuery(
     'faqs',
-    () => faqApi.getFAQs().then(res => res.data)
+    () => faqApi.getFAQs().then(res => res.data),
+    { enabled: isClient }
   );
 
   const createFAQMutation = useMutation(
@@ -82,6 +57,40 @@ export default function FAQsPage() {
       }
     }
   );
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (isClient && !isAuthenticated()) {
+      router.push('/auth/login');
+    }
+  }, [isClient, router]);
+
+  // Show loading state while client-side hydration happens
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading if not authenticated (will redirect)
+  if (!isAuthenticated()) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Redirecting...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleAddFAQ = (e: React.FormEvent) => {
     e.preventDefault();

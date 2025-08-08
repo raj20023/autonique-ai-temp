@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { Toaster } from 'react-hot-toast';
 import { useState } from 'react';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 import '@/styles/globals.css';
 
@@ -19,10 +20,10 @@ export default function App({ Component, pageProps }: AppProps) {
   // No client-side redirects for now
 
   return (
-    <QueryClientProvider client={queryClient}>
-
-      <Component {...pageProps} />
-      <Toaster
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <Component {...pageProps} />
+        <Toaster
         position="top-right"
         toastOptions={{
           duration: 4000,
@@ -47,6 +48,7 @@ export default function App({ Component, pageProps }: AppProps) {
         }}
       />
       <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }

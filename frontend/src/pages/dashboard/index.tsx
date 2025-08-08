@@ -49,37 +49,17 @@ export default function DashboardPage() {
   const queryClient = useQueryClient();
   const [isClient, setIsClient] = useState(false);
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (isClient && !isAuthenticated()) {
-      router.push('/auth/login');
-    }
-  }, [isClient, router]);
-
-  if (!isClient) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
+  // Always call hooks at the top level
   const { data: pages } = useQuery(
     'pages',
     () => pagesApi.getPages().then(res => res.data),
-    { enabled: isLoggedIn }
+    { enabled: isLoggedIn && isClient }
   );
 
   const { data: faqs } = useQuery(
     'faqs',
     () => faqApi.getFAQs().then(res => res.data),
-    { enabled: isLoggedIn }
+    { enabled: isLoggedIn && isClient }
   );
 
   const subscribeWebhookMutation = useMutation(
@@ -94,6 +74,40 @@ export default function DashboardPage() {
       }
     }
   );
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (isClient && !isAuthenticated()) {
+      router.push('/auth/login');
+    }
+  }, [isClient, router]);
+
+  // Show loading state while client-side hydration happens
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading if not authenticated (will redirect)
+  if (!isAuthenticated()) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Redirecting...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isLoggedIn) {
     return null;
