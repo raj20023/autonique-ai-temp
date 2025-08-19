@@ -25,6 +25,16 @@ export default function LoginPage() {
     window.location.href = loginUrl;
   };
 
+  const testCORS = async () => {
+    try {
+      const response = await fetch('https://api.autonique.in/cors-test');
+      const data = await response.json();
+      alert('CORS Test Success: ' + JSON.stringify(data, null, 2));
+    } catch (error) {
+      alert('CORS Test Failed: ' + error);
+    }
+  };
+
   const goBack = () => {
     router.push('/');
   };
@@ -93,10 +103,17 @@ export default function LoginPage() {
             {/* Login Button */}
             <button
               onClick={handleFacebookLogin}
-              className="w-full btn-instagram text-lg py-4 flex items-center justify-center space-x-3"
+              className="w-full btn-instagram text-lg py-4 flex items-center justify-center space-x-3 mb-3"
             >
               <Instagram className="h-5 w-5" />
               <span>Continue with Instagram Business</span>
+            </button>
+
+            <button
+              onClick={testCORS}
+              className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
+            >
+              Test API Connection
             </button>
 
             {/* Disclaimer */}

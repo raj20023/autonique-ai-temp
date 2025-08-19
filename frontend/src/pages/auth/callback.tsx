@@ -46,16 +46,19 @@ export default function CallbackPage() {
         }, 2000);
 
       } catch (error: any) {
+        console.error('Callback error details:', error);
         setStatus('error');
 
         let errorMessage = 'Failed to connect your Instagram account. Please try again.';
 
-        if (error.response?.status === 400) {
+        if (error.message?.includes('CORS')) {
+          errorMessage = 'Server configuration error. Please contact support.';
+        } else if (error.response?.status === 400) {
           errorMessage = error.response?.data?.detail || 'Invalid authorization code. Please try logging in again.';
         } else if (error.response?.status === 500) {
           errorMessage = 'Server error. Please try again later.';
-        } else if (error.message.includes('Network Error')) {
-          errorMessage = 'Network error. Please check your connection and try again.';
+        } else if (error.message.includes('Network Error') || error.code === 'ERR_NETWORK') {
+          errorMessage = 'Cannot connect to server. Please try again later.';
         }
 
         setMessage(errorMessage);
