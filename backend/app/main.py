@@ -76,13 +76,12 @@ app.add_middleware(
     ]
 )
 
-# CORS middleware - temporarily allow all origins for debugging
-logger.info(f"CORS allowed origins: {settings.ALLOWED_ORIGINS}")
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Temporarily allow all origins
+    allow_origins=settings.ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -126,19 +125,7 @@ async def options_handler():
     """Handle CORS preflight requests"""
     return {"message": "CORS preflight OK"}
 
-@app.get("/debug-env")
-async def debug_env():
-    """Debug endpoint to check environment variables"""
-    import os
-    return {
-        "environment": settings.ENVIRONMENT,
-        "debug": settings.DEBUG,
-        "cors_origins": settings.ALLOWED_ORIGINS,
-        "facebook_app_id": settings.FACEBOOK_APP_ID[:10] + "..." if hasattr(settings, 'FACEBOOK_APP_ID') and settings.FACEBOOK_APP_ID else "NOT SET",
-        "database_url": "SET" if settings.DATABASE_URL else "NOT SET",
-        "google_api_key": "SET" if hasattr(settings, 'GOOGLE_API_KEY') and settings.GOOGLE_API_KEY else "NOT SET",
-        "all_env_vars": [key for key in os.environ.keys() if not key.startswith('_')]
-    }
+
 
 @app.get("/ready")
 def ready():
@@ -161,37 +148,7 @@ async def health_check():
             "timestamp": time.time()
         }
 
-@app.get("/test")
-async def test_endpoint():
-    return {
-        "message": "Backend is working!",
-        "ai_model": "Gemini 2.0 Flash",
-        "framework": "LangChain",
-        "cache": "In-memory (Redis-free)",
-        "status": "operational",
-        "cors_origins": settings.ALLOWED_ORIGINS,
-        "environment": settings.ENVIRONMENT
-    }
 
-@app.get("/webhook-test")
-async def webhook_test():
-    """Simple webhook test endpoint"""
-    return {
-        "message": "Webhook endpoint is accessible",
-        "webhook_url": "/api/v1/webhook/",
-        "verify_token": settings.WEBHOOK_VERIFY_TOKEN,
-        "status": "ready"
-    }
-
-@app.post("/init-db")
-async def init_database():
-    """Initialize database tables manually"""
-    try:
-        from app.core.database import engine, Base
-        Base.metadata.create_all(bind=engine)
-        return {"status": "success", "message": "Database initialized"}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
 
 port = int(os.environ.get("PORT", 8000))
 

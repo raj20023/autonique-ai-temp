@@ -29,22 +29,7 @@ export default function CallbackPage() {
 
         setMessage('Exchanging authorization code...');
 
-        // Force production URL since Railway env vars aren't working
         const redirectUri = 'https://autonique.in/auth/callback';
-
-        console.log('=== Callback Debug ===');
-        console.log('Code:', code);
-        console.log('Redirect URI:', redirectUri);
-        console.log('API Base URL:', 'https://api.autonique.in');
-
-        // Test API connectivity first
-        try {
-          const healthCheck = await fetch('https://api.autonique.in/test');
-          console.log('API Health Check:', healthCheck.status);
-        } catch (healthError) {
-          console.error('API Health Check Failed:', healthError);
-        }
-
         const response = await authApi.handleCallback(code as string, redirectUri);
 
         setMessage('Setting up your account...');
@@ -61,14 +46,6 @@ export default function CallbackPage() {
         }, 2000);
 
       } catch (error: any) {
-        console.error('Callback error:', error);
-        console.error('Error details:', {
-          status: error.response?.status,
-          statusText: error.response?.statusText,
-          data: error.response?.data,
-          message: error.message
-        });
-
         setStatus('error');
 
         let errorMessage = 'Failed to connect your Instagram account. Please try again.';

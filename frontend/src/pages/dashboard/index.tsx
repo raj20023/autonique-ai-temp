@@ -168,52 +168,7 @@ export default function DashboardPage() {
             />
           </div>
 
-          {/* Debug Info (temporary) */}
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-            <h3 className="text-sm font-medium text-yellow-900 mb-2">Debug Info</h3>
-            <div className="text-xs text-yellow-800 space-y-1">
-              <p>Pages loaded: {pages ? `Yes (${pages.length} pages)` : 'No'}</p>
-              <p>Webhook pages: {webhookPages}</p>
-              <p>Active FAQs: {activeFAQs}</p>
-              <p>User logged in: {isLoggedIn ? 'Yes' : 'No'}</p>
-              <p>Should show webhook button: {webhookPages === 0 ? 'Yes' : 'No'}</p>
-              <p>Auth token exists: {localStorage.getItem('access_token') ? 'Yes' : 'No'}</p>
-              <p>User object: {user ? `ID: ${user.id}, Name: ${user.name}` : 'None'}</p>
-            </div>
-            <div className="mt-3">
-              <div className="flex space-x-2">
-                <button
-                  onClick={async () => {
-                    try {
-                      const response = await fetch('https://api.autonique.in/api/v1/pages/debug', {
-                        headers: {
-                          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-                          'Content-Type': 'application/json'
-                        }
-                      });
-                      const data = await response.json();
-                      alert(JSON.stringify(data, null, 2));
-                    } catch (error) {
-                      alert('Error: ' + error);
-                    }
-                  }}
-                  className="text-xs bg-yellow-600 text-white px-2 py-1 rounded hover:bg-yellow-700"
-                >
-                  Test Debug API
-                </button>
-                <button
-                  onClick={() => {
-                    // Clear auth and redirect to re-login
-                    localStorage.removeItem('access_token');
-                    window.location.href = '/auth/login';
-                  }}
-                  className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700"
-                >
-                  Re-login to Refresh Pages
-                </button>
-              </div>
-            </div>
-          </div>
+
 
           {/* Quick Actions & Status */}
           <div className="grid lg:grid-cols-2 gap-8">

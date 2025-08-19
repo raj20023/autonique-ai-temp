@@ -15,30 +15,14 @@ export default function LoginPage() {
   }, [router]);
 
   const handleFacebookLogin = () => {
-    // Force production values since Railway env vars aren't working
     const appId = '2032087817551720';
     const frontendUrl = 'https://autonique.in';
     const redirectUri = `${frontendUrl}/auth/callback`;
     const scope = 'pages_show_list,pages_messaging,instagram_basic,instagram_manage_messages';
 
-    // Comprehensive debug logging
-    console.log('=== Facebook Login Debug ===');
-    console.log('App ID:', appId);
-    console.log('Frontend URL:', frontendUrl);
-    console.log('Redirect URI:', redirectUri);
-    console.log('Scope:', scope);
-
     const loginUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&response_type=code`;
 
-    console.log('Final Login URL:', loginUrl);
-
-    // Show user the URL for manual testing
-    if (confirm('Debug Mode: Do you want to see the login URL in console? Click OK to continue with login, Cancel to copy URL to clipboard.')) {
-      window.location.href = loginUrl;
-    } else {
-      navigator.clipboard.writeText(loginUrl);
-      alert('Login URL copied to clipboard. You can paste it in a new tab to test manually.');
-    }
+    window.location.href = loginUrl;
   };
 
   const goBack = () => {

@@ -17,7 +17,7 @@ export default function App({ Component, pageProps }: AppProps) {
     },
   }));
 
-  // No client-side redirects for now
+
 
   return (
     <ErrorBoundary>
@@ -47,7 +47,7 @@ export default function App({ Component, pageProps }: AppProps) {
           },
         }}
       />
-      <ReactQueryDevtools initialIsOpen={false} />
+      {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
       </QueryClientProvider>
     </ErrorBoundary>
   );

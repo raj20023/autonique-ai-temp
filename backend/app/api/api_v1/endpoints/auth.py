@@ -65,7 +65,6 @@ async def facebook_callback(
         
         # Get user's pages and Instagram accounts
         pages = await facebook_service.get_user_pages(access_token)
-        logger.info(f"Found {len(pages)} pages for user {user.id}")
 
         for page_data in pages:
             page_id = page_data["id"]
@@ -87,9 +86,6 @@ async def facebook_callback(
                     ig_business_id, page_access_token
                 )
                 instagram_username = ig_info.get("username")
-                logger.info(f"Found Instagram account for page {page_name}: {instagram_username}")
-            else:
-                logger.warning(f"No Instagram Business Account found for page {page_name}")
 
             # Create or update page record
             existing_page = db.query(Page).filter(Page.fb_page_id == page_id).first()
@@ -104,12 +100,10 @@ async def facebook_callback(
                     instagram_username=instagram_username
                 )
                 db.add(page)
-                logger.info(f"Created new page record: {page_name}")
             else:
                 existing_page.page_access_token = encrypt_token(page_access_token)
                 existing_page.ig_business_id = ig_business_id
                 existing_page.instagram_username = instagram_username
-                logger.info(f"Updated existing page record: {page_name}")
         
         db.commit()
         
