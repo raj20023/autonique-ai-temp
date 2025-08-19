@@ -56,7 +56,7 @@ async def lifespan(app: FastAPI):
             pass
 
 app = FastAPI(
-    title="Autonique.ai API",
+    title="AutoniqueAI API",
     description="Instagram Business Auto-Reply SaaS Platform",
     version="1.0.0",
     docs_url="/docs" if settings.DEBUG else None,

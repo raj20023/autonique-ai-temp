@@ -47,7 +47,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
               <div className="bg-white/20 backdrop-blur-sm rounded-xl p-2 shadow-lg">
                 <img
                   src="/logo.png"
-                  alt="Autonique.ai Logo"
+                  alt="AutoniqueAI Logo"
                   className="h-10 w-10"
                   onError={(e) => {
                     // Fallback to a visible icon if logo fails to load
@@ -60,7 +60,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                   <span className="text-brand-950 font-bold text-lg">A</span>
                 </div>
               </div>
-              <span className="text-xl font-bold text-white">Autonique.ai</span>
+              <span className="text-xl font-bold text-white">AutoniqueAI</span>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
@@ -103,7 +103,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
               <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 shadow-lg">
                 <img
                   src="/logo.png"
-                  alt="Autonique.ai Logo"
+                  alt="AutoniqueAI Logo"
                   className="h-12 w-12"
                   onError={(e) => {
                     // Fallback to a visible icon if logo fails to load
@@ -116,7 +116,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                   <span className="text-brand-950 font-bold text-xl">A</span>
                 </div>
               </div>
-              <span className="text-2xl font-bold text-white">Autonique.ai</span>
+              <span className="text-2xl font-bold text-white">AutoniqueAI</span>
             </div>
           </div>
           <nav className="flex-1 px-6 py-6">

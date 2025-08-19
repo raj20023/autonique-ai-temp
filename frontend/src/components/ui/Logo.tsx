@@ -39,7 +39,7 @@ export default function Logo({ className = '', size = 'md', showFallback = true 
     <div className={`${sizeClasses[size]} ${className}`}>
       <img 
         src="/logo.png" 
-        alt="Autonique.ai Logo" 
+        alt="AutoniqueAI Logo"
         className={`${sizeClasses[size]} object-contain transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
         onError={handleImageError}
         onLoad={handleImageLoad}

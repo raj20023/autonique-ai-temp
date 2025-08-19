@@ -104,7 +104,7 @@ export default function FAQsPage() {
   return (
     <>
       <Head>
-        <title>FAQs - InstaReply</title>
+        <title>FAQs - AutoniqueAI</title>
       </Head>
       
       <DashboardLayout title="FAQ Management">

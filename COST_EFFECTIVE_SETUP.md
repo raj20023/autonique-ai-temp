@@ -38,7 +38,7 @@ This guide shows how to run InstaReply with minimal costs by removing expensive 
 ```bash
 # Clone and setup
 git clone <your-repo>
-cd InstaReply
+cd AutoniqueAI
 
 # Backend setup
 cd backend
@@ -48,7 +48,7 @@ pip install -r requirements.txt
 
 # Use SQLite for development (no PostgreSQL needed)
 # Edit .env:
-DATABASE_URL=sqlite:///./instareply.db
+DATABASE_URL=sqlite:///./autonique.db
 
 # Start backend
 uvicorn app.main:app --reload

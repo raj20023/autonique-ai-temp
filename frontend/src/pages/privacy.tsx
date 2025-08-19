@@ -6,7 +6,7 @@ export default function PrivacyPage() {
   return (
     <>
       <Head>
-        <title>Privacy Policy - Autonique.ai</title>
+        <title>Privacy Policy - AutoniqueAI</title>
       </Head>
 
       <div className="min-h-screen bg-gray-50 py-12">
@@ -28,7 +28,7 @@ export default function PrivacyPage() {
               
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Information We Collect</h2>
               <p className="text-gray-700 mb-4">
-                Autonique.ai collects information you provide directly to us, such as when you create an account,
+                AutoniqueAI collects information you provide directly to us, such as when you create an account,
                 connect your Instagram Business account, or contact us for support.
               </p>
               
@@ -58,7 +58,7 @@ export default function PrivacyPage() {
               
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Contact Us</h2>
               <p className="text-gray-700">
-                If you have any questions about this Privacy Policy, please contact us at privacy@autonique.ai
+                If you have any questions about this Privacy Policy, please contact us at autonique.ai@gmail.com
               </p>
             </div>
           </div>

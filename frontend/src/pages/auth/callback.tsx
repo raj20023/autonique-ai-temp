@@ -87,7 +87,7 @@ export default function CallbackPage() {
   return (
     <>
       <Head>
-        <title>Connecting Account - InstaReply</title>
+        <title>Connecting Account - AutoniqueAI</title>
         <meta name="description" content="Connecting your Instagram Business account..." />
       </Head>
 
@@ -102,7 +102,7 @@ export default function CallbackPage() {
             {/* Header */}
             <div className="flex items-center justify-center space-x-2 mb-6">
               <Instagram className="h-8 w-8 text-instagram-500" />
-              <span className="text-2xl font-bold text-gradient">InstaReply</span>
+              <span className="text-2xl font-bold text-gradient">AutoniqueAI</span>
             </div>
 
             {/* Status Icon */}

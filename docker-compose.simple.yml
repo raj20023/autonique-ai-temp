@@ -26,7 +26,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:root@postgres:5432/instareply_db
+      - DATABASE_URL=postgresql://postgres:root@postgres:5432/autonique_db
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - FACEBOOK_APP_ID=${FACEBOOK_APP_ID}
       - FACEBOOK_APP_SECRET=${FACEBOOK_APP_SECRET}

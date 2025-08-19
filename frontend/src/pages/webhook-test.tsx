@@ -8,7 +8,7 @@ export default function WebhookTestPage() {
   const testWebhook = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/v1/webhook/?hub.mode=subscribe&hub.verify_token=instareply_webhook_2024_secure_token_xyz789&hub.challenge=12345');
+      const response = await fetch('/api/v1/webhook/?hub.mode=subscribe&hub.verify_token=autonique_webhook_2024_secure_token_xyz789&hub.challenge=12345');
       const result = await response.text();
       setTestResult(`Success: ${result}`);
     } catch (error) {

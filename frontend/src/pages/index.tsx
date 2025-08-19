@@ -63,7 +63,7 @@ export default function HomePage() {
   return (
     <>
       <Head>
-        <title>Autonique.ai - Instagram Auto-Reply SaaS</title>
+        <title>AutoniqueAI - Instagram Auto-Reply SaaS</title>
         <meta name="description" content="Automatically respond to Instagram DMs with AI-powered FAQ matching. Save time and never miss a customer inquiry." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
@@ -78,7 +78,7 @@ export default function HomePage() {
                 <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 shadow-lg">
                   <img
                     src="/logo.png"
-                    alt="Autonique.ai Logo"
+                    alt="AutoniqueAI Logo"
                     className="h-12 w-12 drop-shadow-lg"
                     onError={(e) => {
                       // Fallback to a visible icon if logo fails to load
@@ -91,7 +91,7 @@ export default function HomePage() {
                     <span className="text-brand-950 font-bold text-xl">A</span>
                   </div>
                 </div>
-                <span className="text-3xl font-bold text-white drop-shadow-lg">Autonique.ai</span>
+                <span className="text-3xl font-bold text-white drop-shadow-lg">AutoniqueAI</span>
               </div>
               <div className="hidden md:flex items-center space-x-8">
                 <Link href="#features" className="text-white/90 hover:text-white transition-colors font-medium">
@@ -124,7 +124,7 @@ export default function HomePage() {
               <div className="inline-block bg-white/20 backdrop-blur-sm rounded-3xl p-8 shadow-2xl">
                 <img
                   src="/logo.png"
-                  alt="Autonique.ai Logo"
+                  alt="AutoniqueAI Logo"
                   className="h-20 w-20 mx-auto drop-shadow-2xl"
                   onError={(e) => {
                     // Fallback to a visible icon if logo fails to load
@@ -276,7 +276,7 @@ export default function HomePage() {
                   Transform your customer service
                 </h2>
                 <p className="text-xl text-white/90 mb-10 leading-relaxed">
-                  Join thousands of businesses already using Autonique.ai to provide
+                  Join thousands of businesses already using AutoniqueAI to provide
                   instant, accurate customer support on Instagram.
                 </p>
 
@@ -353,7 +353,7 @@ export default function HomePage() {
               Ready to automate your Instagram customer service?
             </h2>
             <p className="text-2xl text-white/90 mb-12 font-medium">
-              Join thousands of businesses saving time with Autonique.ai
+              Join thousands of businesses saving time with AutoniqueAI
             </p>
             <button
               onClick={handleGetStarted}
@@ -374,7 +374,7 @@ export default function HomePage() {
                 <div className="bg-gradient-to-r from-accent-500 to-yellow-400 rounded-2xl p-3 shadow-lg">
                   <img
                     src="/logo.png"
-                    alt="Autonique.ai Logo"
+                    alt="AutoniqueAI Logo"
                     className="h-10 w-10"
                     onError={(e) => {
                       // Fallback to a visible icon if logo fails to load
@@ -387,7 +387,7 @@ export default function HomePage() {
                     <span className="text-brand-950 font-bold text-lg">A</span>
                   </div>
                 </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-accent-500 to-yellow-400 bg-clip-text text-transparent">Autonique.ai</span>
+                <span className="text-2xl font-bold bg-gradient-to-r from-accent-500 to-yellow-400 bg-clip-text text-transparent">AutoniqueAI</span>
               </div>
 
               <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8">
@@ -400,7 +400,7 @@ export default function HomePage() {
                   </a>
                 </div>
                 <p className="text-white/70 text-sm">
-                  © 2024 Autonique.ai. All rights reserved.
+                  © 2024 AutoniqueAI. All rights reserved.
                 </p>
               </div>
             </div>

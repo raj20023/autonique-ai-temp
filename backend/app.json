@@ -1,5 +1,5 @@
 {
-  "name": "Autonique.ai Backend",
+  "name": "AutoniqueAI Backend",
   "description": "Instagram Auto-Reply SaaS Backend with Gemini AI",
   "keywords": ["python", "fastapi", "instagram", "ai", "gemini"],
   "website": "https://github.com/yourusername/autonique-ai",

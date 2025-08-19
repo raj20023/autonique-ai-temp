@@ -1,4 +1,4 @@
-# InstaReply - Instagram Business Auto-Reply SaaS
+# AutoniqueAI - Instagram Business Auto-Reply SaaS
 
 A complete SaaS platform that automatically responds to Instagram DMs using AI-powered FAQ matching.
 
@@ -13,7 +13,7 @@ A complete SaaS platform that automatically responds to Instagram DMs using AI-p
 ## 🏗️ Architecture
 
 ```
-InstaReply/
+AutoniqueAI/
 ├── frontend/          # Next.js React app
 ├── backend/           # FastAPI Python backend
 ├── database/          # PostgreSQL schemas and migrations
@@ -45,7 +45,7 @@ InstaReply/
 
 ```bash
 git clone <your-repo>
-cd InstaReply
+cd AutoniqueAI
 ```
 
 ### 2. Backend Setup
@@ -75,7 +75,7 @@ npm run dev
 
 ```bash
 # Create PostgreSQL database
-createdb instareply_db
+createdb autonique_db
 
 # Run migrations
 cd backend

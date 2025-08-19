@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Railway startup script for Autonique.ai
+Railway startup script for AutoniqueAI
 Handles PORT environment variable properly
 """
 import os
@@ -11,7 +11,7 @@ def main():
     # Get port from environment variable
     port = os.getenv("PORT", "8000")
     
-    print(f"🚀 Starting Autonique.ai API on port {port}")
+    print(f"🚀 Starting AutoniqueAI API on port {port}")
     print(f"Environment: {os.getenv('ENVIRONMENT', 'development')}")
     
     # Start uvicorn with proper port

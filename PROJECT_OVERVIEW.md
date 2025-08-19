@@ -1,8 +1,8 @@
-# InstaReply - Complete Project Overview
+# AutoniqueAI - Complete Project Overview
 
 ## 🎯 Project Summary
 
-InstaReply is a complete SaaS platform that automatically responds to Instagram DMs using AI-powered FAQ matching. Built with modern technologies and ready for production deployment.
+AutoniqueAI is a complete SaaS platform that automatically responds to Instagram DMs using AI-powered FAQ matching. Built with modern technologies and ready for production deployment.
 
 ## 🏗️ Architecture Overview
 
@@ -21,7 +21,7 @@ InstaReply is a complete SaaS platform that automatically responds to Instagram 
 ## 📁 Project Structure
 
 ```
-InstaReply/
+AutoniqueAI/
 ├── 📁 backend/                 # FastAPI Python backend
 │   ├── 📁 app/
 │   │   ├── 📁 api/             # API routes
@@ -291,4 +291,4 @@ MIT License - see LICENSE file for details.
 
 ---
 
-**InstaReply** - Automate your Instagram customer service with AI-powered responses. Built with ❤️ using modern web technologies.
+**AutoniqueAI** - Automate your Instagram customer service with AI-powered responses. Built with ❤️ using modern web technologies.

@@ -6,7 +6,7 @@ export default function TermsPage() {
   return (
     <>
       <Head>
-        <title>Terms of Service - Autonique.ai</title>
+        <title>Terms of Service - AutoniqueAI</title>
       </Head>
 
       <div className="min-h-screen bg-gray-50 py-12">
@@ -28,13 +28,13 @@ export default function TermsPage() {
               
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Acceptance of Terms</h2>
               <p className="text-gray-700 mb-4">
-                By accessing and using Autonique.ai, you accept and agree to be bound by the terms
+                By accessing and using AutoniqueAI, you accept and agree to be bound by the terms
                 and provision of this agreement.
               </p>
               
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Service Description</h2>
               <p className="text-gray-700 mb-4">
-                Autonique.ai is an automated customer service platform that helps businesses respond
+                AutoniqueAI is an automated customer service platform that helps businesses respond
                 to Instagram direct messages using AI-powered FAQ matching and response generation.
               </p>
               
@@ -55,13 +55,13 @@ export default function TermsPage() {
               
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Limitation of Liability</h2>
               <p className="text-gray-700 mb-4">
-                Autonique.ai shall not be liable for any indirect, incidental, special, consequential,
+                AutoniqueAI shall not be liable for any indirect, incidental, special, consequential,
                 or punitive damages resulting from your use of the service.
               </p>
               
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Contact Us</h2>
               <p className="text-gray-700">
-                If you have any questions about these Terms of Service, please contact us at terms@autonique.ai
+                If you have any questions about these Terms of Service, please contact us at autonique.ai@gmail.com
               </p>
             </div>
           </div>

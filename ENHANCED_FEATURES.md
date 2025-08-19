@@ -1,4 +1,4 @@
-# InstaReply Enhanced Features with Gemini 2.0 Flash + LangChain
+# AutoniqueAI Enhanced Features with Gemini 2.0 Flash + LangChain
 
 ## 🚀 **Major Upgrades**
 

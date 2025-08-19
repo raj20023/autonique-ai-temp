@@ -1,6 +1,6 @@
-# InstaReply Deployment Guide
+# AutoniqueAI Deployment Guide
 
-This guide covers deploying InstaReply to production environments.
+This guide covers deploying AutoniqueAI to production environments.
 
 ## 🚀 Quick Deploy Options
 

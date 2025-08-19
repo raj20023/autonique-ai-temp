@@ -50,7 +50,7 @@ export default function LoginPage() {
   return (
     <>
       <Head>
-        <title>Login - InstaReply</title>
+        <title>Login - AutoniqueAI</title>
         <meta name="description" content="Connect your Instagram Business account to start automating your DMs" />
       </Head>
 
@@ -76,7 +76,7 @@ export default function LoginPage() {
             <div className="text-center mb-8">
               <div className="flex items-center justify-center space-x-2 mb-4">
                 <Instagram className="h-8 w-8 text-instagram-500" />
-                <span className="text-2xl font-bold text-gradient">InstaReply</span>
+                <span className="text-2xl font-bold text-gradient">AutoniqueAI</span>
               </div>
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
                 Connect Your Instagram Business

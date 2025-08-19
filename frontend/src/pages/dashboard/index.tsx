@@ -120,7 +120,7 @@ export default function DashboardPage() {
   return (
     <>
       <Head>
-        <title>Dashboard - InstaReply</title>
+        <title>Dashboard - AutoniqueAI</title>
         <meta name="description" content="Manage your Instagram auto-reply system" />
       </Head>
 

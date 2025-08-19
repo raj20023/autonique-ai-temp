@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Starting Autonique.ai API..."
+echo "🚀 Starting AutoniqueAI API..."
 echo "PORT environment variable: ${PORT:-8000}"
 
 # Start the application

@@ -30,12 +30,12 @@ except Exception as e:
     sys.exit(1)
 
 print("🔄 Creating FastAPI app...", flush=True)
-app = FastAPI(title="Autonique Test")
+app = FastAPI(title="AutoniqueAI Test")
 
 @app.get("/")
 def root():
     print("📥 Root endpoint called", flush=True)
-    return {"status": "working", "message": "Autonique.ai test app is running!"}
+    return {"status": "working", "message": "AutoniqueAI test app is running!"}
 
 @app.get("/ping")
 def ping():
