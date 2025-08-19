@@ -64,22 +64,21 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Security middleware
+# Security middleware - Allow all hosts for now
 app.add_middleware(
     TrustedHostMiddleware,
-    allowed_hosts=["*"] if settings.DEBUG else [
-        "autonique.in",
-        "*.autonique.in",
-        "www.autonique.in",
-        "localhost",
-        "127.0.0.1"
-    ]
+    allowed_hosts=["*"]
 )
 
-# CORS middleware
+# CORS middleware - Explicit origins for credentials support
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origins=[
+        "https://autonique.in",
+        "https://www.autonique.in",
+        "http://localhost:3000",
+        "http://localhost:3001"
+    ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
@@ -120,10 +119,28 @@ def ping():
     """Ultra-simple ping endpoint"""
     return {"ping": "pong"}
 
+@app.get("/cors-test")
+def cors_test(request: Request):
+    """Test CORS configuration"""
+    return {
+        "message": "CORS test successful",
+        "origin": request.headers.get("origin"),
+        "user_agent": request.headers.get("user-agent"),
+        "host": request.headers.get("host")
+    }
+
 @app.options("/{path:path}")
-async def options_handler():
+async def options_handler(request: Request):
     """Handle CORS preflight requests"""
-    return {"message": "CORS preflight OK"}
+    return JSONResponse(
+        content={"message": "CORS preflight OK"},
+        headers={
+            "Access-Control-Allow-Origin": request.headers.get("origin", "*"),
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Credentials": "true",
+        }
+    )
 
 
 
