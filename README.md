@@ -86,7 +86,7 @@ alembic upgrade head
 
 ### Backend (.env)
 ```
-DATABASE_URL=postgresql://user:password@localhost/instareply_db
+DATABASE_URL=postgresql://user:password@localhost/autonique_db
 FACEBOOK_APP_ID=your_facebook_app_id
 FACEBOOK_APP_SECRET=your_facebook_app_secret
 GOOGLE_API_KEY=your_google_gemini_api_key

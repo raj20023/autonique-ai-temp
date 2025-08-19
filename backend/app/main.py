@@ -111,7 +111,7 @@ app.include_router(api_router, prefix="/api/v1")
 async def root():
     """Simple root endpoint for health checks"""
     return {
-        "message": "Autonique.ai API",
+        "message": "AutoniqueAI API",
         "version": "1.0.0",
         "status": "running"
     }

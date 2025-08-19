@@ -5,7 +5,7 @@ import os
 
 class Settings(BaseSettings):
     # Database
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://username:password@localhost:5432/instareply_db")
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://username:password@localhost:5432/autonique_db")
 
     @field_validator('DATABASE_URL')
     @classmethod

@@ -32,7 +32,7 @@ export default function WebhookTestPage() {
   return (
     <>
       <Head>
-        <title>Webhook Test - Autonique.ai</title>
+        <title>Webhook Test - AutoniqueAI</title>
       </Head>
       
       <div className="min-h-screen bg-gray-50 py-12">

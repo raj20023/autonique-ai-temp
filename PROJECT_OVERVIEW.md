@@ -164,7 +164,7 @@ docker-compose up -d
 
 #### Backend (.env)
 ```bash
-DATABASE_URL=postgresql://user:pass@localhost/instareply_db
+DATABASE_URL=postgresql://user:pass@localhost/autonique_db
 FACEBOOK_APP_ID=your_facebook_app_id
 FACEBOOK_APP_SECRET=your_facebook_app_secret
 OPENAI_API_KEY=your_openai_api_key

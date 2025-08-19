@@ -30,7 +30,7 @@ export default function CallbackPage() {
         setMessage('Exchanging authorization code...');
 
         // Force production URL since Railway env vars aren't working
-        const redirectUri = 'https://www.autonique.in/auth/callback';
+        const redirectUri = 'https://autonique.in/auth/callback';
 
         console.log('=== Callback Debug ===');
         console.log('Code:', code);
@@ -62,11 +62,26 @@ export default function CallbackPage() {
 
       } catch (error: any) {
         console.error('Callback error:', error);
+        console.error('Error details:', {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          message: error.message
+        });
+
         setStatus('error');
-        setMessage(
-          error.response?.data?.detail || 
-          'Failed to connect your Instagram account. Please try again.'
-        );
+
+        let errorMessage = 'Failed to connect your Instagram account. Please try again.';
+
+        if (error.response?.status === 400) {
+          errorMessage = error.response?.data?.detail || 'Invalid authorization code. Please try logging in again.';
+        } else if (error.response?.status === 500) {
+          errorMessage = 'Server error. Please try again later.';
+        } else if (error.message.includes('Network Error')) {
+          errorMessage = 'Network error. Please check your connection and try again.';
+        }
+
+        setMessage(errorMessage);
         toast.error('Authentication failed');
       }
     };

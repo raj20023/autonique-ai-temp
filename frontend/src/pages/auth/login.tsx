@@ -17,30 +17,28 @@ export default function LoginPage() {
   const handleFacebookLogin = () => {
     // Force production values since Railway env vars aren't working
     const appId = '2032087817551720';
-    const frontendUrl = 'https://www.autonique.in';
+    const frontendUrl = 'https://autonique.in';
     const redirectUri = `${frontendUrl}/auth/callback`;
     const scope = 'pages_show_list,pages_messaging,instagram_basic,instagram_manage_messages';
 
     // Comprehensive debug logging
-    console.log('=== Environment Variables Debug ===');
-    console.log('NODE_ENV:', process.env.NODE_ENV);
-    console.log('All NEXT_PUBLIC vars:', Object.keys(process.env).filter(key => key.startsWith('NEXT_PUBLIC_')));
-    console.log('NEXT_PUBLIC_FACEBOOK_APP_ID:', process.env.NEXT_PUBLIC_FACEBOOK_APP_ID);
-    console.log('NEXT_PUBLIC_FRONTEND_URL:', process.env.NEXT_PUBLIC_FRONTEND_URL);
-    console.log('NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
-    console.log('=== Computed Values ===');
-    console.log('Facebook App ID (with fallback):', appId);
-    console.log('Frontend URL (with fallback):', frontendUrl);
+    console.log('=== Facebook Login Debug ===');
+    console.log('App ID:', appId);
+    console.log('Frontend URL:', frontendUrl);
     console.log('Redirect URI:', redirectUri);
-
-    // Skip validation for now since we have fallbacks
-    console.log('Using App ID:', appId);
-    console.log('Using Frontend URL:', frontendUrl);
+    console.log('Scope:', scope);
 
     const loginUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&response_type=code`;
 
     console.log('Final Login URL:', loginUrl);
-    window.location.href = loginUrl;
+
+    // Show user the URL for manual testing
+    if (confirm('Debug Mode: Do you want to see the login URL in console? Click OK to continue with login, Cancel to copy URL to clipboard.')) {
+      window.location.href = loginUrl;
+    } else {
+      navigator.clipboard.writeText(loginUrl);
+      alert('Login URL copied to clipboard. You can paste it in a new tab to test manually.');
+    }
   };
 
   const goBack = () => {
