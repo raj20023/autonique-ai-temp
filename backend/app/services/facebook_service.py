@@ -112,7 +112,7 @@ class FacebookService:
         params = {
             "client_id": self.app_id,
             "redirect_uri": redirect_uri,
-            "scope": "pages_show_list,pages_messaging,instagram_basic,instagram_manage_messages",
+            "scope": "pages_show_list,pages_messaging,instagram_basic,instagram_manage_messages,pages_read_engagement",
             "response_type": "code"
         }
         if state:
