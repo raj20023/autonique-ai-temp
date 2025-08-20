@@ -455,7 +455,16 @@ async def check_token_info(
 
     try:
         # Check user token
-        user_access_token = decrypt_token(current_user.access_token)
+        try:
+            user_access_token = decrypt_token(current_user.access_token)
+            user_token_decryption_ok = True
+        except Exception as e:
+            logger.error(f"Failed to decrypt user access token: {e}")
+            return {
+                "error": "Failed to decrypt user access token",
+                "details": str(e),
+                "solution": "Please logout and login again to refresh your tokens"
+            }
 
         # Get token debug info
         async with httpx.AsyncClient() as client:
@@ -494,13 +503,28 @@ async def check_token_info(
                             "expires_at": expires_at,
                             "expires_text": expires_text,
                             "is_valid": page_debug.get("data", {}).get("is_valid", False),
-                            "scopes": page_debug.get("data", {}).get("scopes", [])
+                            "scopes": page_debug.get("data", {}).get("scopes", []),
+                            "decryption_ok": True
                         })
                     except Exception as e:
+                        error_msg = str(e)
+                        if "InvalidToken" in error_msg or "decrypt" in error_msg.lower():
+                            error_type = "Token decryption failed - need to re-login"
+                        else:
+                            error_type = "API call failed"
+
                         page_token_info.append({
                             "page_name": page.page_name,
-                            "error": str(e)
+                            "error": error_msg,
+                            "error_type": error_type,
+                            "decryption_ok": False
                         })
+                else:
+                    page_token_info.append({
+                        "page_name": page.page_name,
+                        "error": "No access token stored",
+                        "error_type": "Missing token"
+                    })
 
         user_expires_at = user_debug.get("data", {}).get("expires_at", 0)
         user_expires_text = "Never expires" if user_expires_at == 0 else f"Expires at timestamp: {user_expires_at}"
@@ -516,6 +540,38 @@ async def check_token_info(
 
     except Exception as e:
         return {"error": str(e)}
+
+@app.post("/force-token-refresh")
+async def force_token_refresh(
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """Force refresh all tokens for current user"""
+    from app.services.token_refresh_service import TokenRefreshService
+
+    try:
+        token_service = TokenRefreshService()
+        success = await token_service.refresh_user_tokens(db, current_user)
+
+        if success:
+            return {
+                "success": True,
+                "message": "Tokens refreshed successfully",
+                "recommendation": "Try using auto-reply feature again"
+            }
+        else:
+            return {
+                "success": False,
+                "message": "Token refresh failed",
+                "recommendation": "Please logout and login again to get fresh tokens"
+            }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "recommendation": "Please logout and login again to get fresh tokens"
+        }
 
 port = int(os.environ.get("PORT", 8000))
 

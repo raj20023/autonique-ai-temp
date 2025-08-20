@@ -535,6 +535,44 @@ ${pageTokensList || 'No page tokens found'}
                   <span className="text-sm text-indigo-600">Token Info</span>
                 </button>
 
+                <button
+                  onClick={async () => {
+                    try {
+                      const accessToken = localStorage.getItem('access_token');
+                      if (!accessToken) {
+                        alert('No access token found. Please login again.');
+                        return;
+                      }
+
+                      const confirmRefresh = confirm('🔄 Force Token Refresh\n\nThis will attempt to refresh all your Facebook/Instagram tokens.\n\nProceed?');
+                      if (!confirmRefresh) return;
+
+                      const response = await fetch('https://api.autonique.in/force-token-refresh', {
+                        method: 'POST',
+                        headers: {
+                          'Authorization': `Bearer ${accessToken}`,
+                          'Content-Type': 'application/json'
+                        }
+                      });
+                      const data = await response.json();
+
+                      if (data.success) {
+                        alert(`✅ Token Refresh Successful!\n\n${data.message}\n\n💡 ${data.recommendation}`);
+                      } else {
+                        alert(`❌ Token Refresh Failed\n\n${data.message || data.error}\n\n💡 ${data.recommendation}`);
+                      }
+                    } catch (error) {
+                      alert('❌ Error during token refresh: ' + error + '\n\n💡 Please logout and login again.');
+                    }
+                  }}
+                  className="w-full flex items-center justify-between p-4 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors border border-orange-200"
+                >
+                  <div className="flex items-center space-x-3">
+                    <span className="text-sm font-medium text-orange-800">🔄 Force Token Refresh</span>
+                  </div>
+                  <span className="text-sm text-orange-600">Refresh Now</span>
+                </button>
+
               </div>
             </motion.div>
 
