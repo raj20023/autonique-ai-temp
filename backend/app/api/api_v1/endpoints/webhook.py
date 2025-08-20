@@ -67,6 +67,22 @@ async def handle_webhook(request: Request):
         logger.error(f"Webhook processing error: {e}")
         return {"status": "error", "message": str(e)}
 
+# Add routes without trailing slash for Facebook compatibility
+@router.get("")
+async def verify_webhook_no_slash(
+    request: Request,
+    hub_mode: str = Query(alias="hub.mode", default=None),
+    hub_token: str = Query(alias="hub.verify_token", default=None),
+    hub_challenge: str = Query(alias="hub.challenge", default=None)
+):
+    """Verify webhook subscription with Facebook (no trailing slash)"""
+    return await verify_webhook(request, hub_mode, hub_token, hub_challenge)
+
+@router.post("")
+async def handle_webhook_no_slash(request: Request):
+    """Handle incoming Instagram messages (no trailing slash)"""
+    return await handle_webhook(request)
+
 async def process_webhook_entry(entry: dict):
     """Process a single webhook entry"""
     try:

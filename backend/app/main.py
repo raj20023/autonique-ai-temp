@@ -384,6 +384,18 @@ async def check_recent_messages(
     except Exception as e:
         return {"error": str(e)}
 
+@app.get("/test-webhook-url")
+async def test_webhook_url():
+    """Test webhook URL accessibility"""
+    return {
+        "webhook_urls": [
+            "https://api.autonique.in/api/v1/webhook",
+            "https://api.autonique.in/api/v1/webhook/"
+        ],
+        "verify_token": settings.WEBHOOK_VERIFY_TOKEN,
+        "message": "Both webhook URLs should be accessible"
+    }
+
 
 
 port = int(os.environ.get("PORT", 8000))
