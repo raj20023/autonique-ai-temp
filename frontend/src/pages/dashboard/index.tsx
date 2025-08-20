@@ -498,30 +498,17 @@ This should match one of the IG Business IDs above.`);
                       if (data.error) {
                         alert('❌ Error checking token info:\n\n' + data.error);
                       } else {
-                        const pageTokensList = data.page_tokens.map((token: any) => {
-                          if (token.error) {
-                            return `❌ ${token.page_name}: Error - ${token.error}`;
-                          }
-                          return `${token.expires_at === 0 ? '✅' : '⚠️'} ${token.page_name}
-  • ${token.expires_text}
-  • Valid: ${token.is_valid ? '✅' : '❌'}
-  • Scopes: ${token.scopes?.length || 0} permissions`;
-                        }).join('\n\n');
+                        const pageStatusList = data.page_token_statuses.join('\n');
 
-                        alert(`🔐 Token Information:
+                        alert(`🔐 Token Status Check:
 
 👤 User Token:
-• ${data.user_expires_text}
-• Valid: ${data.user_is_valid ? '✅' : '❌'}
-• Scopes: ${data.user_scopes?.length || 0} permissions
+${data.user_token_status}
 
 📄 Page Tokens:
-${pageTokensList || 'No page tokens found'}
+${pageStatusList || 'No page tokens found'}
 
-📋 Summary: ${data.summary}
-
-💡 Long-lived tokens (never expire) are best for production!
-⚠️ If tokens expire frequently, we may need to implement better refresh logic.`);
+� ${data.recommendation}`);
                       }
                     } catch (error) {
                       alert('Error checking token info: ' + error);
@@ -535,43 +522,7 @@ ${pageTokensList || 'No page tokens found'}
                   <span className="text-sm text-indigo-600">Token Info</span>
                 </button>
 
-                <button
-                  onClick={async () => {
-                    try {
-                      const accessToken = localStorage.getItem('access_token');
-                      if (!accessToken) {
-                        alert('No access token found. Please login again.');
-                        return;
-                      }
 
-                      const confirmRefresh = confirm('🔄 Force Token Refresh\n\nThis will attempt to refresh all your Facebook/Instagram tokens.\n\nProceed?');
-                      if (!confirmRefresh) return;
-
-                      const response = await fetch('https://api.autonique.in/force-token-refresh', {
-                        method: 'POST',
-                        headers: {
-                          'Authorization': `Bearer ${accessToken}`,
-                          'Content-Type': 'application/json'
-                        }
-                      });
-                      const data = await response.json();
-
-                      if (data.success) {
-                        alert(`✅ Token Refresh Successful!\n\n${data.message}\n\n💡 ${data.recommendation}`);
-                      } else {
-                        alert(`❌ Token Refresh Failed\n\n${data.message || data.error}\n\n💡 ${data.recommendation}`);
-                      }
-                    } catch (error) {
-                      alert('❌ Error during token refresh: ' + error + '\n\n💡 Please logout and login again.');
-                    }
-                  }}
-                  className="w-full flex items-center justify-between p-4 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors border border-orange-200"
-                >
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm font-medium text-orange-800">🔄 Force Token Refresh</span>
-                  </div>
-                  <span className="text-sm text-orange-600">Refresh Now</span>
-                </button>
 
               </div>
             </motion.div>

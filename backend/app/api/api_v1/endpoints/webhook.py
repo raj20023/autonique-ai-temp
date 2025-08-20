@@ -194,42 +194,10 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
 
             try:
                 page_access_token = decrypt_token(page.page_access_token)
-                logger.info("Successfully decrypted page access token")
             except Exception as e:
                 logger.error(f"Failed to decrypt page access token: {e}")
-                logger.error(f"Page access token (encrypted): {page.page_access_token[:50]}...")
-
-                # Try to decrypt user token first
-                try:
-                    user_access_token = decrypt_token(user.access_token)
-                    logger.info("User access token decryption successful")
-
-                    # Try to get fresh page token using Facebook API
-                    from app.services.facebook_service import FacebookService
-                    facebook_service = FacebookService()
-
-                    # Get fresh page token
-                    page_token_data = await facebook_service.get_page_access_token(
-                        page.fb_page_id, user_access_token
-                    )
-
-                    if page_token_data and page_token_data.get("access_token"):
-                        page_access_token = page_token_data["access_token"]
-
-                        # Update the stored token with fresh encryption
-                        from app.core.security import encrypt_token
-                        page.page_access_token = encrypt_token(page_access_token)
-                        db.commit()
-                        logger.info("Successfully refreshed and re-encrypted page access token")
-                    else:
-                        logger.error("Failed to get fresh page token from Facebook API")
-                        return
-
-                except Exception as refresh_error:
-                    logger.error(f"Failed to refresh token: {refresh_error}")
-                    logger.error(f"User access token (encrypted): {user.access_token[:50]}...")
-                    logger.error("Both user and page token decryption failed - user needs to re-login")
-                    return
+                logger.error("User needs to logout and login again to refresh tokens")
+                return
 
             logger.info(f"Attempting to send auto-reply to sender_id: {sender_id}")
             logger.info(f"Using Instagram Business ID: {page.ig_business_id}")
