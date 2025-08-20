@@ -160,6 +160,74 @@ async def health_check():
             "timestamp": time.time()
         }
 
+@app.get("/debug-system")
+async def debug_system(
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """Debug system status for troubleshooting auto-reply issues"""
+    from app.services.facebook_service import FacebookService
+    from app.core.security import decrypt_token
+    from app.models.page import Page
+    from app.models.faq import FAQ
+    from app.models.message import Message
+
+    try:
+        # Get user's pages
+        pages = db.query(Page).filter(Page.user_id == current_user.id).all()
+
+        # Get user's FAQs
+        faqs = db.query(FAQ).filter(
+            FAQ.user_id == current_user.id,
+            FAQ.is_active == True
+        ).all()
+
+        # Get recent messages
+        recent_messages = db.query(Message).filter(
+            Message.user_id == current_user.id
+        ).order_by(Message.created_at.desc()).limit(5).all()
+
+        # Check webhook subscriptions
+        facebook_service = FacebookService()
+        webhook_status = []
+
+        for page in pages:
+            if page.ig_business_id:
+                page_access_token = decrypt_token(page.page_access_token)
+                # Check if webhook is subscribed (this is a simplified check)
+                webhook_status.append({
+                    "page_name": page.page_name,
+                    "page_id": page.fb_page_id,
+                    "ig_business_id": page.ig_business_id,
+                    "webhook_subscribed": page.webhook_subscribed,
+                    "has_access_token": bool(page.page_access_token)
+                })
+
+        return {
+            "user_id": current_user.fb_user_id,
+            "user_name": current_user.name,
+            "pages_count": len(pages),
+            "pages": webhook_status,
+            "faqs_count": len(faqs),
+            "faqs": [{"id": faq.id, "question": faq.question[:50] + "...", "has_embedding": bool(faq.embedding_vector)} for faq in faqs],
+            "recent_messages_count": len(recent_messages),
+            "recent_messages": [
+                {
+                    "id": msg.id,
+                    "message_text": msg.message_text[:50] + "...",
+                    "auto_replied": msg.auto_replied,
+                    "response_text": msg.response_text[:50] + "..." if msg.response_text else None,
+                    "created_at": msg.created_at.isoformat()
+                } for msg in recent_messages
+            ],
+            "webhook_url": "https://api.autonique.in/api/v1/webhook/",
+            "webhook_verify_token": settings.WEBHOOK_VERIFY_TOKEN,
+            "system_status": "operational"
+        }
+
+    except Exception as e:
+        return {"error": str(e), "system_status": "error"}
+
 
 
 port = int(os.environ.get("PORT", 8000))

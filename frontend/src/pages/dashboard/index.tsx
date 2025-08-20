@@ -227,6 +227,58 @@ export default function DashboardPage() {
                   </div>
                   <span className="text-sm text-gray-500">→</span>
                 </button>
+
+                <button
+                  onClick={async () => {
+                    try {
+                      const accessToken = localStorage.getItem('access_token');
+                      if (!accessToken) {
+                        alert('No access token found. Please login again.');
+                        return;
+                      }
+
+                      const response = await fetch('https://api.autonique.in/debug-system', {
+                        headers: {
+                          'Authorization': `Bearer ${accessToken}`,
+                          'Content-Type': 'application/json'
+                        }
+                      });
+                      const data = await response.json();
+
+                      if (data.error) {
+                        alert('Error checking system:\n' + data.error);
+                      } else {
+                        const debugInfo = `🔍 AutoniqueAI System Debug Report
+
+👤 User: ${data.user_name} (ID: ${data.user_id})
+
+📄 Pages: ${data.pages_count} connected
+${data.pages.map(p => `  • ${p.page_name} (Instagram: ${p.ig_business_id ? 'Connected' : 'Not Connected'}, Webhook: ${p.webhook_subscribed ? 'Active' : 'Inactive'})`).join('\n')}
+
+❓ FAQs: ${data.faqs_count} active
+${data.faqs.map(f => `  • ${f.question} (Embedding: ${f.has_embedding ? 'Yes' : 'No'})`).join('\n')}
+
+💬 Recent Messages: ${data.recent_messages_count}
+${data.recent_messages.map(m => `  • "${m.message_text}" (Auto-replied: ${m.auto_replied ? 'Yes' : 'No'})`).join('\n')}
+
+🔗 Webhook URL: ${data.webhook_url}
+🔑 Webhook Token: ${data.webhook_verify_token}
+
+Status: ${data.system_status}`;
+
+                        alert(debugInfo);
+                      }
+                    } catch (error) {
+                      alert('Error: ' + error);
+                    }
+                  }}
+                  className="w-full flex items-center justify-between p-4 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors border border-orange-200"
+                >
+                  <div className="flex items-center space-x-3">
+                    <span className="text-sm font-medium text-orange-800">🔍 Debug Auto-Reply System</span>
+                  </div>
+                  <span className="text-sm text-orange-600">Troubleshoot</span>
+                </button>
                 
 
               </div>
