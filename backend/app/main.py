@@ -1,7 +1,8 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy.orm import Session
 import time
 import os
 import logging
@@ -10,8 +11,10 @@ from contextlib import asynccontextmanager
 
 from app.core.config import settings
 from app.api.api_v1.api import api_router
-from app.core.database import engine, Base
+from app.core.database import engine, Base, get_db
 from app.core.cache import cleanup_expired_cache_entries
+from app.api.deps import get_current_active_user
+from app.models.user import User
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -119,48 +122,7 @@ def ping():
     """Ultra-simple ping endpoint"""
     return {"ping": "pong"}
 
-@app.get("/cors-test")
-def cors_test(request: Request):
-    """Test CORS configuration"""
-    return {
-        "message": "CORS test successful",
-        "origin": request.headers.get("origin"),
-        "user_agent": request.headers.get("user-agent"),
-        "host": request.headers.get("host")
-    }
 
-@app.get("/facebook-test")
-async def facebook_test():
-    """Test Facebook Graph API configuration"""
-    from app.services.facebook_service import FacebookService
-
-    facebook_service = FacebookService()
-
-    return {
-        "graph_url": facebook_service.graph_url,
-        "app_id": facebook_service.app_id[:10] + "..." if facebook_service.app_id else "NOT SET",
-        "app_secret": "SET" if facebook_service.app_secret else "NOT SET",
-        "test_url": f"{facebook_service.graph_url}/me/accounts"
-    }
-
-@app.get("/debug-permissions")
-async def debug_permissions(access_token: str):
-    """Debug endpoint to check Facebook permissions"""
-    from app.services.facebook_service import FacebookService
-
-    facebook_service = FacebookService()
-
-    try:
-        permissions = await facebook_service.get_user_permissions(access_token)
-        pages = await facebook_service.get_user_pages(access_token)
-
-        return {
-            "permissions": permissions,
-            "pages_count": len(pages),
-            "pages": pages
-        }
-    except Exception as e:
-        return {"error": str(e)}
 
 @app.options("/{path:path}")
 async def options_handler(request: Request):

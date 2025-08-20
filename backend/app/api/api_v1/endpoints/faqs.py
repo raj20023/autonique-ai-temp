@@ -179,47 +179,4 @@ async def test_faq_match(
             "message": "No matching FAQ found"
         }
 
-@router.post("/test-smart-response")
-async def test_smart_response(
-    message: str,
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_db)
-):
-    """Test smart response generation (FAQ + AI fallback)"""
-    faq_service = FAQService()
-    response = await faq_service.find_smart_response(db, current_user.id, message)
 
-    return {
-        "response": response,
-        "message": "Smart response generated"
-    }
-
-@router.get("/suggestions")
-async def get_faq_suggestions(
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_db)
-):
-    """Get FAQ suggestions based on unmatched messages"""
-    faq_service = FAQService()
-    suggestions = await faq_service.improve_faq_from_interactions(db, current_user.id)
-
-    return {
-        "suggestions": suggestions,
-        "count": len(suggestions),
-        "message": f"Found {len(suggestions)} FAQ suggestions"
-    }
-
-@router.post("/analyze-message")
-async def analyze_message_context(
-    message: str,
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_db)
-):
-    """Analyze message context (sentiment, intent, etc.)"""
-    faq_service = FAQService()
-    context = await faq_service.analyze_message_context(db, current_user.id, message)
-
-    return {
-        "context": context,
-        "message": "Message context analyzed"
-    }

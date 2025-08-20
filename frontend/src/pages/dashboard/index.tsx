@@ -19,6 +19,21 @@ import { pagesApi, faqApi } from '@/utils/api';
 import { isAuthenticated } from '@/utils/auth';
 import toast from 'react-hot-toast';
 
+// API function to get user statistics
+const getUserStats = async () => {
+  const token = localStorage.getItem('access_token');
+  const response = await fetch('https://api.autonique.in/api/v1/users/stats', {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch statistics');
+  }
+  return response.json();
+};
+
 const StatCard = ({ title, value, icon: Icon, color, change }: any) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
@@ -30,8 +45,8 @@ const StatCard = ({ title, value, icon: Icon, color, change }: any) => (
       <div>
         <p className="text-sm font-medium text-gray-600">{title}</p>
         <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
-        {change && (
-          <p className={`text-sm mt-1 ${change > 0 ? 'text-green-600' : 'text-red-600'}`}>
+        {change !== null && change !== undefined && (
+          <p className={`text-sm mt-1 ${change > 0 ? 'text-green-600' : change < 0 ? 'text-red-600' : 'text-gray-500'}`}>
             {change > 0 ? '+' : ''}{change}% from last week
           </p>
         )}
@@ -60,6 +75,16 @@ export default function DashboardPage() {
     'faqs',
     () => faqApi.getFAQs().then(res => res.data),
     { enabled: isLoggedIn && isClient }
+  );
+
+  // Fetch user statistics
+  const { data: stats } = useQuery(
+    'userStats',
+    getUserStats,
+    {
+      enabled: isLoggedIn && isClient,
+      refetchInterval: 30000 // Refresh every 30 seconds
+    }
   );
 
   const subscribeWebhookMutation = useMutation(
@@ -113,8 +138,8 @@ export default function DashboardPage() {
     return null;
   }
 
-  const activeFAQs = faqs?.filter(faq => faq.is_active).length || 0;
-  const connectedPages = pages?.filter(page => page.ig_business_id).length || 0;
+  const activeFAQs = stats?.active_faqs || 0;
+  const connectedPages = stats?.connected_pages || 0;
   const webhookPages = pages?.filter(page => page.webhook_subscribed).length || 0;
 
   return (
@@ -143,28 +168,28 @@ export default function DashboardPage() {
               value={activeFAQs}
               icon={MessageSquare}
               color="bg-blue-500"
-              change={12}
+              change={null}
             />
             <StatCard
               title="Connected Pages"
               value={connectedPages}
               icon={Instagram}
               color="bg-purple-500"
-              change={0}
+              change={null}
             />
             <StatCard
               title="Auto-Replies Sent"
-              value="247"
+              value={stats?.auto_replies_sent || 0}
               icon={TrendingUp}
               color="bg-green-500"
-              change={23}
+              change={stats?.recent_activity?.auto_reply_change_percent || null}
             />
             <StatCard
               title="Response Time"
-              value="0.3s"
+              value={stats?.avg_response_time || "< 1s"}
               icon={Clock}
               color="bg-orange-500"
-              change={-15}
+              change={null}
             />
           </div>
 
@@ -203,115 +228,7 @@ export default function DashboardPage() {
                   <span className="text-sm text-gray-500">→</span>
                 </button>
                 
-                <button
-                  onClick={() => router.push('/dashboard/faqs?tab=test')}
-                  className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <div className="flex items-center space-x-3">
-                    <TrendingUp className="h-5 w-5 text-purple-600" />
-                    <span className="font-medium text-gray-900">Test Bot Response</span>
-                  </div>
-                  <span className="text-sm text-gray-500">→</span>
-                </button>
 
-                <button
-                  onClick={async () => {
-                    try {
-                      const response = await fetch('https://api.autonique.in/facebook-test');
-                      const data = await response.json();
-                      alert('Facebook API Config:\n' + JSON.stringify(data, null, 2));
-                    } catch (error) {
-                      alert('Error: ' + error);
-                    }
-                  }}
-                  className="w-full flex items-center justify-between p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg transition-colors border border-yellow-200"
-                >
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm font-medium text-yellow-800">🔧 Test Facebook API</span>
-                  </div>
-                  <span className="text-sm text-yellow-600">Debug</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    const debugInfo = {
-                      pages_count: pages ? pages.length : 'null',
-                      pages_data: pages,
-                      webhook_pages: webhookPages,
-                      active_faqs: activeFAQs,
-                      user_logged_in: isLoggedIn,
-                      auth_token_exists: typeof window !== 'undefined' ? !!localStorage.getItem('access_token') : 'unknown'
-                    };
-                    alert('Dashboard Debug Info:\n' + JSON.stringify(debugInfo, null, 2));
-                  }}
-                  className="w-full flex items-center justify-between p-4 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200"
-                >
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm font-medium text-red-800">🐛 Debug Dashboard Data</span>
-                  </div>
-                  <span className="text-sm text-red-600">Debug</span>
-                </button>
-
-                <button
-                  onClick={async () => {
-                    try {
-                      const response = await fetch('https://api.autonique.in/api/v1/pages/', {
-                        headers: {
-                          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-                          'Content-Type': 'application/json'
-                        }
-                      });
-                      const data = await response.json();
-                      alert('Pages API Response:\n' + JSON.stringify(data, null, 2));
-                      // Refresh the page to update the data
-                      window.location.reload();
-                    } catch (error) {
-                      alert('Pages API Error: ' + error);
-                    }
-                  }}
-                  className="w-full flex items-center justify-between p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors border border-green-200"
-                >
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm font-medium text-green-800">🔄 Refresh Pages</span>
-                  </div>
-                  <span className="text-sm text-green-600">API Test</span>
-                </button>
-
-                <button
-                  onClick={async () => {
-                    try {
-                      const accessToken = localStorage.getItem('access_token');
-                      if (!accessToken) {
-                        alert('No access token found. Please login again.');
-                        return;
-                      }
-
-                      const response = await fetch(`https://api.autonique.in/debug-permissions?access_token=${encodeURIComponent(accessToken)}`);
-                      const data = await response.json();
-
-                      if (data.error) {
-                        alert('Error checking permissions:\n' + data.error);
-                      } else {
-                        const grantedPerms = data.permissions?.data?.filter((p: any) => p.status === 'granted').map((p: any) => p.permission) || [];
-                        alert(`Facebook Permissions Debug:
-
-Granted Permissions: ${grantedPerms.join(', ')}
-Pages Found: ${data.pages_count}
-Pages: ${data.pages?.map((p: any) => `${p.name} (Instagram: ${p.instagram_business_account ? 'Yes' : 'No'})`).join(', ') || 'None'}
-
-Full Response: ${JSON.stringify(data, null, 2)}`);
-                      }
-                    } catch (error) {
-                      alert('Error: ' + error);
-                    }
-                  }}
-                  className="w-full flex items-center justify-between p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
-                >
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm font-medium text-blue-800">🔐 Check FB Permissions</span>
-                  </div>
-                  <span className="text-sm text-blue-600">Debug</span>
-                </button>
               </div>
             </motion.div>
 

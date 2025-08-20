@@ -17,15 +17,7 @@ from app.core.security import decrypt_token
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-@router.get("/test")
-async def test_webhook_config():
-    """Test webhook configuration"""
-    return {
-        "webhook_verify_token": settings.WEBHOOK_VERIFY_TOKEN,
-        "webhook_verify_token_length": len(settings.WEBHOOK_VERIFY_TOKEN),
-        "facebook_app_id": settings.FACEBOOK_APP_ID,
-        "status": "webhook_config_loaded"
-    }
+
 
 @router.get("/")
 async def verify_webhook(
