@@ -213,6 +213,24 @@ export default function DashboardPage() {
                   </div>
                   <span className="text-sm text-gray-500">→</span>
                 </button>
+
+                <button
+                  onClick={async () => {
+                    try {
+                      const response = await fetch('https://api.autonique.in/facebook-test');
+                      const data = await response.json();
+                      alert('Facebook API Config:\n' + JSON.stringify(data, null, 2));
+                    } catch (error) {
+                      alert('Error: ' + error);
+                    }
+                  }}
+                  className="w-full flex items-center justify-between p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg transition-colors border border-yellow-200"
+                >
+                  <div className="flex items-center space-x-3">
+                    <span className="text-sm font-medium text-yellow-800">🔧 Test Facebook API</span>
+                  </div>
+                  <span className="text-sm text-yellow-600">Debug</span>
+                </button>
               </div>
             </motion.div>
 

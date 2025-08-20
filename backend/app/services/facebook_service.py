@@ -27,16 +27,31 @@ class FacebookService:
 
     async def get_user_pages(self, access_token: str) -> List[Dict]:
         """Get user's Facebook pages"""
+        url = f"{self.graph_url}/me/accounts"
+        params = {
+            "access_token": access_token,
+            "fields": "id,name,access_token,instagram_business_account"
+        }
+
+        logger.info(f"Fetching pages from: {url}")
+        logger.info(f"Using Graph API version: {self.graph_url}")
+
         async with httpx.AsyncClient() as client:
-            response = await client.get(
-                f"{self.graph_url}/me/accounts",
-                params={
-                    "access_token": access_token,
-                    "fields": "id,name,access_token,instagram_business_account"
-                }
-            )
-            response.raise_for_status()
-            return response.json().get("data", [])
+            response = await client.get(url, params=params)
+            logger.info(f"Facebook API response status: {response.status_code}")
+
+            if response.status_code != 200:
+                logger.error(f"Facebook API error: {response.text}")
+                response.raise_for_status()
+
+            data = response.json()
+            pages = data.get("data", [])
+            logger.info(f"Found {len(pages)} pages from Facebook API")
+
+            for page in pages:
+                logger.info(f"Page: {page.get('name')} - Has Instagram: {bool(page.get('instagram_business_account'))}")
+
+            return pages
 
     async def get_instagram_business_account(self, page_id: str, page_access_token: str) -> Optional[Dict]:
         """Get Instagram Business Account connected to a Facebook page"""

@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     # Facebook/Instagram API
     FACEBOOK_APP_ID: str
     FACEBOOK_APP_SECRET: str
-    FACEBOOK_GRAPH_API_VERSION: str = "v18.0"
+    FACEBOOK_GRAPH_API_VERSION: str = "v19.0"
     
     # Google Gemini
     GOOGLE_API_KEY: str

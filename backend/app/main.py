@@ -129,6 +129,20 @@ def cors_test(request: Request):
         "host": request.headers.get("host")
     }
 
+@app.get("/facebook-test")
+async def facebook_test():
+    """Test Facebook Graph API configuration"""
+    from app.services.facebook_service import FacebookService
+
+    facebook_service = FacebookService()
+
+    return {
+        "graph_url": facebook_service.graph_url,
+        "app_id": facebook_service.app_id[:10] + "..." if facebook_service.app_id else "NOT SET",
+        "app_secret": "SET" if facebook_service.app_secret else "NOT SET",
+        "test_url": f"{facebook_service.graph_url}/me/accounts"
+    }
+
 @app.options("/{path:path}")
 async def options_handler(request: Request):
     """Handle CORS preflight requests"""
