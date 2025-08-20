@@ -324,6 +324,57 @@ ${data.success ? 'Message API call succeeded!' : 'Message API call failed - chec
                   <span className="text-sm text-purple-600">Test API</span>
                 </button>
 
+                <button
+                  onClick={async () => {
+                    try {
+                      const accessToken = localStorage.getItem('access_token');
+                      if (!accessToken) {
+                        alert('No access token found. Please login again.');
+                        return;
+                      }
+
+                      const response = await fetch('https://api.autonique.in/check-instagram-api', {
+                        headers: {
+                          'Authorization': `Bearer ${accessToken}`,
+                          'Content-Type': 'application/json'
+                        }
+                      });
+                      const data = await response.json();
+
+                      if (data.error) {
+                        alert('❌ Instagram API Check Failed:\n\n' + data.error);
+                      } else {
+                        const accountsInfo = data.instagram_accounts.map((acc: any) => {
+                          if (acc.error) {
+                            return `❌ ${acc.page_name}: Error - ${acc.error}`;
+                          }
+                          return `${acc.api_access_working ? '✅' : '❌'} ${acc.page_name} (@${acc.instagram_username})
+  • Instagram Messages: ${acc.has_instagram_manage_messages ? '✅' : '❌'}
+  • Pages Messaging: ${acc.has_pages_messaging ? '✅' : '❌'}
+  • Permissions: ${acc.permissions.join(', ')}`;
+                        }).join('\n\n');
+
+                        alert(`📱 Instagram API Configuration Check:
+
+Total Accounts: ${data.total_accounts}
+Working Accounts: ${data.working_accounts}
+
+${accountsInfo}
+
+${data.working_accounts === data.total_accounts ? '✅ All accounts configured correctly!' : '❌ Some accounts have permission issues.'}`);
+                      }
+                    } catch (error) {
+                      alert('Error checking Instagram API: ' + error);
+                    }
+                  }}
+                  className="w-full flex items-center justify-between p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
+                >
+                  <div className="flex items-center space-x-3">
+                    <span className="text-sm font-medium text-blue-800">🔐 Check Instagram API Permissions</span>
+                  </div>
+                  <span className="text-sm text-blue-600">Check Config</span>
+                </button>
+
               </div>
             </motion.div>
 

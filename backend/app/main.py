@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 import time
 import os
 import logging
@@ -228,9 +229,12 @@ async def debug_system(
     except Exception as e:
         return {"error": str(e), "system_status": "error"}
 
+class TestMessageRequest(BaseModel):
+    message_text: str
+
 @app.post("/test-instagram-message")
 async def test_instagram_message(
-    message_text: str,
+    request: TestMessageRequest,
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
@@ -259,7 +263,7 @@ async def test_instagram_message(
         success = await instagram_service.send_message(
             page.ig_business_id,
             test_recipient_id,
-            message_text,
+            request.message_text,
             page_access_token
         )
 
@@ -267,9 +271,73 @@ async def test_instagram_message(
             "success": success,
             "page_name": page.page_name,
             "ig_business_id": page.ig_business_id,
-            "message": message_text,
+            "message": request.message_text,
             "test_recipient": test_recipient_id,
             "note": "Check server logs for detailed API response"
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/check-instagram-api")
+async def check_instagram_api(
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """Check Instagram API configuration and permissions"""
+    from app.services.facebook_service import FacebookService
+    from app.core.security import decrypt_token
+    from app.models.page import Page
+
+    try:
+        # Get user's pages
+        pages = db.query(Page).filter(
+            Page.user_id == current_user.id,
+            Page.ig_business_id.isnot(None)
+        ).all()
+
+        if not pages:
+            return {"error": "No Instagram Business accounts found"}
+
+        facebook_service = FacebookService()
+        results = []
+
+        for page in pages:
+            try:
+                page_access_token = decrypt_token(page.page_access_token)
+
+                # Test Instagram account access
+                ig_info = await facebook_service.get_instagram_account_info(
+                    page.ig_business_id, page_access_token
+                )
+
+                # Check permissions
+                permissions = await facebook_service.get_user_permissions(page_access_token)
+                granted_perms = [p["permission"] for p in permissions.get("data", []) if p.get("status") == "granted"]
+
+                results.append({
+                    "page_name": page.page_name,
+                    "ig_business_id": page.ig_business_id,
+                    "instagram_username": ig_info.get("username") if ig_info else "Error fetching",
+                    "instagram_name": ig_info.get("name") if ig_info else "Error fetching",
+                    "permissions": granted_perms,
+                    "has_instagram_manage_messages": "instagram_manage_messages" in granted_perms,
+                    "has_pages_messaging": "pages_messaging" in granted_perms,
+                    "api_access_working": bool(ig_info)
+                })
+
+            except Exception as e:
+                results.append({
+                    "page_name": page.page_name,
+                    "ig_business_id": page.ig_business_id,
+                    "error": str(e),
+                    "api_access_working": False
+                })
+
+        return {
+            "instagram_accounts": results,
+            "total_accounts": len(results),
+            "working_accounts": len([r for r in results if r.get("api_access_working", False)])
         }
 
     except Exception as e:

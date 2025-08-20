@@ -145,3 +145,16 @@ class FacebookService:
             )
             response.raise_for_status()
             return response.json()
+
+    async def get_instagram_account_info(self, ig_business_id: str, access_token: str) -> Dict:
+        """Get Instagram business account information"""
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.graph_url}/{ig_business_id}",
+                params={
+                    "fields": "username,name,profile_picture_url,followers_count",
+                    "access_token": access_token
+                }
+            )
+            response.raise_for_status()
+            return response.json()
