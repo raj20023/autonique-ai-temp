@@ -53,8 +53,12 @@ async def handle_webhook(request: Request):
         body = await request.json()
         logger.info(f"Webhook received: {json.dumps(body, indent=2)}")
         
-        # Verify this is a page subscription
-        if body.get("object") != "page":
+        # Verify this is a page or instagram subscription
+        webhook_object = body.get("object")
+        logger.info(f"Webhook object type: {webhook_object}")
+
+        if webhook_object not in ["page", "instagram"]:
+            logger.info(f"Ignoring webhook object type: {webhook_object}")
             return {"status": "ok"}
         
         # Process each entry
