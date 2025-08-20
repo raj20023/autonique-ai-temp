@@ -174,9 +174,16 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
             created_at=datetime.fromtimestamp(timestamp / 1000) if timestamp else datetime.utcnow()
         )
         
+        # Check if user has any FAQs
+        from app.models.faq import FAQ
+        faq_count = db.query(FAQ).filter(FAQ.user_id == user.id, FAQ.is_active == True).count()
+        logger.info(f"User has {faq_count} active FAQs")
+
         # Find smart response (FAQ matching + AI fallback)
+        logger.info(f"Looking for smart response for message: '{message_text}'")
         faq_service = FAQService()
         response_text = await faq_service.find_smart_response(db, user.id, message_text)
+        logger.info(f"Smart response generated: '{response_text}'")
 
         if response_text:
             # Try to find FAQ match for logging
@@ -212,9 +219,15 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
             logger.info(f"No response generated for message: {message_text}")
         
         # Save message record
+        logger.info(f"Saving message record to database")
         db.add(message_record)
         db.commit()
+        logger.info(f"Message record saved successfully")
         
     except Exception as e:
         logger.error(f"Error processing message event: {e}")
+        logger.error(f"Exception type: {type(e).__name__}")
+        logger.error(f"Exception details: {str(e)}")
+        import traceback
+        logger.error(f"Full traceback: {traceback.format_exc()}")
         db.rollback()
