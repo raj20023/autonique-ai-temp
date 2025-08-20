@@ -117,9 +117,11 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
         sender_id = sender.get("id")
         message_id = message_data.get("mid")
         message_text = message_data.get("text", "")
-        
+
+        logger.info(f"Processing message - Sender ID: {sender_id}, Message ID: {message_id}, Text: {message_text}")
+
         if not sender_id or not message_id or not message_text:
-            logger.warning("Incomplete message data received")
+            logger.warning(f"Incomplete message data - Sender ID: {sender_id}, Message ID: {message_id}, Text: '{message_text}'")
             return
         
         # Check if we've already processed this message
@@ -151,6 +153,10 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
             # Send reply via Instagram
             instagram_service = InstagramService()
             page_access_token = decrypt_token(page.page_access_token)
+
+            logger.info(f"Attempting to send auto-reply to sender_id: {sender_id}")
+            logger.info(f"Using Instagram Business ID: {page.ig_business_id}")
+            logger.info(f"Response text: {response_text}")
 
             success = await instagram_service.send_message(
                 page.ig_business_id,

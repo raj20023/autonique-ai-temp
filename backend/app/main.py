@@ -343,6 +343,47 @@ async def check_instagram_api(
     except Exception as e:
         return {"error": str(e)}
 
+@app.get("/check-recent-messages")
+async def check_recent_messages(
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """Check recent message processing activity"""
+    from app.models.message import Message
+    from datetime import datetime, timedelta
+
+    try:
+        # Get recent messages (last 24 hours)
+        yesterday = datetime.utcnow() - timedelta(days=1)
+        recent_messages = db.query(Message).filter(
+            Message.user_id == current_user.id,
+            Message.created_at >= yesterday
+        ).order_by(Message.created_at.desc()).limit(10).all()
+
+        message_details = []
+        for msg in recent_messages:
+            message_details.append({
+                "id": msg.id,
+                "ig_message_id": msg.ig_message_id,
+                "ig_user_id": msg.ig_user_id,
+                "message_text": msg.message_text,
+                "response_text": msg.response_text,
+                "auto_replied": msg.auto_replied,
+                "reply_sent_at": msg.reply_sent_at.isoformat() if msg.reply_sent_at else None,
+                "created_at": msg.created_at.isoformat(),
+                "similarity_score": msg.similarity_score
+            })
+
+        return {
+            "total_recent_messages": len(message_details),
+            "messages": message_details,
+            "auto_replied_count": len([m for m in message_details if m["auto_replied"]]),
+            "failed_replies": len([m for m in message_details if m["response_text"] and not m["auto_replied"]])
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
+
 
 
 port = int(os.environ.get("PORT", 8000))

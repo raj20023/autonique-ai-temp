@@ -375,6 +375,57 @@ ${data.working_accounts === data.total_accounts ? '✅ All accounts configured c
                   <span className="text-sm text-blue-600">Check Config</span>
                 </button>
 
+                <button
+                  onClick={async () => {
+                    try {
+                      const accessToken = localStorage.getItem('access_token');
+                      if (!accessToken) {
+                        alert('No access token found. Please login again.');
+                        return;
+                      }
+
+                      const response = await fetch('https://api.autonique.in/check-recent-messages', {
+                        headers: {
+                          'Authorization': `Bearer ${accessToken}`,
+                          'Content-Type': 'application/json'
+                        }
+                      });
+                      const data = await response.json();
+
+                      if (data.error) {
+                        alert('❌ Error checking recent messages:\n\n' + data.error);
+                      } else {
+                        const messagesList = data.messages.map((msg: any) => {
+                          return `${msg.auto_replied ? '✅' : '❌'} "${msg.message_text.substring(0, 30)}..."
+  • From: ${msg.ig_user_id}
+  • Response: ${msg.response_text ? msg.response_text.substring(0, 30) + '...' : 'None'}
+  • Sent: ${msg.reply_sent_at ? new Date(msg.reply_sent_at).toLocaleString() : 'Not sent'}
+  • Score: ${msg.similarity_score || 'N/A'}`;
+                        }).join('\n\n');
+
+                        alert(`📬 Recent Message Processing (Last 24h):
+
+Total Messages: ${data.total_recent_messages}
+Auto-Replied: ${data.auto_replied_count}
+Failed Replies: ${data.failed_replies}
+
+Recent Messages:
+${messagesList || 'No recent messages found'}
+
+${data.failed_replies > 0 ? '⚠️ Some replies failed to send - check server logs for Instagram API errors.' : data.auto_replied_count > 0 ? '✅ Auto-replies are working!' : '⚠️ No auto-replies sent recently.'}`);
+                      }
+                    } catch (error) {
+                      alert('Error checking recent messages: ' + error);
+                    }
+                  }}
+                  className="w-full flex items-center justify-between p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors border border-green-200"
+                >
+                  <div className="flex items-center space-x-3">
+                    <span className="text-sm font-medium text-green-800">📬 Check Recent Message Processing</span>
+                  </div>
+                  <span className="text-sm text-green-600">View Activity</span>
+                </button>
+
               </div>
             </motion.div>
 
