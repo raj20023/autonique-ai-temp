@@ -478,6 +478,63 @@ This should match one of the IG Business IDs above.`);
                   <span className="text-sm text-yellow-600">Check IDs</span>
                 </button>
 
+                <button
+                  onClick={async () => {
+                    try {
+                      const accessToken = localStorage.getItem('access_token');
+                      if (!accessToken) {
+                        alert('No access token found. Please login again.');
+                        return;
+                      }
+
+                      const response = await fetch('https://api.autonique.in/check-token-info', {
+                        headers: {
+                          'Authorization': `Bearer ${accessToken}`,
+                          'Content-Type': 'application/json'
+                        }
+                      });
+                      const data = await response.json();
+
+                      if (data.error) {
+                        alert('❌ Error checking token info:\n\n' + data.error);
+                      } else {
+                        const pageTokensList = data.page_tokens.map((token: any) => {
+                          if (token.error) {
+                            return `❌ ${token.page_name}: Error - ${token.error}`;
+                          }
+                          return `${token.expires_at === 0 ? '✅' : '⚠️'} ${token.page_name}
+  • ${token.expires_text}
+  • Valid: ${token.is_valid ? '✅' : '❌'}
+  • Scopes: ${token.scopes?.length || 0} permissions`;
+                        }).join('\n\n');
+
+                        alert(`🔐 Token Information:
+
+👤 User Token:
+• ${data.user_expires_text}
+• Valid: ${data.user_is_valid ? '✅' : '❌'}
+• Scopes: ${data.user_scopes?.length || 0} permissions
+
+📄 Page Tokens:
+${pageTokensList || 'No page tokens found'}
+
+📋 Summary: ${data.summary}
+
+💡 Long-lived tokens (never expire) are best for production!
+⚠️ If tokens expire frequently, we may need to implement better refresh logic.`);
+                      }
+                    } catch (error) {
+                      alert('Error checking token info: ' + error);
+                    }
+                  }}
+                  className="w-full flex items-center justify-between p-4 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors border border-indigo-200"
+                >
+                  <div className="flex items-center space-x-3">
+                    <span className="text-sm font-medium text-indigo-800">🔐 Check Token Expiration</span>
+                  </div>
+                  <span className="text-sm text-indigo-600">Token Info</span>
+                </button>
+
               </div>
             </motion.div>
 

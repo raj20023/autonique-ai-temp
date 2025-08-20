@@ -158,3 +158,20 @@ class FacebookService:
             )
             response.raise_for_status()
             return response.json()
+
+    async def get_page_access_token(self, page_id: str, user_access_token: str) -> Optional[Dict]:
+        """Get page access token for a specific page"""
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    f"{self.graph_url}/{page_id}",
+                    params={
+                        "fields": "access_token",
+                        "access_token": user_access_token
+                    }
+                )
+                response.raise_for_status()
+                return response.json()
+        except Exception as e:
+            logger.error(f"Failed to get page access token for {page_id}: {e}")
+            return None

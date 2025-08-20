@@ -191,7 +191,28 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
 
             # Send reply via Instagram
             instagram_service = InstagramService()
-            page_access_token = decrypt_token(page.page_access_token)
+
+            try:
+                page_access_token = decrypt_token(page.page_access_token)
+            except Exception as e:
+                logger.error(f"Failed to decrypt page access token: {e}")
+                # Try to refresh the token
+                from app.services.facebook_service import FacebookService
+                facebook_service = FacebookService()
+                try:
+                    # Get fresh token using the user's access token
+                    user_access_token = decrypt_token(user.access_token)
+                    fresh_token_data = await facebook_service.exchange_for_long_lived_token(user_access_token)
+                    page_access_token = fresh_token_data["access_token"]
+
+                    # Update the stored token
+                    from app.core.security import encrypt_token
+                    page.page_access_token = encrypt_token(page_access_token)
+                    db.commit()
+                    logger.info("Successfully refreshed page access token")
+                except Exception as refresh_error:
+                    logger.error(f"Failed to refresh token: {refresh_error}")
+                    return
 
             logger.info(f"Attempting to send auto-reply to sender_id: {sender_id}")
             logger.info(f"Using Instagram Business ID: {page.ig_business_id}")
@@ -203,6 +224,33 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
                 response_text,
                 page_access_token
             )
+
+            # If failed, try refreshing token and retry once
+            if not success:
+                logger.info("First attempt failed, trying to refresh token and retry...")
+                try:
+                    from app.services.facebook_service import FacebookService
+                    facebook_service = FacebookService()
+                    user_access_token = decrypt_token(user.access_token)
+                    fresh_token_data = await facebook_service.exchange_for_long_lived_token(user_access_token)
+                    fresh_page_token = fresh_token_data["access_token"]
+
+                    # Retry with fresh token
+                    success = await instagram_service.send_message(
+                        page.ig_business_id,
+                        sender_id,
+                        response_text,
+                        fresh_page_token
+                    )
+
+                    if success:
+                        # Update stored token if retry succeeded
+                        from app.core.security import encrypt_token
+                        page.page_access_token = encrypt_token(fresh_page_token)
+                        db.commit()
+                        logger.info("Retry with fresh token succeeded")
+                except Exception as retry_error:
+                    logger.error(f"Token refresh retry failed: {retry_error}")
 
             if success:
                 if faq_match:

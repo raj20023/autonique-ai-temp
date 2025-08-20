@@ -48,6 +48,15 @@ async def lifespan(app: FastAPI):
         logger.warning(f"Could not start cache cleanup task: {e}")
         cleanup_task = None
 
+    # Start token refresh service
+    try:
+        from app.services.token_refresh_service import token_refresh_service
+        token_task = asyncio.create_task(token_refresh_service.start_periodic_refresh(interval_hours=24))
+        logger.info("Token refresh service started (every 24 hours for long-lived tokens)")
+    except Exception as e:
+        logger.warning(f"Could not start token refresh service: {e}")
+        token_task = None
+
     yield
 
     # Shutdown
@@ -56,6 +65,13 @@ async def lifespan(app: FastAPI):
         cleanup_task.cancel()
         try:
             await cleanup_task
+        except asyncio.CancelledError:
+            pass
+
+    if 'token_task' in locals() and token_task:
+        token_task.cancel()
+        try:
+            await token_task
         except asyncio.CancelledError:
             pass
 
@@ -427,7 +443,79 @@ async def debug_pages(
     except Exception as e:
         return {"error": str(e)}
 
+@app.get("/check-token-info")
+async def check_token_info(
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """Check token information and expiration"""
+    import httpx
+    from app.core.security import decrypt_token
+    from app.models.page import Page
 
+    try:
+        # Check user token
+        user_access_token = decrypt_token(current_user.access_token)
+
+        # Get token debug info
+        async with httpx.AsyncClient() as client:
+            # Check user token
+            user_debug_response = await client.get(
+                f"https://graph.facebook.com/debug_token",
+                params={
+                    "input_token": user_access_token,
+                    "access_token": f"{settings.FACEBOOK_APP_ID}|{settings.FACEBOOK_APP_SECRET}"
+                }
+            )
+            user_debug = user_debug_response.json()
+
+            # Check page tokens
+            pages = db.query(Page).filter(Page.user_id == current_user.id).all()
+            page_token_info = []
+
+            for page in pages:
+                if page.page_access_token:
+                    try:
+                        page_access_token = decrypt_token(page.page_access_token)
+                        page_debug_response = await client.get(
+                            f"https://graph.facebook.com/debug_token",
+                            params={
+                                "input_token": page_access_token,
+                                "access_token": f"{settings.FACEBOOK_APP_ID}|{settings.FACEBOOK_APP_SECRET}"
+                            }
+                        )
+                        page_debug = page_debug_response.json()
+
+                        expires_at = page_debug.get("data", {}).get("expires_at", 0)
+                        expires_text = "Never expires (long-lived)" if expires_at == 0 else f"Expires at timestamp: {expires_at}"
+
+                        page_token_info.append({
+                            "page_name": page.page_name,
+                            "expires_at": expires_at,
+                            "expires_text": expires_text,
+                            "is_valid": page_debug.get("data", {}).get("is_valid", False),
+                            "scopes": page_debug.get("data", {}).get("scopes", [])
+                        })
+                    except Exception as e:
+                        page_token_info.append({
+                            "page_name": page.page_name,
+                            "error": str(e)
+                        })
+
+        user_expires_at = user_debug.get("data", {}).get("expires_at", 0)
+        user_expires_text = "Never expires" if user_expires_at == 0 else f"Expires at timestamp: {user_expires_at}"
+
+        return {
+            "user_expires_at": user_expires_at,
+            "user_expires_text": user_expires_text,
+            "user_is_valid": user_debug.get("data", {}).get("is_valid", False),
+            "user_scopes": user_debug.get("data", {}).get("scopes", []),
+            "page_tokens": page_token_info,
+            "summary": f"User token: {user_expires_text}, Page tokens: {len([p for p in page_token_info if p.get('expires_at') == 0])} never expire"
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
 
 port = int(os.environ.get("PORT", 8000))
 

@@ -40,6 +40,10 @@ async def facebook_callback(
         long_lived_data = await facebook_service.exchange_for_long_lived_token(short_lived_token)
         access_token = long_lived_data["access_token"]
 
+        # Log token info for debugging
+        expires_in = long_lived_data.get("expires_in", "No expiration info")
+        logger.info(f"Long-lived user token obtained - expires in: {expires_in} seconds")
+
         # Log permissions for debugging
         try:
             permissions = await facebook_service.get_user_permissions(access_token)
@@ -81,6 +85,9 @@ async def facebook_callback(
             page_id = page_data["id"]
             page_name = page_data["name"]
             page_access_token = page_data["access_token"]
+
+            # Log page token info
+            logger.info(f"Page token for {page_name}: {page_access_token[:20]}... (Page tokens are typically long-lived)")
             
             # Check for Instagram Business Account
             ig_account = await facebook_service.get_instagram_business_account(
