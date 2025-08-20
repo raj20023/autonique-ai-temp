@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useAuth } from '@/hooks/useAuth';
-import { pagesApi, faqApi } from '@/utils/api';
+import { pagesApi } from '@/utils/api';
 import { isAuthenticated } from '@/utils/auth';
 import toast from 'react-hot-toast';
 
@@ -71,11 +71,7 @@ export default function DashboardPage() {
     { enabled: isLoggedIn && isClient }
   );
 
-  const { data: faqs } = useQuery(
-    'faqs',
-    () => faqApi.getFAQs().then(res => res.data),
-    { enabled: isLoggedIn && isClient }
-  );
+
 
   // Fetch user statistics
   const { data: stats } = useQuery(
@@ -253,13 +249,13 @@ export default function DashboardPage() {
 👤 User: ${data.user_name} (ID: ${data.user_id})
 
 📄 Pages: ${data.pages_count} connected
-${data.pages.map(p => `  • ${p.page_name} (Instagram: ${p.ig_business_id ? 'Connected' : 'Not Connected'}, Webhook: ${p.webhook_subscribed ? 'Active' : 'Inactive'})`).join('\n')}
+${data.pages?.map((p: any) => `  • ${p.page_name} (Instagram: ${p.ig_business_id ? 'Connected' : 'Not Connected'}, Webhook: ${p.webhook_subscribed ? 'Active' : 'Inactive'})`).join('\n') || 'No pages'}
 
 ❓ FAQs: ${data.faqs_count} active
-${data.faqs.map(f => `  • ${f.question} (Embedding: ${f.has_embedding ? 'Yes' : 'No'})`).join('\n')}
+${data.faqs?.map((f: any) => `  • ${f.question} (Embedding: ${f.has_embedding ? 'Yes' : 'No'})`).join('\n') || 'No FAQs'}
 
 💬 Recent Messages: ${data.recent_messages_count}
-${data.recent_messages.map(m => `  • "${m.message_text}" (Auto-replied: ${m.auto_replied ? 'Yes' : 'No'})`).join('\n')}
+${data.recent_messages?.map((m: any) => `  • "${m.message_text}" (Auto-replied: ${m.auto_replied ? 'Yes' : 'No'})`).join('\n') || 'No recent messages'}
 
 🔗 Webhook URL: ${data.webhook_url}
 🔑 Webhook Token: ${data.webhook_verify_token}
