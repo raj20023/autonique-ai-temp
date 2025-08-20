@@ -426,6 +426,58 @@ ${data.failed_replies > 0 ? '⚠️ Some replies failed to send - check server l
                   <span className="text-sm text-green-600">View Activity</span>
                 </button>
 
+                <button
+                  onClick={async () => {
+                    try {
+                      const accessToken = localStorage.getItem('access_token');
+                      if (!accessToken) {
+                        alert('No access token found. Please login again.');
+                        return;
+                      }
+
+                      const response = await fetch('https://api.autonique.in/debug-pages', {
+                        headers: {
+                          'Authorization': `Bearer ${accessToken}`,
+                          'Content-Type': 'application/json'
+                        }
+                      });
+                      const data = await response.json();
+
+                      if (data.error) {
+                        alert('❌ Error checking pages:\n\n' + data.error);
+                      } else {
+                        const pagesList = data.pages.map((page: any) => {
+                          return `📄 ${page.page_name}
+  • FB Page ID: ${page.fb_page_id}
+  • IG Business ID: ${page.ig_business_id}
+  • Webhook: ${page.webhook_subscribed ? '✅' : '❌'}
+  • Token: ${page.has_access_token ? '✅' : '❌'}`;
+                        }).join('\n\n');
+
+                        alert(`📄 Pages in Database:
+
+Total Pages: ${data.total_pages}
+
+${pagesList || 'No pages found'}
+
+${data.webhook_lookup_note}
+
+From your recent webhook log:
+Webhook received ID: 17841476479498569
+This should match one of the IG Business IDs above.`);
+                      }
+                    } catch (error) {
+                      alert('Error checking pages: ' + error);
+                    }
+                  }}
+                  className="w-full flex items-center justify-between p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg transition-colors border border-yellow-200"
+                >
+                  <div className="flex items-center space-x-3">
+                    <span className="text-sm font-medium text-yellow-800">📄 Debug Pages Database</span>
+                  </div>
+                  <span className="text-sm text-yellow-600">Check IDs</span>
+                </button>
+
               </div>
             </motion.div>
 

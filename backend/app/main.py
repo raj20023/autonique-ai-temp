@@ -396,6 +396,37 @@ async def test_webhook_url():
         "message": "Both webhook URLs should be accessible"
     }
 
+@app.get("/debug-pages")
+async def debug_pages(
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """Debug pages in database"""
+    from app.models.page import Page
+
+    try:
+        pages = db.query(Page).filter(Page.user_id == current_user.id).all()
+
+        page_details = []
+        for page in pages:
+            page_details.append({
+                "id": page.id,
+                "page_name": page.page_name,
+                "fb_page_id": page.fb_page_id,
+                "ig_business_id": page.ig_business_id,
+                "webhook_subscribed": page.webhook_subscribed,
+                "has_access_token": bool(page.page_access_token)
+            })
+
+        return {
+            "total_pages": len(page_details),
+            "pages": page_details,
+            "webhook_lookup_note": "Webhook uses ig_business_id to find the page"
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
+
 
 
 port = int(os.environ.get("PORT", 8000))

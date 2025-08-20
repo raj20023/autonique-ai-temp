@@ -88,8 +88,11 @@ async def process_webhook_entry(entry: dict):
     try:
         page_id = entry.get("id")
         messaging_events = entry.get("messaging", [])
-        
+
+        logger.info(f"Processing webhook entry - Page ID: {page_id}, Messaging events: {len(messaging_events)}")
+
         if not messaging_events:
+            logger.info("No messaging events found in webhook entry")
             return
         
         # Get database session
@@ -97,16 +100,25 @@ async def process_webhook_entry(entry: dict):
         
         try:
             # Find the page in our database
-            page = db.query(Page).filter(Page.fb_page_id == page_id).first()
+            # For Instagram webhooks, the ID is the Instagram Business ID, not Facebook Page ID
+            page = db.query(Page).filter(Page.ig_business_id == page_id).first()
             if not page:
-                logger.warning(f"Page {page_id} not found in database")
-                return
+                logger.warning(f"Instagram Business Account {page_id} not found in database")
+                # Also try Facebook Page ID as fallback
+                page = db.query(Page).filter(Page.fb_page_id == page_id).first()
+                if not page:
+                    logger.warning(f"Page {page_id} not found in database (tried both IG Business ID and FB Page ID)")
+                    return
             
+            logger.info(f"Found page: {page.page_name} (ID: {page.id}) for Instagram Business ID: {page.ig_business_id}")
+
             # Get the user
             user = db.query(User).filter(User.id == page.user_id).first()
             if not user:
                 logger.warning(f"User for page {page_id} not found")
                 return
+
+            logger.info(f"Found user: {user.name} (ID: {user.id})")
             
             # Process each messaging event
             for messaging_event in messaging_events:
