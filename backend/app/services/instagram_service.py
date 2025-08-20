@@ -13,7 +13,8 @@ class InstagramService:
     async def send_message(self, ig_business_id: str, recipient_id: str, message_text: str, access_token: str) -> bool:
         """Send a message via Instagram Messaging API"""
         try:
-            url = f"{self.graph_url}/{ig_business_id}/messages"
+            # Use the correct endpoint as per Facebook documentation
+            url = f"{self.graph_url}/me/messages"
             payload = {
                 "recipient": {"id": recipient_id},
                 "message": {"text": message_text}
