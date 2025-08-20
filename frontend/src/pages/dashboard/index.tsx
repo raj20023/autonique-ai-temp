@@ -275,7 +275,54 @@ Status: ${data.system_status}`;
                   </div>
                   <span className="text-sm text-orange-600">Troubleshoot</span>
                 </button>
-                
+
+                <button
+                  onClick={async () => {
+                    try {
+                      const accessToken = localStorage.getItem('access_token');
+                      if (!accessToken) {
+                        alert('No access token found. Please login again.');
+                        return;
+                      }
+
+                      const testMessage = prompt('Enter test message to send:', 'Hello! This is a test message from AutoniqueAI.');
+                      if (!testMessage) return;
+
+                      const response = await fetch('https://api.autonique.in/test-instagram-message', {
+                        method: 'POST',
+                        headers: {
+                          'Authorization': `Bearer ${accessToken}`,
+                          'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ message_text: testMessage })
+                      });
+                      const data = await response.json();
+
+                      if (data.error) {
+                        alert('❌ Instagram Message Test Failed:\n\n' + data.error + '\n\nCheck the debug system for more details.');
+                      } else {
+                        alert(`📱 Instagram Message Test Result:
+
+Success: ${data.success ? '✅ Yes' : '❌ No'}
+Page: ${data.page_name}
+Instagram ID: ${data.ig_business_id}
+Message: "${data.message}"
+
+${data.note}
+
+${data.success ? 'Message API call succeeded!' : 'Message API call failed - check server logs for Instagram API errors.'}`);
+                      }
+                    } catch (error) {
+                      alert('Error testing Instagram message: ' + error);
+                    }
+                  }}
+                  className="w-full flex items-center justify-between p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors border border-purple-200"
+                >
+                  <div className="flex items-center space-x-3">
+                    <span className="text-sm font-medium text-purple-800">📱 Test Instagram Messaging</span>
+                  </div>
+                  <span className="text-sm text-purple-600">Test API</span>
+                </button>
 
               </div>
             </motion.div>

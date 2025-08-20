@@ -228,6 +228,53 @@ async def debug_system(
     except Exception as e:
         return {"error": str(e), "system_status": "error"}
 
+@app.post("/test-instagram-message")
+async def test_instagram_message(
+    message_text: str,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """Test Instagram message sending manually"""
+    from app.services.instagram_service import InstagramService
+    from app.core.security import decrypt_token
+    from app.models.page import Page
+
+    try:
+        # Get user's first Instagram-connected page
+        page = db.query(Page).filter(
+            Page.user_id == current_user.id,
+            Page.ig_business_id.isnot(None)
+        ).first()
+
+        if not page:
+            return {"error": "No Instagram Business account found"}
+
+        # For testing, we'll try to send to a test recipient
+        # In production, this would be the actual sender ID from webhook
+        test_recipient_id = "test_recipient_id"  # This won't work but will show API errors
+
+        instagram_service = InstagramService()
+        page_access_token = decrypt_token(page.page_access_token)
+
+        success = await instagram_service.send_message(
+            page.ig_business_id,
+            test_recipient_id,
+            message_text,
+            page_access_token
+        )
+
+        return {
+            "success": success,
+            "page_name": page.page_name,
+            "ig_business_id": page.ig_business_id,
+            "message": message_text,
+            "test_recipient": test_recipient_id,
+            "note": "Check server logs for detailed API response"
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
+
 
 
 port = int(os.environ.get("PORT", 8000))

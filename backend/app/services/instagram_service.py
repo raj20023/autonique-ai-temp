@@ -13,25 +13,48 @@ class InstagramService:
     async def send_message(self, ig_business_id: str, recipient_id: str, message_text: str, access_token: str) -> bool:
         """Send a message via Instagram Messaging API"""
         try:
+            url = f"{self.graph_url}/{ig_business_id}/messages"
+            payload = {
+                "recipient": {"id": recipient_id},
+                "message": {"text": message_text}
+            }
+
+            logger.info(f"Attempting to send message to {recipient_id}")
+            logger.info(f"URL: {url}")
+            logger.info(f"Instagram Business ID: {ig_business_id}")
+            logger.info(f"Message: {message_text}")
+
             async with httpx.AsyncClient() as client:
                 response = await client.post(
-                    f"{self.graph_url}/{ig_business_id}/messages",
-                    json={
-                        "recipient": {"id": recipient_id},
-                        "message": {"text": message_text}
-                    },
+                    url,
+                    json=payload,
                     params={"access_token": access_token}
                 )
-                
+
+                logger.info(f"Instagram API response status: {response.status_code}")
+                logger.info(f"Instagram API response: {response.text}")
+
                 if response.status_code == 200:
                     logger.info(f"Message sent successfully to {recipient_id}")
                     return True
                 else:
-                    logger.error(f"Failed to send message: {response.text}")
+                    logger.error(f"Failed to send message - Status: {response.status_code}")
+                    logger.error(f"Error response: {response.text}")
+
+                    # Parse error for common issues
+                    try:
+                        error_data = response.json()
+                        if "error" in error_data:
+                            error_msg = error_data["error"].get("message", "Unknown error")
+                            error_code = error_data["error"].get("code", "Unknown code")
+                            logger.error(f"Instagram API Error - Code: {error_code}, Message: {error_msg}")
+                    except:
+                        pass
+
                     return False
-                    
+
         except Exception as e:
-            logger.error(f"Error sending Instagram message: {e}")
+            logger.error(f"Exception sending Instagram message: {e}")
             return False
 
     async def get_message_details(self, message_id: str, access_token: str) -> Optional[Dict]:
