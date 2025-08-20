@@ -34,8 +34,19 @@ async def facebook_callback(
         
         # Exchange code for access token
         token_data = await facebook_service.exchange_code_for_token(code, redirect_uri)
-        access_token = token_data["access_token"]
-        
+        short_lived_token = token_data["access_token"]
+
+        # Exchange for long-lived token
+        long_lived_data = await facebook_service.exchange_for_long_lived_token(short_lived_token)
+        access_token = long_lived_data["access_token"]
+
+        # Log permissions for debugging
+        try:
+            permissions = await facebook_service.get_user_permissions(access_token)
+            logger.info(f"Granted permissions: {permissions}")
+        except Exception as e:
+            logger.warning(f"Could not fetch permissions: {e}")
+
         # Get user info
         user_info = await facebook_service.get_user_info(access_token)
         fb_user_id = user_info["id"]

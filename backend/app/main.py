@@ -143,6 +143,25 @@ async def facebook_test():
         "test_url": f"{facebook_service.graph_url}/me/accounts"
     }
 
+@app.get("/debug-permissions")
+async def debug_permissions(access_token: str):
+    """Debug endpoint to check Facebook permissions"""
+    from app.services.facebook_service import FacebookService
+
+    facebook_service = FacebookService()
+
+    try:
+        permissions = await facebook_service.get_user_permissions(access_token)
+        pages = await facebook_service.get_user_pages(access_token)
+
+        return {
+            "permissions": permissions,
+            "pages_count": len(pages),
+            "pages": pages
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
 @app.options("/{path:path}")
 async def options_handler(request: Request):
     """Handle CORS preflight requests"""

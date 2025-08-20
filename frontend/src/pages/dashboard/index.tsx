@@ -276,6 +276,42 @@ export default function DashboardPage() {
                   </div>
                   <span className="text-sm text-green-600">API Test</span>
                 </button>
+
+                <button
+                  onClick={async () => {
+                    try {
+                      const accessToken = localStorage.getItem('access_token');
+                      if (!accessToken) {
+                        alert('No access token found. Please login again.');
+                        return;
+                      }
+
+                      const response = await fetch(`https://api.autonique.in/debug-permissions?access_token=${encodeURIComponent(accessToken)}`);
+                      const data = await response.json();
+
+                      if (data.error) {
+                        alert('Error checking permissions:\n' + data.error);
+                      } else {
+                        const grantedPerms = data.permissions?.data?.filter((p: any) => p.status === 'granted').map((p: any) => p.permission) || [];
+                        alert(`Facebook Permissions Debug:
+
+Granted Permissions: ${grantedPerms.join(', ')}
+Pages Found: ${data.pages_count}
+Pages: ${data.pages?.map((p: any) => `${p.name} (Instagram: ${p.instagram_business_account ? 'Yes' : 'No'})`).join(', ') || 'None'}
+
+Full Response: ${JSON.stringify(data, null, 2)}`);
+                      }
+                    } catch (error) {
+                      alert('Error: ' + error);
+                    }
+                  }}
+                  className="w-full flex items-center justify-between p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
+                >
+                  <div className="flex items-center space-x-3">
+                    <span className="text-sm font-medium text-blue-800">🔐 Check FB Permissions</span>
+                  </div>
+                  <span className="text-sm text-blue-600">Debug</span>
+                </button>
               </div>
             </motion.div>
 

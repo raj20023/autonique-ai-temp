@@ -112,11 +112,36 @@ class FacebookService:
         params = {
             "client_id": self.app_id,
             "redirect_uri": redirect_uri,
-            "scope": "pages_show_list,pages_messaging,instagram_basic,instagram_manage_messages,pages_read_engagement,business_management",
+            "scope": "pages_show_list,pages_read_engagement,pages_manage_metadata,pages_messaging,instagram_basic,instagram_manage_messages,business_management",
             "response_type": "code"
         }
         if state:
             params["state"] = state
-        
+
         query_string = "&".join([f"{k}={v}" for k, v in params.items()])
         return f"{settings.FACEBOOK_OAUTH_URL}?{query_string}"
+
+    async def exchange_for_long_lived_token(self, short_lived_token: str) -> Dict:
+        """Exchange short-lived token for long-lived token"""
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.graph_url}/oauth/access_token",
+                params={
+                    "grant_type": "fb_exchange_token",
+                    "client_id": self.app_id,
+                    "client_secret": self.app_secret,
+                    "fb_exchange_token": short_lived_token
+                }
+            )
+            response.raise_for_status()
+            return response.json()
+
+    async def get_user_permissions(self, access_token: str) -> Dict:
+        """Get permissions granted to the access token"""
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.graph_url}/me/permissions",
+                params={"access_token": access_token}
+            )
+            response.raise_for_status()
+            return response.json()

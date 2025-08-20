@@ -18,7 +18,7 @@ export default function LoginPage() {
     const appId = '2032087817551720';
     const frontendUrl = 'https://autonique.in';
     const redirectUri = `${frontendUrl}/auth/callback`;
-    const scope = 'pages_show_list,pages_messaging,instagram_basic,instagram_manage_messages';
+    const scope = 'pages_show_list,pages_read_engagement,pages_manage_metadata,pages_messaging,instagram_basic,instagram_manage_messages,business_management';
 
     const loginUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&response_type=code&auth_type=rerequest`;
 

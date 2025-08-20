@@ -72,9 +72,12 @@ Complete guide to setting up your Facebook App for InstaReply.
 
 #### Required Permissions
 - `pages_show_list` - Access user's pages
+- `pages_read_engagement` - Read page engagement data
+- `pages_manage_metadata` - Manage page metadata (required for Instagram business account access)
 - `pages_messaging` - Send/receive messages on behalf of pages
 - `instagram_basic` - Access basic Instagram account info
 - `instagram_manage_messages` - Manage Instagram messages
+- `business_management` - Manage business assets
 
 ### 7. App Review Process
 
@@ -83,9 +86,12 @@ For production use, you'll need to submit your app for review:
 1. Go to App Review > Permissions and Features
 2. Request these permissions:
    - `pages_show_list`
+   - `pages_read_engagement`
+   - `pages_manage_metadata`
    - `pages_messaging`
    - `instagram_basic`
    - `instagram_manage_messages`
+   - `business_management`
 
 3. Provide required information:
    - Detailed description of how you use each permission
