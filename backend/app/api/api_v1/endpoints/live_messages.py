@@ -46,38 +46,39 @@ async def get_live_messages_data(
     try:
         logger.info(f"Fetching live messages for user {current_user.id}")
 
-        # Get user's pages first
-        user_pages = db.query(Page).filter(Page.user_id == current_user.id).all()
-        user_page_ids = [page.id for page in user_pages]
-
-        logger.info(f"User has {len(user_pages)} pages with IDs: {user_page_ids}")
-
-        # Get messages from last 24 hours for this user's pages
+        # Get messages from last 24 hours for this user directly
         yesterday = datetime.utcnow() - timedelta(days=1)
 
         messages = db.query(Message).filter(
-            Message.page_id.in_(user_page_ids),
+            Message.user_id == current_user.id,
             Message.created_at >= yesterday
         ).order_by(Message.created_at.desc()).limit(20).all()
 
         logger.info(f"Found {len(messages)} messages for user")
 
+        # Get user's pages to determine which Instagram account the messages came from
+        user_pages = db.query(Page).filter(Page.user_id == current_user.id).all()
+        logger.info(f"User has {len(user_pages)} pages")
+
+        # Create a mapping of page info (we'll use the first Instagram-connected page as default)
+        default_page = None
+        for page in user_pages:
+            if page.instagram_username:
+                default_page = page
+                break
+
+        if not default_page and user_pages:
+            default_page = user_pages[0]  # Use first page as fallback
+
         message_list = []
         for msg in messages:
-            # Get page info - the page should already be joined, but let's be safe
-            page = None
-            try:
-                page = db.query(Page).filter(Page.id == msg.page_id).first()
-            except Exception as e:
-                logger.warning(f"Could not fetch page for message {msg.id}: {e}")
-
-            # Use page data if available, otherwise use fallback
+            # Since messages don't have page_id, we'll use the user's primary Instagram page
             instagram_username = "unknown"
             page_name = "Unknown Page"
 
-            if page:
-                instagram_username = page.instagram_username or "unknown"
-                page_name = page.page_name or "Unknown Page"
+            if default_page:
+                instagram_username = default_page.instagram_username or "unknown"
+                page_name = default_page.page_name or "Unknown Page"
 
             message_list.append({
                 "timestamp": msg.created_at.isoformat(),
@@ -228,18 +229,27 @@ async def public_demo_messages(db: Session = Depends(get_db)):
         # Get recent messages from all users (last 24 hours) for demo purposes
         yesterday = datetime.utcnow() - timedelta(days=1)
 
-        messages = db.query(Message).join(Page).filter(
+        messages = db.query(Message).filter(
             Message.created_at >= yesterday
         ).order_by(Message.created_at.desc()).limit(20).all()
 
         demo_messages = []
         for msg in messages:
-            page = db.query(Page).filter(Page.id == msg.page_id).first()
+            # Get the user's pages to find Instagram info
+            user_pages = db.query(Page).filter(Page.user_id == msg.user_id).all()
+
+            # Find the first page with Instagram username
+            instagram_username = "demo_account"
+
+            for page in user_pages:
+                if page.instagram_username:
+                    instagram_username = page.instagram_username
+                    break
 
             # Anonymize sensitive data for public demo
             demo_messages.append({
                 "timestamp": msg.created_at.isoformat(),
-                "instagram_account": f"@{page.instagram_username}" if page and page.instagram_username else "@demo_account",
+                "instagram_account": f"@{instagram_username}",
                 "customer_message": msg.message_text,
                 "our_response": msg.response_text,
                 "auto_replied": msg.auto_replied,

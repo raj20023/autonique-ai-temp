@@ -498,12 +498,23 @@ async def live_messages_data(
 
         message_list = []
         for msg in messages:
-            page = db.query(Page).filter(Page.id == msg.page_id).first()
+            # Get the user's pages to find Instagram info
+            user_pages = db.query(Page).filter(Page.user_id == msg.user_id).all()
+
+            # Find the first page with Instagram username
+            instagram_username = "unknown"
+            page_name = "Unknown Page"
+
+            for page in user_pages:
+                if page.instagram_username:
+                    instagram_username = page.instagram_username
+                    page_name = page.page_name
+                    break
 
             message_list.append({
                 "timestamp": msg.created_at.isoformat(),
-                "instagram_account": f"@{page.instagram_username}" if page and page.instagram_username else "@unknown",
-                "page_name": page.page_name if page else "Unknown Page",
+                "instagram_account": f"@{instagram_username}",
+                "page_name": page_name,
                 "customer_message": msg.message_text,
                 "our_response": msg.response_text,
                 "auto_replied": msg.auto_replied,
@@ -566,7 +577,7 @@ async def live_messages_demo():
         # Get recent messages from last 24 hours from all users
         yesterday = datetime.utcnow() - timedelta(days=1)
 
-        messages = db.query(Message).join(Page, Message.page_id == Page.id).filter(
+        messages = db.query(Message).filter(
             Message.created_at >= yesterday
         ).order_by(Message.created_at.desc()).limit(10).all()
 
@@ -574,22 +585,32 @@ async def live_messages_demo():
         demo_accounts = set()
 
         for msg in messages:
-            page = db.query(Page).filter(Page.id == msg.page_id).first()
-            instagram_username = page.instagram_username if page and page.instagram_username else "demo_account"
+            # Get the user's pages to find Instagram info
+            user_pages = db.query(Page).filter(Page.user_id == msg.user_id).all()
+
+            # Find the first page with Instagram username
+            instagram_username = "demo_account"
+            page_name = "Demo Page"
+            webhook_active = True
+
+            for page in user_pages:
+                if page.instagram_username:
+                    instagram_username = page.instagram_username
+                    page_name = page.page_name
+                    webhook_active = page.webhook_subscribed
+                    demo_accounts.add((page.page_name, page.instagram_username, page.webhook_subscribed))
+                    break
 
             demo_messages.append({
                 "timestamp": msg.created_at.isoformat(),
                 "instagram_account": f"@{instagram_username}",
-                "page_name": page.page_name if page else "Demo Page",
+                "page_name": page_name,
                 "customer_message": msg.message_text,
                 "our_response": msg.response_text,
                 "auto_replied": msg.auto_replied,
                 "reply_sent_at": msg.reply_sent_at.isoformat() if msg.reply_sent_at else None,
                 "status": "✅ Sent" if msg.auto_replied else "❌ Failed" if msg.response_text else "⏳ Processing"
             })
-
-            if page and page.instagram_username:
-                demo_accounts.add((page.page_name, page.instagram_username, page.webhook_subscribed))
 
         # Create demo Instagram accounts list
         instagram_accounts = []
