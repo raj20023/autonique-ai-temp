@@ -566,7 +566,7 @@ async def live_messages_demo():
         # Get recent messages from last 24 hours from all users
         yesterday = datetime.utcnow() - timedelta(days=1)
 
-        messages = db.query(Message).join(Page).filter(
+        messages = db.query(Message).join(Page, Message.page_id == Page.id).filter(
             Message.created_at >= yesterday
         ).order_by(Message.created_at.desc()).limit(10).all()
 

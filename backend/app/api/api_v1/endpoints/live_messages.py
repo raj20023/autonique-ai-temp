@@ -44,22 +44,45 @@ async def get_live_messages_data(
 ):
     """Get live messages data for authenticated users"""
     try:
-        # Get messages from last 24 hours for this user
+        logger.info(f"Fetching live messages for user {current_user.id}")
+
+        # Get user's pages first
+        user_pages = db.query(Page).filter(Page.user_id == current_user.id).all()
+        user_page_ids = [page.id for page in user_pages]
+
+        logger.info(f"User has {len(user_pages)} pages with IDs: {user_page_ids}")
+
+        # Get messages from last 24 hours for this user's pages
         yesterday = datetime.utcnow() - timedelta(days=1)
 
-        messages = db.query(Message).join(Page).filter(
-            Page.user_id == current_user.id,
+        messages = db.query(Message).filter(
+            Message.page_id.in_(user_page_ids),
             Message.created_at >= yesterday
         ).order_by(Message.created_at.desc()).limit(20).all()
 
+        logger.info(f"Found {len(messages)} messages for user")
+
         message_list = []
         for msg in messages:
-            page = db.query(Page).filter(Page.id == msg.page_id).first()
+            # Get page info - the page should already be joined, but let's be safe
+            page = None
+            try:
+                page = db.query(Page).filter(Page.id == msg.page_id).first()
+            except Exception as e:
+                logger.warning(f"Could not fetch page for message {msg.id}: {e}")
+
+            # Use page data if available, otherwise use fallback
+            instagram_username = "unknown"
+            page_name = "Unknown Page"
+
+            if page:
+                instagram_username = page.instagram_username or "unknown"
+                page_name = page.page_name or "Unknown Page"
 
             message_list.append({
                 "timestamp": msg.created_at.isoformat(),
-                "instagram_account": f"@{page.instagram_username}" if page and page.instagram_username else "@unknown",
-                "page_name": page.page_name if page else "Unknown Page",
+                "instagram_account": f"@{instagram_username}",
+                "page_name": page_name,
                 "customer_message": msg.message_text,
                 "our_response": msg.response_text,
                 "auto_replied": msg.auto_replied,
@@ -69,16 +92,21 @@ async def get_live_messages_data(
 
         # Get user's Instagram accounts
         pages = db.query(Page).filter(
-            Page.user_id == current_user.id,
-            Page.ig_business_id.isnot(None)
+            Page.user_id == current_user.id
         ).all()
+
+        logger.info(f"Found {len(pages)} pages for user {current_user.id}")
 
         instagram_accounts = []
         for page in pages:
+            logger.info(f"Page: {page.page_name}, IG ID: {page.ig_business_id}, Username: {page.instagram_username}")
+
+            # Include all pages, not just those with IG business ID
             instagram_accounts.append({
                 "page_name": page.page_name,
-                "instagram_username": page.instagram_username or "Unknown",
-                "webhook_active": page.webhook_subscribed
+                "instagram_username": page.instagram_username or "Not connected",
+                "webhook_active": page.webhook_subscribed,
+                "has_ig_business_id": bool(page.ig_business_id)
             })
 
         # Get stats
