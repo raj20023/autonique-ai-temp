@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
+import logging
 
 from app.core.database import get_db
 from app.api.deps import get_current_active_user
@@ -9,6 +10,8 @@ from app.models.page import Page
 from app.schemas.page import PageResponse, PageUpdate
 from app.services.facebook_service import FacebookService
 from app.core.security import decrypt_token
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -21,6 +24,62 @@ def get_user_pages(
     """Get user's Facebook pages with Instagram accounts"""
     pages = db.query(Page).filter(Page.user_id == current_user.id).all()
     return pages
+
+@router.get("/instagram-details")
+async def get_instagram_details(
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """Get Instagram account details with profile pictures for dashboard"""
+    pages = db.query(Page).filter(Page.user_id == current_user.id).all()
+    facebook_service = FacebookService()
+
+    instagram_accounts = []
+    for page in pages:
+        if page.ig_business_id and page.page_access_token:
+            try:
+                page_access_token = decrypt_token(page.page_access_token)
+                ig_info = await facebook_service.get_instagram_account_info(
+                    page.ig_business_id, page_access_token
+                )
+
+                if ig_info:
+                    instagram_accounts.append({
+                        "page_id": page.id,
+                        "page_name": page.page_name,
+                        "instagram_username": ig_info.get("username", "Unknown"),
+                        "instagram_display_name": ig_info.get("name", page.page_name),
+                        "profile_picture_url": ig_info.get("profile_picture_url", ""),
+                        "ig_business_id": page.ig_business_id,
+                        "webhook_subscribed": page.webhook_subscribed
+                    })
+                else:
+                    # Fallback if API call fails
+                    instagram_accounts.append({
+                        "page_id": page.id,
+                        "page_name": page.page_name,
+                        "instagram_username": page.instagram_username or "Unknown",
+                        "instagram_display_name": page.page_name,
+                        "profile_picture_url": "",
+                        "ig_business_id": page.ig_business_id,
+                        "webhook_subscribed": page.webhook_subscribed,
+                        "error": "Could not fetch Instagram details"
+                    })
+
+            except Exception as e:
+                logger.error(f"Error fetching Instagram details for page {page.page_name}: {e}")
+                instagram_accounts.append({
+                    "page_id": page.id,
+                    "page_name": page.page_name,
+                    "instagram_username": page.instagram_username or "Unknown",
+                    "instagram_display_name": page.page_name,
+                    "profile_picture_url": "",
+                    "ig_business_id": page.ig_business_id,
+                    "webhook_subscribed": page.webhook_subscribed,
+                    "error": "Token error - please re-login"
+                })
+
+    return {"instagram_accounts": instagram_accounts}
 
 @router.get("/{page_id}", response_model=PageResponse)
 def get_page(

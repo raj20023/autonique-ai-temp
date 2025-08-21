@@ -71,6 +71,23 @@ export default function DashboardPage() {
     { enabled: isLoggedIn && isClient }
   );
 
+  // Fetch Instagram account details for dashboard display
+  const { data: instagramData } = useQuery(
+    'instagramDetails',
+    async () => {
+      const token = localStorage.getItem('access_token');
+      const response = await fetch('https://api.autonique.in/api/v1/pages/instagram-details', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!response.ok) throw new Error('Failed to fetch Instagram details');
+      return response.json();
+    },
+    { enabled: isLoggedIn && isClient }
+  );
+
 
 
   // Fetch user statistics
@@ -522,7 +539,56 @@ ${pageStatusList || 'No page tokens found'}
                   <span className="text-sm text-indigo-600">Token Info</span>
                 </button>
 
+                <button
+                  onClick={async () => {
+                    try {
+                      const accessToken = localStorage.getItem('access_token');
+                      if (!accessToken) {
+                        alert('No access token found. Please login again.');
+                        return;
+                      }
 
+                      const response = await fetch('https://api.autonique.in/api/v1/demo/permissions-demo', {
+                        headers: {
+                          'Authorization': `Bearer ${accessToken}`,
+                          'Content-Type': 'application/json'
+                        }
+                      });
+                      const data = await response.json();
+
+                      if (data.error) {
+                        alert('❌ Error loading permissions demo:\n\n' + data.error);
+                      } else {
+                        // Show permissions summary in alert for quick view
+                        const permissionsList = data.requested_permissions.map((perm: any) =>
+                          `✅ ${perm.permission}: ${perm.purpose}`
+                        ).join('\n');
+
+                        alert(`🔐 AutoniqueAI Permissions Demo
+
+📋 App Purpose: ${data.app_purpose}
+
+🔑 Requested Permissions (${data.reviewer_summary.total_permissions_requested}):
+${permissionsList}
+
+📊 Summary:
+• All permissions justified: ${data.reviewer_summary.all_permissions_justified ? '✅ Yes' : '❌ No'}
+• Business use case: ${data.reviewer_summary.business_use_case}
+• User benefit: ${data.reviewer_summary.user_benefit}
+
+💡 This demo shows Facebook reviewers exactly how each permission is used in our Instagram auto-reply bot.`);
+                      }
+                    } catch (error) {
+                      alert('Error loading permissions demo: ' + error);
+                    }
+                  }}
+                  className="w-full flex items-center justify-between p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
+                >
+                  <div className="flex items-center space-x-3">
+                    <span className="text-sm font-medium text-blue-800">🔐 Permissions Demo (For Facebook Review)</span>
+                  </div>
+                  <span className="text-sm text-blue-600">Show Demo</span>
+                </button>
 
               </div>
             </motion.div>
@@ -614,11 +680,60 @@ ${pageStatusList || 'No page tokens found'}
             </motion.div>
           </div>
 
+          {/* Instagram Accounts */}
+          {instagramData?.instagram_accounts && instagramData.instagram_accounts.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.4 }}
+              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+            >
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Connected Instagram Accounts</h2>
+              <div className="space-y-4">
+                {instagramData.instagram_accounts.map((account: any) => (
+                  <div key={account.page_id} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+                    <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                      {account.profile_picture_url ? (
+                        <img
+                          src={account.profile_picture_url}
+                          alt={account.instagram_username}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Instagram className="h-6 w-6 text-gray-400" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        @{account.instagram_username}
+                      </p>
+                      <p className="text-xs text-gray-500">{account.instagram_display_name}</p>
+                      {account.error && (
+                        <p className="text-xs text-red-500">{account.error}</p>
+                      )}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      {account.webhook_subscribed ? (
+                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                          Active
+                        </span>
+                      ) : (
+                        <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full">
+                          Setup Required
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
           {/* Recent Activity */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.4 }}
+            transition={{ duration: 0.4, delay: 0.5 }}
             className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
           >
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
