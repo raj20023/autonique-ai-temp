@@ -45,7 +45,7 @@ export const logout = (): void => {
 export const getFacebookLoginUrl = (): string => {
   const appId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID;
   const redirectUri = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/auth/callback`;
-  const scope = 'pages_show_list,pages_read_engagement,pages_manage_metadata,pages_messaging,instagram_basic,instagram_manage_messages,business_management';
+  const scope = 'pages_messaging,instagram_basic,instagram_manage_messages';
 
   return `https://www.facebook.com/v19.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&response_type=code&auth_type=rerequest`;
 };

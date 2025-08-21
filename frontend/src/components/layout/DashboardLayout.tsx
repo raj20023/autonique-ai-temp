@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
@@ -28,8 +28,40 @@ const navigation = [
 
 export default function DashboardLayout({ children, title }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [instagramProfile, setInstagramProfile] = useState<any>(null);
   const { user, logout } = useAuth();
   const router = useRouter();
+
+  // Fetch Instagram profile for header display
+  useEffect(() => {
+    const fetchInstagramProfile = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        if (!token) return;
+
+        const response = await fetch('https://api.autonique.in/api/v1/pages/instagram-details', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.instagram_accounts && data.instagram_accounts.length > 0) {
+            // Use the first Instagram account for header display
+            setInstagramProfile(data.instagram_accounts[0]);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching Instagram profile:', error);
+      }
+    };
+
+    if (user) {
+      fetchInstagramProfile();
+    }
+  }, [user]);
 
   const handleLogout = () => {
     logout();
@@ -145,15 +177,23 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
           {/* User section */}
           <div className="border-t border-white/20 p-6">
             <div className="flex items-center space-x-4 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-accent-500 to-yellow-400 rounded-full flex items-center justify-center shadow-lg">
-                <User className="h-6 w-6 text-white" />
+              <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-r from-accent-500 to-yellow-400 flex items-center justify-center shadow-lg">
+                {instagramProfile?.profile_picture_url ? (
+                  <img
+                    src={instagramProfile.profile_picture_url}
+                    alt={instagramProfile.instagram_username}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <Instagram className="h-6 w-6 text-white" />
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-lg font-semibold text-white truncate">
-                  {user?.name || 'User'}
+                  {instagramProfile ? `@${instagramProfile.instagram_username}` : (user?.name || 'User')}
                 </p>
                 <p className="text-sm text-white/70 truncate">
-                  {user?.email || 'No email'}
+                  {instagramProfile ? instagramProfile.instagram_display_name : (user?.email || 'No email')}
                 </p>
               </div>
             </div>
@@ -187,12 +227,27 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
 
             <div className="flex items-center space-x-6">
               <div className="hidden sm:flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-accent-500 to-yellow-400 rounded-full flex items-center justify-center shadow-lg">
-                  <User className="h-5 w-5 text-white" />
+                <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-r from-accent-500 to-yellow-400 flex items-center justify-center shadow-lg">
+                  {instagramProfile?.profile_picture_url ? (
+                    <img
+                      src={instagramProfile.profile_picture_url}
+                      alt={instagramProfile.instagram_username}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <Instagram className="h-5 w-5 text-white" />
+                  )}
                 </div>
-                <span className="text-lg font-semibold text-brand-950">
-                  {user?.name || 'User'}
-                </span>
+                <div className="flex flex-col">
+                  <span className="text-lg font-semibold text-brand-950">
+                    {instagramProfile ? `@${instagramProfile.instagram_username}` : (user?.name || 'User')}
+                  </span>
+                  {instagramProfile && (
+                    <span className="text-sm text-brand-700">
+                      {instagramProfile.instagram_display_name}
+                    </span>
+                  )}
+                </div>
               </div>
               <button
                 onClick={handleLogout}

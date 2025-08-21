@@ -241,354 +241,41 @@ export default function DashboardPage() {
                   <span className="text-sm text-gray-500">→</span>
                 </button>
 
-                <button
-                  onClick={async () => {
-                    try {
-                      const accessToken = localStorage.getItem('access_token');
-                      if (!accessToken) {
-                        alert('No access token found. Please login again.');
-                        return;
-                      }
+                <div className="text-center py-8">
+                  <p className="text-sm text-gray-600">
+                    Your Instagram auto-reply system is ready to help customers 24/7!
+                  </p>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Add FAQs above to improve response accuracy.
+                  </p>
+                </div>
 
-                      const response = await fetch('https://api.autonique.in/debug-system', {
-                        headers: {
-                          'Authorization': `Bearer ${accessToken}`,
-                          'Content-Type': 'application/json'
-                        }
-                      });
-                      const data = await response.json();
 
-                      if (data.error) {
-                        alert('Error checking system:\n' + data.error);
-                      } else {
-                        const debugInfo = `🔍 AutoniqueAI System Debug Report
 
-👤 User: ${data.user_name} (ID: ${data.user_id})
 
-📄 Pages: ${data.pages_count} connected
-${data.pages?.map((p: any) => `  • ${p.page_name} (Instagram: ${p.ig_business_id ? 'Connected' : 'Not Connected'}, Webhook: ${p.webhook_subscribed ? 'Active' : 'Inactive'})`).join('\n') || 'No pages'}
+              </div>
+            </motion.div>
 
-❓ FAQs: ${data.faqs_count} active
-${data.faqs?.map((f: any) => `  • ${f.question} (Embedding: ${f.has_embedding ? 'Yes' : 'No'})`).join('\n') || 'No FAQs'}
-
-💬 Recent Messages: ${data.recent_messages_count}
-${data.recent_messages?.map((m: any) => `  • "${m.message_text}" (Auto-replied: ${m.auto_replied ? 'Yes' : 'No'})`).join('\n') || 'No recent messages'}
-
-🔗 Webhook URL: ${data.webhook_url}
-🔑 Webhook Token: ${data.webhook_verify_token}
-
-Status: ${data.system_status}`;
-
-                        alert(debugInfo);
-                      }
-                    } catch (error) {
-                      alert('Error: ' + error);
-                    }
-                  }}
-                  className="w-full flex items-center justify-between p-4 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors border border-orange-200"
-                >
+            {/* System Status */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+            >
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">System Status</h2>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <span className="text-sm font-medium text-orange-800">🔍 Debug Auto-Reply System</span>
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span className="text-gray-900">Instagram Connection</span>
                   </div>
-                  <span className="text-sm text-orange-600">Troubleshoot</span>
-                </button>
+                  <span className="text-green-600 text-sm">Active</span>
+                </div>
 
-                <button
-                  onClick={async () => {
-                    try {
-                      const accessToken = localStorage.getItem('access_token');
-                      if (!accessToken) {
-                        alert('No access token found. Please login again.');
-                        return;
-                      }
 
-                      const testMessage = prompt('Enter test message to send:', 'Hello! This is a test message from AutoniqueAI.');
-                      if (!testMessage) return;
 
-                      const response = await fetch('https://api.autonique.in/test-instagram-message', {
-                        method: 'POST',
-                        headers: {
-                          'Authorization': `Bearer ${accessToken}`,
-                          'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ message_text: testMessage })
-                      });
-                      const data = await response.json();
 
-                      if (data.error) {
-                        alert('❌ Instagram Message Test Failed:\n\n' + data.error + '\n\nCheck the debug system for more details.');
-                      } else {
-                        alert(`📱 Instagram Message Test Result:
-
-Success: ${data.success ? '✅ Yes' : '❌ No'}
-Page: ${data.page_name}
-Instagram ID: ${data.ig_business_id}
-Message: "${data.message}"
-
-${data.note}
-
-${data.success ? 'Message API call succeeded!' : 'Message API call failed - check server logs for Instagram API errors.'}`);
-                      }
-                    } catch (error) {
-                      alert('Error testing Instagram message: ' + error);
-                    }
-                  }}
-                  className="w-full flex items-center justify-between p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors border border-purple-200"
-                >
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm font-medium text-purple-800">📱 Test Instagram Messaging</span>
-                  </div>
-                  <span className="text-sm text-purple-600">Test API</span>
-                </button>
-
-                <button
-                  onClick={async () => {
-                    try {
-                      const accessToken = localStorage.getItem('access_token');
-                      if (!accessToken) {
-                        alert('No access token found. Please login again.');
-                        return;
-                      }
-
-                      const response = await fetch('https://api.autonique.in/check-instagram-api', {
-                        headers: {
-                          'Authorization': `Bearer ${accessToken}`,
-                          'Content-Type': 'application/json'
-                        }
-                      });
-                      const data = await response.json();
-
-                      if (data.error) {
-                        alert('❌ Instagram API Check Failed:\n\n' + data.error);
-                      } else {
-                        const accountsInfo = data.instagram_accounts.map((acc: any) => {
-                          if (acc.error) {
-                            return `❌ ${acc.page_name}: Error - ${acc.error}`;
-                          }
-                          return `${acc.api_access_working ? '✅' : '❌'} ${acc.page_name} (@${acc.instagram_username})
-  • Instagram Messages: ${acc.has_instagram_manage_messages ? '✅' : '❌'}
-  • Pages Messaging: ${acc.has_pages_messaging ? '✅' : '❌'}
-  • Permissions: ${acc.permissions.join(', ')}`;
-                        }).join('\n\n');
-
-                        alert(`📱 Instagram API Configuration Check:
-
-Total Accounts: ${data.total_accounts}
-Working Accounts: ${data.working_accounts}
-
-${accountsInfo}
-
-${data.working_accounts === data.total_accounts ? '✅ All accounts configured correctly!' : '❌ Some accounts have permission issues.'}`);
-                      }
-                    } catch (error) {
-                      alert('Error checking Instagram API: ' + error);
-                    }
-                  }}
-                  className="w-full flex items-center justify-between p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
-                >
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm font-medium text-blue-800">🔐 Check Instagram API Permissions</span>
-                  </div>
-                  <span className="text-sm text-blue-600">Check Config</span>
-                </button>
-
-                <button
-                  onClick={async () => {
-                    try {
-                      const accessToken = localStorage.getItem('access_token');
-                      if (!accessToken) {
-                        alert('No access token found. Please login again.');
-                        return;
-                      }
-
-                      const response = await fetch('https://api.autonique.in/check-recent-messages', {
-                        headers: {
-                          'Authorization': `Bearer ${accessToken}`,
-                          'Content-Type': 'application/json'
-                        }
-                      });
-                      const data = await response.json();
-
-                      if (data.error) {
-                        alert('❌ Error checking recent messages:\n\n' + data.error);
-                      } else {
-                        const messagesList = data.messages.map((msg: any) => {
-                          return `${msg.auto_replied ? '✅' : '❌'} "${msg.message_text.substring(0, 30)}..."
-  • From: ${msg.ig_user_id}
-  • Response: ${msg.response_text ? msg.response_text.substring(0, 30) + '...' : 'None'}
-  • Sent: ${msg.reply_sent_at ? new Date(msg.reply_sent_at).toLocaleString() : 'Not sent'}
-  • Score: ${msg.similarity_score || 'N/A'}`;
-                        }).join('\n\n');
-
-                        alert(`📬 Recent Message Processing (Last 24h):
-
-Total Messages: ${data.total_recent_messages}
-Auto-Replied: ${data.auto_replied_count}
-Failed Replies: ${data.failed_replies}
-
-Recent Messages:
-${messagesList || 'No recent messages found'}
-
-${data.failed_replies > 0 ? '⚠️ Some replies failed to send - check server logs for Instagram API errors.' : data.auto_replied_count > 0 ? '✅ Auto-replies are working!' : '⚠️ No auto-replies sent recently.'}`);
-                      }
-                    } catch (error) {
-                      alert('Error checking recent messages: ' + error);
-                    }
-                  }}
-                  className="w-full flex items-center justify-between p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors border border-green-200"
-                >
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm font-medium text-green-800">📬 Check Recent Message Processing</span>
-                  </div>
-                  <span className="text-sm text-green-600">View Activity</span>
-                </button>
-
-                <button
-                  onClick={async () => {
-                    try {
-                      const accessToken = localStorage.getItem('access_token');
-                      if (!accessToken) {
-                        alert('No access token found. Please login again.');
-                        return;
-                      }
-
-                      const response = await fetch('https://api.autonique.in/debug-pages', {
-                        headers: {
-                          'Authorization': `Bearer ${accessToken}`,
-                          'Content-Type': 'application/json'
-                        }
-                      });
-                      const data = await response.json();
-
-                      if (data.error) {
-                        alert('❌ Error checking pages:\n\n' + data.error);
-                      } else {
-                        const pagesList = data.pages.map((page: any) => {
-                          return `📄 ${page.page_name}
-  • FB Page ID: ${page.fb_page_id}
-  • IG Business ID: ${page.ig_business_id}
-  • Webhook: ${page.webhook_subscribed ? '✅' : '❌'}
-  • Token: ${page.has_access_token ? '✅' : '❌'}`;
-                        }).join('\n\n');
-
-                        alert(`📄 Pages in Database:
-
-Total Pages: ${data.total_pages}
-
-${pagesList || 'No pages found'}
-
-${data.webhook_lookup_note}
-
-From your recent webhook log:
-Webhook received ID: 17841476479498569
-This should match one of the IG Business IDs above.`);
-                      }
-                    } catch (error) {
-                      alert('Error checking pages: ' + error);
-                    }
-                  }}
-                  className="w-full flex items-center justify-between p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg transition-colors border border-yellow-200"
-                >
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm font-medium text-yellow-800">📄 Debug Pages Database</span>
-                  </div>
-                  <span className="text-sm text-yellow-600">Check IDs</span>
-                </button>
-
-                <button
-                  onClick={async () => {
-                    try {
-                      const accessToken = localStorage.getItem('access_token');
-                      if (!accessToken) {
-                        alert('No access token found. Please login again.');
-                        return;
-                      }
-
-                      const response = await fetch('https://api.autonique.in/check-token-info', {
-                        headers: {
-                          'Authorization': `Bearer ${accessToken}`,
-                          'Content-Type': 'application/json'
-                        }
-                      });
-                      const data = await response.json();
-
-                      if (data.error) {
-                        alert('❌ Error checking token info:\n\n' + data.error);
-                      } else {
-                        const pageStatusList = data.page_token_statuses.join('\n');
-
-                        alert(`🔐 Token Status Check:
-
-👤 User Token:
-${data.user_token_status}
-
-📄 Page Tokens:
-${pageStatusList || 'No page tokens found'}
-
-� ${data.recommendation}`);
-                      }
-                    } catch (error) {
-                      alert('Error checking token info: ' + error);
-                    }
-                  }}
-                  className="w-full flex items-center justify-between p-4 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors border border-indigo-200"
-                >
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm font-medium text-indigo-800">🔐 Check Token Expiration</span>
-                  </div>
-                  <span className="text-sm text-indigo-600">Token Info</span>
-                </button>
-
-                <button
-                  onClick={async () => {
-                    try {
-                      const accessToken = localStorage.getItem('access_token');
-                      if (!accessToken) {
-                        alert('No access token found. Please login again.');
-                        return;
-                      }
-
-                      const response = await fetch('https://api.autonique.in/api/v1/demo/permissions-demo', {
-                        headers: {
-                          'Authorization': `Bearer ${accessToken}`,
-                          'Content-Type': 'application/json'
-                        }
-                      });
-                      const data = await response.json();
-
-                      if (data.error) {
-                        alert('❌ Error loading permissions demo:\n\n' + data.error);
-                      } else {
-                        // Show permissions summary in alert for quick view
-                        const permissionsList = data.requested_permissions.map((perm: any) =>
-                          `✅ ${perm.permission}: ${perm.purpose}`
-                        ).join('\n');
-
-                        alert(`🔐 AutoniqueAI Permissions Demo
-
-📋 App Purpose: ${data.app_purpose}
-
-🔑 Requested Permissions (${data.reviewer_summary.total_permissions_requested}):
-${permissionsList}
-
-📊 Summary:
-• All permissions justified: ${data.reviewer_summary.all_permissions_justified ? '✅ Yes' : '❌ No'}
-• Business use case: ${data.reviewer_summary.business_use_case}
-• User benefit: ${data.reviewer_summary.user_benefit}
-
-💡 This demo shows Facebook reviewers exactly how each permission is used in our Instagram auto-reply bot.`);
-                      }
-                    } catch (error) {
-                      alert('Error loading permissions demo: ' + error);
-                    }
-                  }}
-                  className="w-full flex items-center justify-between p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
-                >
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm font-medium text-blue-800">🔐 Permissions Demo (For Facebook Review)</span>
-                  </div>
-                  <span className="text-sm text-blue-600">Show Demo</span>
-                </button>
 
               </div>
             </motion.div>
