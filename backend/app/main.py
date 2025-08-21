@@ -363,11 +363,12 @@ async def check_recent_messages(
     from datetime import datetime, timedelta
 
     try:
-        # Get recent messages (last 24 hours)
+        # Get recent messages (last 24 hours) - only incoming messages
         yesterday = datetime.utcnow() - timedelta(days=1)
         recent_messages = db.query(Message).filter(
             Message.user_id == current_user.id,
-            Message.created_at >= yesterday
+            Message.created_at >= yesterday,
+            Message.is_incoming == True
         ).order_by(Message.created_at.desc()).limit(10).all()
 
         message_details = []
@@ -491,9 +492,10 @@ async def live_messages_data(
         # Get recent messages from last 24 hours for this user
         yesterday = datetime.utcnow() - timedelta(days=1)
 
-        messages = db.query(Message).join(Page).filter(
-            Page.user_id == current_user.id,
-            Message.created_at >= yesterday
+        messages = db.query(Message).filter(
+            Message.user_id == current_user.id,
+            Message.created_at >= yesterday,
+            Message.is_incoming == True
         ).order_by(Message.created_at.desc()).limit(20).all()
 
         message_list = []
@@ -697,6 +699,107 @@ async def debug_user_pages(current_user: User = Depends(get_current_active_user)
             "user_name": current_user.name,
             "total_pages": len(pages),
             "pages": page_info
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/debug-user-messages")
+async def debug_user_messages(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    """Debug endpoint to check user's recent messages"""
+    try:
+        from app.models.message import Message
+        from datetime import datetime, timedelta
+
+        # Get recent messages
+        yesterday = datetime.utcnow() - timedelta(days=1)
+        messages = db.query(Message).filter(
+            Message.user_id == current_user.id,
+            Message.created_at >= yesterday
+        ).order_by(Message.created_at.desc()).limit(10).all()
+
+        message_info = []
+        for msg in messages:
+            message_info.append({
+                "id": msg.id,
+                "ig_message_id": msg.ig_message_id,
+                "ig_user_id": msg.ig_user_id,
+                "message_text": msg.message_text,
+                "response_text": msg.response_text,
+                "auto_replied": msg.auto_replied,
+                "reply_sent_at": msg.reply_sent_at.isoformat() if msg.reply_sent_at else None,
+                "created_at": msg.created_at.isoformat(),
+                "similarity_score": msg.similarity_score,
+                "matched_faq_id": msg.matched_faq_id
+            })
+
+        return {
+            "user_id": current_user.id,
+            "user_name": current_user.name,
+            "total_messages": len(messages),
+            "messages": message_info
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.post("/cleanup-bot-messages")
+async def cleanup_bot_messages(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    """Clean up duplicate bot messages from database"""
+    try:
+        from app.models.message import Message
+        from app.models.page import Page
+
+        # Get user's pages to know the Instagram Business IDs
+        pages = db.query(Page).filter(Page.user_id == current_user.id).all()
+        ig_business_ids = [page.ig_business_id for page in pages if page.ig_business_id]
+
+        if not ig_business_ids:
+            return {"message": "No Instagram Business IDs found for cleanup"}
+
+        # Find messages where the sender_id matches our Instagram Business IDs (bot messages)
+        bot_messages = db.query(Message).filter(
+            Message.user_id == current_user.id,
+            Message.ig_user_id.in_(ig_business_ids)
+        ).all()
+
+        # Also find messages where the message_text matches recent response_text (duplicates)
+        duplicate_messages = []
+        all_messages = db.query(Message).filter(Message.user_id == current_user.id).order_by(Message.created_at).all()
+
+        for msg in all_messages:
+            if msg.response_text:
+                # Look for messages where message_text equals this response_text
+                duplicates = db.query(Message).filter(
+                    Message.user_id == current_user.id,
+                    Message.message_text == msg.response_text,
+                    Message.created_at > msg.created_at  # Only later messages
+                ).all()
+                duplicate_messages.extend(duplicates)
+
+        # Combine both types of problematic messages
+        messages_to_delete = list(set(bot_messages + duplicate_messages))
+
+        deleted_count = 0
+        deleted_details = []
+
+        for msg in messages_to_delete:
+            deleted_details.append({
+                "id": msg.id,
+                "message_text": msg.message_text,
+                "ig_user_id": msg.ig_user_id,
+                "created_at": msg.created_at.isoformat(),
+                "reason": "Bot message" if msg.ig_user_id in ig_business_ids else "Duplicate response"
+            })
+            db.delete(msg)
+            deleted_count += 1
+
+        db.commit()
+
+        return {
+            "message": f"Cleaned up {deleted_count} bot/duplicate messages",
+            "deleted_messages": deleted_details,
+            "ig_business_ids_checked": ig_business_ids
         }
 
     except Exception as e:

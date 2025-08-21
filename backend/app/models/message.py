@@ -16,6 +16,7 @@ class Message(Base):
     similarity_score = Column(Float, nullable=True)  # Similarity score with matched FAQ
     auto_replied = Column(Boolean, default=False)
     reply_sent_at = Column(DateTime, nullable=True)
+    is_incoming = Column(Boolean, default=True)  # True for incoming messages, False for outgoing (bot) messages
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships

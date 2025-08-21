@@ -147,30 +147,78 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
         timestamp = messaging_event.get("timestamp")
         
         sender_id = sender.get("id")
+        recipient_id = recipient.get("id")
         message_id = message_data.get("mid")
         message_text = message_data.get("text", "")
 
-        logger.info(f"Processing message - Sender ID: {sender_id}, Message ID: {message_id}, Text: {message_text}")
+        logger.info(f"Processing message - Sender ID: {sender_id}, Recipient ID: {recipient_id}, Message ID: {message_id}, Text: {message_text}")
+        logger.info(f"Page Instagram Business ID: {page.ig_business_id}")
 
         if not sender_id or not message_id or not message_text:
             logger.warning(f"Incomplete message data - Sender ID: {sender_id}, Message ID: {message_id}, Text: '{message_text}'")
             return
-        
+
+        # IMPORTANT: Ignore messages sent by our own bot
+        # When we send a message, Instagram sends it back to our webhook with sender_id = our Instagram Business ID
+        if sender_id == page.ig_business_id:
+            logger.info(f"Ignoring message sent by our own bot (sender_id {sender_id} matches our IG Business ID {page.ig_business_id})")
+            return
+
+        # Also check if sender_id matches recipient_id (another way to detect bot messages)
+        if sender_id == recipient_id:
+            logger.info(f"Ignoring message where sender equals recipient (likely bot message): {sender_id}")
+            return
+
         # Check if we've already processed this message
         existing_message = db.query(Message).filter(
             Message.ig_message_id == message_id
         ).first()
-        
+
         if existing_message:
             logger.info(f"Message {message_id} already processed")
             return
+
+        # Enhanced safety check: See if this message text matches any recent response we sent
+        # This catches cases where the bot message detection above might miss something
+        from datetime import timedelta
+        recent_cutoff = datetime.utcnow() - timedelta(minutes=10)  # Extended to 10 minutes for better coverage
+
+        # Check for exact match with recent responses
+        recent_response = db.query(Message).filter(
+            Message.user_id == user.id,
+            Message.response_text == message_text,
+            Message.reply_sent_at >= recent_cutoff
+        ).first()
+
+        if recent_response:
+            logger.info(f"Ignoring message that exactly matches our recent response: '{message_text}' (sent at {recent_response.reply_sent_at})")
+            return
+
+        # Additional check: Look for similar responses (in case of slight variations)
+        # This is more comprehensive than exact match
+        recent_responses = db.query(Message).filter(
+            Message.user_id == user.id,
+            Message.response_text.isnot(None),
+            Message.reply_sent_at >= recent_cutoff
+        ).all()
+
+        for response in recent_responses:
+            # Check if the incoming message text is very similar to any recent response
+            # Using simple string similarity (could be enhanced with fuzzy matching if needed)
+            if response.response_text and len(message_text) > 10:  # Only check for longer messages
+                # Check if message text is contained in response or vice versa (with some tolerance)
+                if (message_text.lower().strip() in response.response_text.lower().strip() or
+                    response.response_text.lower().strip() in message_text.lower().strip()):
+                    logger.info(f"Ignoring message that appears to be our recent response (similarity check): '{message_text}' vs recent response: '{response.response_text}'")
+                    return
         
-        # Create message record
+        # Create message record - explicitly mark as incoming message
         message_record = Message(
             user_id=user.id,
             ig_user_id=sender_id,
             ig_message_id=message_id,
             message_text=message_text,
+            is_incoming=True,  # Explicitly mark as incoming message from customer
             created_at=datetime.fromtimestamp(timestamp / 1000) if timestamp else datetime.utcnow()
         )
         

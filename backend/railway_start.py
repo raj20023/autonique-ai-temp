@@ -10,10 +10,26 @@ import subprocess
 def main():
     # Get port from environment variable
     port = os.getenv("PORT", "8000")
-    
+
     print(f"🚀 Starting AutoniqueAI API on port {port}")
     print(f"Environment: {os.getenv('ENVIRONMENT', 'development')}")
-    
+
+    # Run database migrations first
+    print("📦 Running database migrations...")
+    try:
+        migration_result = subprocess.run(
+            ["alembic", "upgrade", "head"],
+            capture_output=True,
+            text=True,
+            cwd="/app"  # Railway app directory
+        )
+        if migration_result.returncode == 0:
+            print("✅ Database migrations completed successfully")
+        else:
+            print(f"⚠️ Migration warning: {migration_result.stderr}")
+    except Exception as e:
+        print(f"⚠️ Migration error (continuing anyway): {e}")
+
     # Start uvicorn with proper port
     cmd = [
         "uvicorn",

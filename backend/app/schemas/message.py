@@ -18,6 +18,7 @@ class MessageResponse(MessageBase):
     similarity_score: Optional[float] = None
     auto_replied: bool
     reply_sent_at: Optional[datetime] = None
+    is_incoming: bool = True
     created_at: datetime
 
     class Config:

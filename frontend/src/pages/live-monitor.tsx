@@ -322,18 +322,31 @@ export default function LiveMonitor() {
                           </p>
                         </div>
 
-                        {message.our_response && (
+                        {message.our_response ? (
                           <div className="bg-green-50 rounded-lg p-3">
                             <p className="text-sm text-gray-700">
                               <span className="font-medium">AutoniqueAI:</span> "{message.our_response}"
                             </p>
                           </div>
+                        ) : (
+                          <div className="bg-yellow-50 rounded-lg p-3">
+                            <p className="text-sm text-gray-600 italic">
+                              No response generated or response pending...
+                            </p>
+                          </div>
                         )}
                       </div>
 
-                      <p className="text-xs text-gray-500 mt-2">
-                        Page: {message.page_name}
-                      </p>
+                      <div className="flex justify-between items-center mt-2">
+                        <p className="text-xs text-gray-500">
+                          Page: {message.page_name}
+                        </p>
+                        {message.reply_sent_at && (
+                          <p className="text-xs text-gray-500">
+                            Sent: {formatTime(message.reply_sent_at)}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </motion.div>

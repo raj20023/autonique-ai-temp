@@ -49,9 +49,11 @@ async def get_live_messages_data(
         # Get messages from last 24 hours for this user directly
         yesterday = datetime.utcnow() - timedelta(days=1)
 
+        # Only show incoming messages (from customers), not outgoing bot messages
         messages = db.query(Message).filter(
             Message.user_id == current_user.id,
-            Message.created_at >= yesterday
+            Message.created_at >= yesterday,
+            Message.is_incoming == True  # Only show incoming customer messages
         ).order_by(Message.created_at.desc()).limit(20).all()
 
         logger.info(f"Found {len(messages)} messages for user")
@@ -163,26 +165,30 @@ async def get_message_stats(
         last_24h = now - timedelta(days=1)
         last_week = now - timedelta(days=7)
         
-        # Query messages for each period
-        messages_last_hour = db.query(Message).join(Page).filter(
-            Page.user_id == current_user.id,
-            Message.created_at >= last_hour
+        # Query messages for each period - only count incoming messages
+        messages_last_hour = db.query(Message).filter(
+            Message.user_id == current_user.id,
+            Message.created_at >= last_hour,
+            Message.is_incoming == True
         ).count()
-        
-        messages_last_24h = db.query(Message).join(Page).filter(
-            Page.user_id == current_user.id,
-            Message.created_at >= last_24h
-        ).count()
-        
-        messages_last_week = db.query(Message).join(Page).filter(
-            Page.user_id == current_user.id,
-            Message.created_at >= last_week
-        ).count()
-        
-        # Get success rate
-        successful_replies = db.query(Message).join(Page).filter(
-            Page.user_id == current_user.id,
+
+        messages_last_24h = db.query(Message).filter(
+            Message.user_id == current_user.id,
             Message.created_at >= last_24h,
+            Message.is_incoming == True
+        ).count()
+
+        messages_last_week = db.query(Message).filter(
+            Message.user_id == current_user.id,
+            Message.created_at >= last_week,
+            Message.is_incoming == True
+        ).count()
+
+        # Get success rate - only count successful replies to incoming messages
+        successful_replies = db.query(Message).filter(
+            Message.user_id == current_user.id,
+            Message.created_at >= last_24h,
+            Message.is_incoming == True,
             Message.auto_replied == True
         ).count()
         
@@ -229,8 +235,10 @@ async def public_demo_messages(db: Session = Depends(get_db)):
         # Get recent messages from all users (last 24 hours) for demo purposes
         yesterday = datetime.utcnow() - timedelta(days=1)
 
+        # Only show incoming messages for demo
         messages = db.query(Message).filter(
-            Message.created_at >= yesterday
+            Message.created_at >= yesterday,
+            Message.is_incoming == True
         ).order_by(Message.created_at.desc()).limit(20).all()
 
         demo_messages = []
@@ -258,13 +266,15 @@ async def public_demo_messages(db: Session = Depends(get_db)):
                 "processing_time_ms": 1200 if msg.auto_replied else None  # Simulated processing time
             })
 
-        # Get overall stats
+        # Get overall stats - only count incoming messages
         total_messages_24h = db.query(Message).filter(
-            Message.created_at >= yesterday
+            Message.created_at >= yesterday,
+            Message.is_incoming == True
         ).count()
 
         successful_replies = db.query(Message).filter(
             Message.created_at >= yesterday,
+            Message.is_incoming == True,
             Message.auto_replied == True
         ).count()
 

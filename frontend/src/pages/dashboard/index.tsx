@@ -258,36 +258,37 @@ export default function DashboardPage() {
                       View Live Message Monitor
                     </a>
 
-                    <button
-                      onClick={async () => {
-                        try {
-                          const token = localStorage.getItem('access_token');
-                          if (!token) {
-                            alert('No access token found. Please login again.');
-                            return;
-                          }
-
-                          const response = await fetch('https://api.autonique.in/debug-user-pages', {
-                            headers: {
-                              'Authorization': `Bearer ${token}`,
-                              'Content-Type': 'application/json'
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      <button
+                        onClick={async () => {
+                          try {
+                            const token = localStorage.getItem('access_token');
+                            if (!token) {
+                              alert('No access token found. Please login again.');
+                              return;
                             }
-                          });
-                          const data = await response.json();
 
-                          if (data.error) {
-                            alert('Error: ' + data.error);
-                          } else {
-                            const pagesList = data.pages.map((page: any) =>
-                              `📄 ${page.page_name}
+                            const response = await fetch('https://api.autonique.in/debug-user-pages', {
+                              headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                              }
+                            });
+                            const data = await response.json();
+
+                            if (data.error) {
+                              alert('Error: ' + data.error);
+                            } else {
+                              const pagesList = data.pages.map((page: any) =>
+                                `📄 ${page.page_name}
   • FB Page ID: ${page.fb_page_id}
   • IG Business ID: ${page.ig_business_id || 'None'}
   • Instagram Username: ${page.instagram_username || 'None'}
   • Webhook: ${page.webhook_subscribed ? '✅' : '❌'}
   • Token: ${page.has_access_token ? '✅' : '❌'}`
-                            ).join('\n\n');
+                              ).join('\n\n');
 
-                            alert(`🔍 Debug: Your Pages in Database
+                              alert(`🔍 Debug: Your Pages in Database
 
 User: ${data.user_name} (ID: ${data.user_id})
 Total Pages: ${data.total_pages}
@@ -295,15 +296,113 @@ Total Pages: ${data.total_pages}
 ${pagesList || 'No pages found'}
 
 This helps debug why the live monitor might not show your accounts.`);
+                            }
+                          } catch (error) {
+                            alert('Error: ' + error);
                           }
-                        } catch (error) {
-                          alert('Error: ' + error);
-                        }
-                      }}
-                      className="block mx-auto px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded transition-colors"
-                    >
-                      🔍 Debug Pages
-                    </button>
+                        }}
+                        className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded transition-colors"
+                      >
+                        🔍 Debug Pages
+                      </button>
+
+                      <button
+                        onClick={async () => {
+                          try {
+                            const token = localStorage.getItem('access_token');
+                            if (!token) {
+                              alert('No access token found. Please login again.');
+                              return;
+                            }
+
+                            const response = await fetch('https://api.autonique.in/debug-user-messages', {
+                              headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                              }
+                            });
+                            const data = await response.json();
+
+                            if (data.error) {
+                              alert('Error: ' + data.error);
+                            } else {
+                              const messagesList = data.messages.map((msg: any) =>
+                                `💬 Message ID: ${msg.id}
+  • Customer: "${msg.message_text}"
+  • Our Response: "${msg.response_text || 'None'}"
+  • Auto-replied: ${msg.auto_replied ? '✅' : '❌'}
+  • Sent At: ${msg.reply_sent_at || 'Not sent'}
+  • Created: ${new Date(msg.created_at).toLocaleString()}`
+                              ).join('\n\n');
+
+                              alert(`💬 Debug: Your Recent Messages
+
+User: ${data.user_name}
+Total Messages (24h): ${data.total_messages}
+
+${messagesList || 'No recent messages found'}
+
+This shows the actual data stored in the database.`);
+                            }
+                          } catch (error) {
+                            alert('Error: ' + error);
+                          }
+                        }}
+                        className="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-medium rounded transition-colors"
+                      >
+                        💬 Debug Messages
+                      </button>
+
+                      <button
+                        onClick={async () => {
+                          if (!confirm('This will remove duplicate bot messages from your database. Continue?')) {
+                            return;
+                          }
+
+                          try {
+                            const token = localStorage.getItem('access_token');
+                            if (!token) {
+                              alert('No access token found. Please login again.');
+                              return;
+                            }
+
+                            const response = await fetch('https://api.autonique.in/cleanup-bot-messages', {
+                              method: 'POST',
+                              headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                              }
+                            });
+                            const data = await response.json();
+
+                            if (data.error) {
+                              alert('Error: ' + data.error);
+                            } else {
+                              const deletedList = data.deleted_messages?.slice(0, 5).map((msg: any) =>
+                                `• "${msg.message_text.substring(0, 50)}..." (${msg.reason})`
+                              ).join('\n') || 'None';
+
+                              alert(`🧹 Cleanup Complete!
+
+Deleted Messages: ${data.deleted_messages?.length || 0}
+Instagram Business IDs Checked: ${data.ig_business_ids_checked?.join(', ') || 'None'}
+
+Sample Deleted Messages:
+${deletedList}
+
+${data.deleted_messages?.length > 5 ? '...and more' : ''}
+
+Your live monitor should now show correct data!`);
+                            }
+                          } catch (error) {
+                            alert('Error: ' + error);
+                          }
+                        }}
+                        className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 text-xs font-medium rounded transition-colors"
+                      >
+                        🧹 Clean Bot Messages
+                      </button>
+                    </div>
                   </div>
 
                   <p className="text-xs text-gray-500 mt-3">
