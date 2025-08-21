@@ -477,7 +477,73 @@ async def check_token_info(
     except Exception as e:
         return {"error": str(e)}
 
+@app.get("/live-messages-demo")
+async def live_messages_demo():
+    """Public demo of live messages for Facebook reviewers (no auth required)"""
+    from app.models.message import Message
+    from app.models.page import Page
+    from datetime import datetime, timedelta
+    from app.core.database import SessionLocal
 
+    db = SessionLocal()
+    try:
+        # Get recent messages from last 24 hours
+        yesterday = datetime.utcnow() - timedelta(days=1)
+
+        messages = db.query(Message).join(Page).filter(
+            Message.created_at >= yesterday
+        ).order_by(Message.created_at.desc()).limit(20).all()
+
+        demo_messages = []
+        for msg in messages:
+            page = db.query(Page).filter(Page.id == msg.page_id).first()
+
+            demo_messages.append({
+                "timestamp": msg.created_at.isoformat(),
+                "instagram_account": f"@{page.instagram_username}" if page and page.instagram_username else "@demo_account",
+                "customer_message": msg.message_text,
+                "our_response": msg.response_text,
+                "auto_replied": msg.auto_replied,
+                "reply_sent_at": msg.reply_sent_at.isoformat() if msg.reply_sent_at else None,
+                "status": "✅ Sent" if msg.auto_replied else "❌ Failed" if msg.response_text else "⏳ Processing"
+            })
+
+        # Get stats
+        total_messages = len(demo_messages)
+        successful_replies = len([m for m in demo_messages if m["auto_replied"]])
+        success_rate = (successful_replies / total_messages * 100) if total_messages > 0 else 0
+
+        return {
+            "app_name": "AutoniqueAI",
+            "purpose": "Instagram Auto-Reply Bot for Small Businesses",
+            "total_messages": total_messages,
+            "successful_replies": successful_replies,
+            "success_rate": round(success_rate, 1),
+            "messages": demo_messages,
+            "last_updated": datetime.utcnow().isoformat(),
+            "permissions_used": [
+                "pages_messaging: Send auto-reply messages through Facebook Pages",
+                "instagram_basic: Access Instagram account information",
+                "instagram_manage_messages: Receive and send Instagram Direct Messages"
+            ],
+            "note_for_reviewers": "This demonstrates real Instagram message processing using minimal Facebook permissions"
+        }
+
+    except Exception as e:
+        return {
+            "error": str(e),
+            "demo_data": {
+                "app_name": "AutoniqueAI",
+                "purpose": "Instagram Auto-Reply Bot for Small Businesses",
+                "total_messages": 0,
+                "successful_replies": 0,
+                "success_rate": 0,
+                "messages": [],
+                "note": "Demo temporarily unavailable - this would show real Instagram message processing"
+            }
+        }
+    finally:
+        db.close()
 
 port = int(os.environ.get("PORT", 8000))
 
