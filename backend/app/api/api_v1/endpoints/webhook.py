@@ -256,6 +256,25 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
         db.add(message_record)
         db.commit()
         logger.info(f"Message record saved successfully")
+
+        # Broadcast to live monitoring (for Facebook reviewers)
+        try:
+            from app.api.api_v1.endpoints.live_messages import broadcast_new_message
+            await broadcast_new_message({
+                "id": message_record.id,
+                "timestamp": message_record.created_at.isoformat(),
+                "page_name": page.page_name,
+                "instagram_username": page.instagram_username or "Unknown",
+                "customer_message": message_text,
+                "our_response": response_text,
+                "auto_replied": success,
+                "reply_sent_at": message_record.reply_sent_at.isoformat() if message_record.reply_sent_at else None,
+                "similarity_score": message_record.similarity_score,
+                "ig_user_id": sender_id,
+                "status": "✅ Sent" if success else "❌ Failed" if response_text else "⏳ Processing"
+            })
+        except Exception as e:
+            logger.error(f"Failed to broadcast message update: {e}")
         
     except Exception as e:
         logger.error(f"Error processing message event: {e}")

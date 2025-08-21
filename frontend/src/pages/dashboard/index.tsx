@@ -11,7 +11,8 @@ import {
   Instagram,
   CheckCircle,
   AlertCircle,
-  Plus
+  Plus,
+  Activity
 } from 'lucide-react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useAuth } from '@/hooks/useAuth';
@@ -241,12 +242,23 @@ export default function DashboardPage() {
                   <span className="text-sm text-gray-500">→</span>
                 </button>
 
-                <div className="text-center py-8">
-                  <p className="text-sm text-gray-600">
+                <div className="text-center py-6">
+                  <p className="text-sm text-gray-600 mb-4">
                     Your Instagram auto-reply system is ready to help customers 24/7!
                   </p>
-                  <p className="text-xs text-gray-500 mt-2">
-                    Add FAQs above to improve response accuracy.
+
+                  <a
+                    href="/live-monitor"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    <Activity className="h-4 w-4 mr-2" />
+                    View Live Message Monitor
+                  </a>
+
+                  <p className="text-xs text-gray-500 mt-3">
+                    For Facebook reviewers: This shows real-time message processing
                   </p>
                 </div>
 
