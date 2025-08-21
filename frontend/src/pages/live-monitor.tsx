@@ -12,16 +12,13 @@ import {
 } from 'lucide-react';
 
 interface Message {
-  id: number;
   timestamp: string;
+  instagram_account: string;
   page_name: string;
-  instagram_username: string;
   customer_message: string;
   our_response: string;
   auto_replied: boolean;
   reply_sent_at: string | null;
-  similarity_score: number;
-  ig_user_id: string;
   status: string;
 }
 
@@ -48,11 +45,27 @@ export default function LiveMonitor() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<string>('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const fetchData = async () => {
     try {
-      // Use the public demo endpoint to avoid CORS issues
-      const response = await fetch('https://api.autonique.in/live-messages-demo');
+      const token = localStorage.getItem('access_token');
+      let response;
+
+      if (token) {
+        // Use authenticated endpoint for real user data
+        setIsAuthenticated(true);
+        response = await fetch('https://api.autonique.in/live-messages-data', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+      } else {
+        // Use public demo endpoint for reviewers
+        setIsAuthenticated(false);
+        response = await fetch('https://api.autonique.in/live-messages-demo');
+      }
 
       if (response.ok) {
         const data = await response.json();
@@ -61,7 +74,7 @@ export default function LiveMonitor() {
         setMessages(data.messages || []);
         setLastUpdated(data.last_updated);
 
-        // Set stats from the demo data
+        // Set stats from the response data
         setStats({
           message_activity: {
             last_hour: Math.floor(data.total_messages / 24), // Estimate
@@ -70,20 +83,15 @@ export default function LiveMonitor() {
           },
           success_rate: data.success_rate,
           successful_replies_24h: data.successful_replies,
-          connected_accounts: 1, // Default
-          instagram_accounts: [
-            {
-              page_name: "Demo Account",
-              instagram_username: "demo_account",
-              webhook_active: true
-            }
-          ],
-          system_status: data.total_messages > 0 ? "Active" : "Waiting for messages",
+          connected_accounts: data.connected_accounts,
+          instagram_accounts: data.instagram_accounts || [],
+          system_status: data.system_status,
           last_updated: data.last_updated
         });
       }
     } catch (error) {
       console.error('Error fetching data:', error);
+      setIsAuthenticated(false);
       // Set default values to prevent undefined errors
       setStats({
         message_activity: {
@@ -95,7 +103,7 @@ export default function LiveMonitor() {
         successful_replies_24h: 0,
         connected_accounts: 0,
         instagram_accounts: [],
-        system_status: "Demo unavailable",
+        system_status: "Error loading data",
         last_updated: new Date().toISOString()
       });
     }
@@ -146,12 +154,24 @@ export default function LiveMonitor() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 flex items-center">
-                  <Activity className="h-6 w-6 text-blue-500 mr-2" />
-                  AutoniqueAI Live Message Monitor
-                </h1>
+                <div className="flex items-center space-x-3">
+                  <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+                    <Activity className="h-6 w-6 text-blue-500 mr-2" />
+                    AutoniqueAI Live Message Monitor
+                  </h1>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    isAuthenticated
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-blue-100 text-blue-800'
+                  }`}>
+                    {isAuthenticated ? 'Your Account' : 'Demo Mode'}
+                  </span>
+                </div>
                 <p className="text-gray-600 mt-1">
-                  Real-time Instagram message processing for Facebook App Review
+                  {isAuthenticated
+                    ? 'Real-time Instagram message processing for your account'
+                    : 'Demo of Instagram message processing for Facebook App Review'
+                  }
                 </p>
               </div>
               <div className="text-right">
@@ -266,7 +286,7 @@ export default function LiveMonitor() {
             ) : (
               messages.map((message, index) => (
                 <motion.div
-                  key={message.id}
+                  key={`${message.timestamp}-${index}`}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
@@ -280,21 +300,21 @@ export default function LiveMonitor() {
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2">
                           <p className="text-sm font-medium text-gray-900">
-                            @{message.instagram_username}
+                            {message.instagram_account}
                           </p>
                           <span className="text-sm text-gray-500">•</span>
                           <p className="text-sm text-gray-500">{formatTime(message.timestamp)}</p>
                         </div>
                         <span className="text-xs font-medium text-gray-600">{message.status}</span>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <div className="bg-blue-50 rounded-lg p-3">
                           <p className="text-sm text-gray-700">
                             <span className="font-medium">Customer:</span> "{message.customer_message}"
                           </p>
                         </div>
-                        
+
                         {message.our_response && (
                           <div className="bg-green-50 rounded-lg p-3">
                             <p className="text-sm text-gray-700">
@@ -303,12 +323,10 @@ export default function LiveMonitor() {
                           </div>
                         )}
                       </div>
-                      
-                      {message.similarity_score && (
-                        <p className="text-xs text-gray-500 mt-2">
-                          FAQ Match Score: {(message.similarity_score * 100).toFixed(1)}%
-                        </p>
-                      )}
+
+                      <p className="text-xs text-gray-500 mt-2">
+                        Page: {message.page_name}
+                      </p>
                     </div>
                   </div>
                 </motion.div>

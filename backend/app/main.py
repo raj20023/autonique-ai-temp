@@ -477,6 +477,82 @@ async def check_token_info(
     except Exception as e:
         return {"error": str(e)}
 
+@app.get("/live-messages-data")
+async def live_messages_data(
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """Get live messages data for authenticated users"""
+    from app.models.message import Message
+    from app.models.page import Page
+    from datetime import datetime, timedelta
+
+    try:
+        # Get recent messages from last 24 hours for this user
+        yesterday = datetime.utcnow() - timedelta(days=1)
+
+        messages = db.query(Message).join(Page).filter(
+            Page.user_id == current_user.id,
+            Message.created_at >= yesterday
+        ).order_by(Message.created_at.desc()).limit(20).all()
+
+        message_list = []
+        for msg in messages:
+            page = db.query(Page).filter(Page.id == msg.page_id).first()
+
+            message_list.append({
+                "timestamp": msg.created_at.isoformat(),
+                "instagram_account": f"@{page.instagram_username}" if page and page.instagram_username else "@unknown",
+                "page_name": page.page_name if page else "Unknown Page",
+                "customer_message": msg.message_text,
+                "our_response": msg.response_text,
+                "auto_replied": msg.auto_replied,
+                "reply_sent_at": msg.reply_sent_at.isoformat() if msg.reply_sent_at else None,
+                "status": "✅ Sent" if msg.auto_replied else "❌ Failed" if msg.response_text else "⏳ Processing"
+            })
+
+        # Get user's Instagram accounts
+        pages = db.query(Page).filter(
+            Page.user_id == current_user.id,
+            Page.ig_business_id.isnot(None)
+        ).all()
+
+        instagram_accounts = []
+        for page in pages:
+            instagram_accounts.append({
+                "page_name": page.page_name,
+                "instagram_username": page.instagram_username or "Unknown",
+                "webhook_active": page.webhook_subscribed
+            })
+
+        # Get stats
+        total_messages = len(message_list)
+        successful_replies = len([m for m in message_list if m["auto_replied"]])
+        success_rate = (successful_replies / total_messages * 100) if total_messages > 0 else 0
+
+        return {
+            "app_name": "AutoniqueAI",
+            "purpose": "Instagram Auto-Reply Bot for Small Businesses",
+            "total_messages": total_messages,
+            "successful_replies": successful_replies,
+            "success_rate": round(success_rate, 1),
+            "messages": message_list,
+            "instagram_accounts": instagram_accounts,
+            "connected_accounts": len(instagram_accounts),
+            "system_status": "Active" if total_messages > 0 else "Waiting for messages",
+            "last_updated": datetime.utcnow().isoformat(),
+            "user_name": current_user.name,
+            "permissions_used": [
+                "pages_messaging: Send auto-reply messages through Facebook Pages",
+                "instagram_basic: Access Instagram account information",
+                "instagram_manage_messages: Receive and send Instagram Direct Messages"
+            ],
+            "note_for_reviewers": "This shows real Instagram message processing for authenticated user"
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
+
 @app.get("/live-messages-demo")
 async def live_messages_demo():
     """Public demo of live messages for Facebook reviewers (no auth required)"""
@@ -487,25 +563,49 @@ async def live_messages_demo():
 
     db = SessionLocal()
     try:
-        # Get recent messages from last 24 hours
+        # Get recent messages from last 24 hours from all users
         yesterday = datetime.utcnow() - timedelta(days=1)
 
         messages = db.query(Message).join(Page).filter(
             Message.created_at >= yesterday
-        ).order_by(Message.created_at.desc()).limit(20).all()
+        ).order_by(Message.created_at.desc()).limit(10).all()
 
         demo_messages = []
+        demo_accounts = set()
+
         for msg in messages:
             page = db.query(Page).filter(Page.id == msg.page_id).first()
+            instagram_username = page.instagram_username if page and page.instagram_username else "demo_account"
 
             demo_messages.append({
                 "timestamp": msg.created_at.isoformat(),
-                "instagram_account": f"@{page.instagram_username}" if page and page.instagram_username else "@demo_account",
+                "instagram_account": f"@{instagram_username}",
+                "page_name": page.page_name if page else "Demo Page",
                 "customer_message": msg.message_text,
                 "our_response": msg.response_text,
                 "auto_replied": msg.auto_replied,
                 "reply_sent_at": msg.reply_sent_at.isoformat() if msg.reply_sent_at else None,
                 "status": "✅ Sent" if msg.auto_replied else "❌ Failed" if msg.response_text else "⏳ Processing"
+            })
+
+            if page and page.instagram_username:
+                demo_accounts.add((page.page_name, page.instagram_username, page.webhook_subscribed))
+
+        # Create demo Instagram accounts list
+        instagram_accounts = []
+        for page_name, username, webhook_active in demo_accounts:
+            instagram_accounts.append({
+                "page_name": page_name,
+                "instagram_username": username,
+                "webhook_active": webhook_active
+            })
+
+        # If no real accounts, add demo account
+        if not instagram_accounts:
+            instagram_accounts.append({
+                "page_name": "Demo Account",
+                "instagram_username": "demo_account",
+                "webhook_active": True
             })
 
         # Get stats
@@ -520,6 +620,9 @@ async def live_messages_demo():
             "successful_replies": successful_replies,
             "success_rate": round(success_rate, 1),
             "messages": demo_messages,
+            "instagram_accounts": instagram_accounts,
+            "connected_accounts": len(instagram_accounts),
+            "system_status": "Active" if total_messages > 0 else "Demo Mode",
             "last_updated": datetime.utcnow().isoformat(),
             "permissions_used": [
                 "pages_messaging: Send auto-reply messages through Facebook Pages",
@@ -539,6 +642,9 @@ async def live_messages_demo():
                 "successful_replies": 0,
                 "success_rate": 0,
                 "messages": [],
+                "instagram_accounts": [{"page_name": "Demo Account", "instagram_username": "demo_account", "webhook_active": True}],
+                "connected_accounts": 1,
+                "system_status": "Demo Mode",
                 "note": "Demo temporarily unavailable - this would show real Instagram message processing"
             }
         }
