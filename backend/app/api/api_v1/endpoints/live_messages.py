@@ -37,52 +37,77 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-@router.get("/live-messages")
-async def get_live_messages(
+@router.get("/live-messages-data")
+async def get_live_messages_data(
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
-    """Get recent messages for live monitoring (for Facebook reviewers)"""
+    """Get live messages data for authenticated users"""
     try:
-        # Get messages from last 24 hours
+        # Get messages from last 24 hours for this user
         yesterday = datetime.utcnow() - timedelta(days=1)
-        
+
         messages = db.query(Message).join(Page).filter(
             Page.user_id == current_user.id,
             Message.created_at >= yesterday
-        ).order_by(Message.created_at.desc()).limit(50).all()
-        
+        ).order_by(Message.created_at.desc()).limit(20).all()
+
         message_list = []
         for msg in messages:
-            # Get page info
             page = db.query(Page).filter(Page.id == msg.page_id).first()
-            
-            message_data = {
-                "id": msg.id,
+
+            message_list.append({
                 "timestamp": msg.created_at.isoformat(),
+                "instagram_account": f"@{page.instagram_username}" if page and page.instagram_username else "@unknown",
                 "page_name": page.page_name if page else "Unknown Page",
-                "instagram_username": page.instagram_username if page else "Unknown",
                 "customer_message": msg.message_text,
                 "our_response": msg.response_text,
                 "auto_replied": msg.auto_replied,
                 "reply_sent_at": msg.reply_sent_at.isoformat() if msg.reply_sent_at else None,
-                "similarity_score": msg.similarity_score,
-                "ig_user_id": msg.ig_user_id,
-                "ig_message_id": msg.ig_message_id,
                 "status": "✅ Sent" if msg.auto_replied else "❌ Failed" if msg.response_text else "⏳ Processing"
-            }
-            message_list.append(message_data)
-        
+            })
+
+        # Get user's Instagram accounts
+        pages = db.query(Page).filter(
+            Page.user_id == current_user.id,
+            Page.ig_business_id.isnot(None)
+        ).all()
+
+        instagram_accounts = []
+        for page in pages:
+            instagram_accounts.append({
+                "page_name": page.page_name,
+                "instagram_username": page.instagram_username or "Unknown",
+                "webhook_active": page.webhook_subscribed
+            })
+
+        # Get stats
+        total_messages = len(message_list)
+        successful_replies = len([m for m in message_list if m["auto_replied"]])
+        success_rate = (successful_replies / total_messages * 100) if total_messages > 0 else 0
+
         return {
-            "total_messages": len(message_list),
+            "app_name": "AutoniqueAI",
+            "purpose": "Instagram Auto-Reply Bot for Small Businesses",
+            "total_messages": total_messages,
+            "successful_replies": successful_replies,
+            "success_rate": round(success_rate, 1),
             "messages": message_list,
+            "instagram_accounts": instagram_accounts,
+            "connected_accounts": len(instagram_accounts),
+            "system_status": "Active" if total_messages > 0 else "Waiting for messages",
             "last_updated": datetime.utcnow().isoformat(),
-            "monitoring_period": "Last 24 hours",
-            "note_for_reviewers": "This shows real-time Instagram message processing by AutoniqueAI"
+            "user_name": current_user.name,
+            "permissions_used": [
+                "pages_messaging: Send auto-reply messages through Facebook Pages",
+                "instagram_basic: Access Instagram account information",
+                "instagram_manage_messages: Receive and send Instagram Direct Messages"
+            ],
+            "note_for_reviewers": "This shows real Instagram message processing for authenticated user"
         }
-        
+
     except Exception as e:
-        logger.error(f"Error fetching live messages: {e}")
+        logger.error(f"Error fetching live messages data: {e}")
         return {"error": str(e)}
 
 @router.websocket("/ws/live-messages")

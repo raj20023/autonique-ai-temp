@@ -247,15 +247,64 @@ export default function DashboardPage() {
                     Your Instagram auto-reply system is ready to help customers 24/7!
                   </p>
 
-                  <a
-                    href="/live-monitor"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
-                  >
-                    <Activity className="h-4 w-4 mr-2" />
-                    View Live Message Monitor
-                  </a>
+                  <div className="space-y-3">
+                    <a
+                      href="/live-monitor"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                    >
+                      <Activity className="h-4 w-4 mr-2" />
+                      View Live Message Monitor
+                    </a>
+
+                    <button
+                      onClick={async () => {
+                        try {
+                          const token = localStorage.getItem('access_token');
+                          if (!token) {
+                            alert('No access token found. Please login again.');
+                            return;
+                          }
+
+                          const response = await fetch('https://api.autonique.in/debug-user-pages', {
+                            headers: {
+                              'Authorization': `Bearer ${token}`,
+                              'Content-Type': 'application/json'
+                            }
+                          });
+                          const data = await response.json();
+
+                          if (data.error) {
+                            alert('Error: ' + data.error);
+                          } else {
+                            const pagesList = data.pages.map((page: any) =>
+                              `📄 ${page.page_name}
+  • FB Page ID: ${page.fb_page_id}
+  • IG Business ID: ${page.ig_business_id || 'None'}
+  • Instagram Username: ${page.instagram_username || 'None'}
+  • Webhook: ${page.webhook_subscribed ? '✅' : '❌'}
+  • Token: ${page.has_access_token ? '✅' : '❌'}`
+                            ).join('\n\n');
+
+                            alert(`🔍 Debug: Your Pages in Database
+
+User: ${data.user_name} (ID: ${data.user_id})
+Total Pages: ${data.total_pages}
+
+${pagesList || 'No pages found'}
+
+This helps debug why the live monitor might not show your accounts.`);
+                          }
+                        } catch (error) {
+                          alert('Error: ' + error);
+                        }
+                      }}
+                      className="block mx-auto px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded transition-colors"
+                    >
+                      🔍 Debug Pages
+                    </button>
+                  </div>
 
                   <p className="text-xs text-gray-500 mt-3">
                     For Facebook reviewers: This shows real-time message processing

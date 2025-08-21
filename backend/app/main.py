@@ -651,6 +651,36 @@ async def live_messages_demo():
     finally:
         db.close()
 
+@app.get("/debug-user-pages")
+async def debug_user_pages(current_user: User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    """Debug endpoint to check user's pages"""
+    try:
+        from app.models.page import Page
+
+        pages = db.query(Page).filter(Page.user_id == current_user.id).all()
+
+        page_info = []
+        for page in pages:
+            page_info.append({
+                "id": page.id,
+                "page_name": page.page_name,
+                "fb_page_id": page.fb_page_id,
+                "ig_business_id": page.ig_business_id,
+                "instagram_username": page.instagram_username,
+                "webhook_subscribed": page.webhook_subscribed,
+                "has_access_token": bool(page.page_access_token)
+            })
+
+        return {
+            "user_id": current_user.id,
+            "user_name": current_user.name,
+            "total_pages": len(pages),
+            "pages": page_info
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
+
 port = int(os.environ.get("PORT", 8000))
 
 if __name__ == "__main__":
