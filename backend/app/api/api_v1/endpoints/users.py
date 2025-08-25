@@ -11,8 +11,15 @@ from app.models.message import Message
 from app.models.faq import FAQ
 from app.models.page import Page
 from app.schemas.user import UserResponse, UserUpdate
+from app.core.security import encrypt_token
+from pydantic import BaseModel
 
 router = APIRouter()
+
+class NotificationPreferences(BaseModel):
+    email_notifications: bool = True
+    message_alerts: bool = True
+    system_updates: bool = True
 
 @router.get("/me", response_model=UserResponse)
 def get_current_user_info(current_user: User = Depends(get_current_active_user)):
@@ -118,7 +125,42 @@ def delete_current_user(
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
-    """Delete current user account"""
+    """Delete current user account and all associated data"""
+
+    # Delete all user's FAQs
+    db.query(FAQ).filter(FAQ.user_id == current_user.id).delete()
+
+    # Delete all user's messages
+    db.query(Message).filter(Message.user_id == current_user.id).delete()
+
+    # Delete all user's pages
+    db.query(Page).filter(Page.user_id == current_user.id).delete()
+
+    # Delete the user
     db.delete(current_user)
     db.commit()
-    return {"message": "User account deleted successfully"}
+
+    return {"message": "User account and all associated data deleted successfully"}
+
+@router.get("/notifications")
+def get_notification_preferences(
+    current_user: User = Depends(get_current_active_user)
+):
+    """Get user notification preferences"""
+    # For now, return default preferences
+    # In the future, you can store these in the database
+    return {
+        "email_notifications": True,
+        "message_alerts": True,
+        "system_updates": True
+    }
+
+@router.put("/notifications")
+def update_notification_preferences(
+    preferences: NotificationPreferences,
+    current_user: User = Depends(get_current_active_user)
+):
+    """Update user notification preferences"""
+    # For now, just return the updated preferences
+    # In the future, you can store these in the database
+    return preferences.dict()
