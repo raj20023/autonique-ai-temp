@@ -16,6 +16,7 @@ from app.core.database import engine, Base, get_db
 from app.core.cache import cleanup_expired_cache_entries
 from app.api.deps import get_current_active_user
 from app.models.user import User
+from app.services.token_refresh_service import token_refresh_service
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -48,8 +49,13 @@ async def lifespan(app: FastAPI):
         logger.warning(f"Could not start cache cleanup task: {e}")
         cleanup_task = None
 
-    # Token refresh service disabled for now to avoid startup issues
-    token_task = None
+    # Start token refresh task (less frequent for long-lived tokens)
+    try:
+        token_task = asyncio.create_task(token_refresh_service.start_periodic_refresh(24))  # Every 24 hours
+        logger.info("Token refresh service started")
+    except Exception as e:
+        logger.warning(f"Could not start token refresh service: {e}")
+        token_task = None
 
     yield
 
@@ -804,6 +810,8 @@ async def cleanup_bot_messages(current_user: User = Depends(get_current_active_u
 
     except Exception as e:
         return {"error": str(e)}
+
+
 
 port = int(os.environ.get("PORT", 8000))
 

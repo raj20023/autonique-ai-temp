@@ -19,6 +19,8 @@ logger = logging.getLogger(__name__)
 
 
 
+
+
 @router.get("/")
 async def verify_webhook(
     request: Request,
@@ -254,8 +256,24 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
                 page_access_token = decrypt_token(page.page_access_token)
             except Exception as e:
                 logger.error(f"Failed to decrypt page access token: {e}")
-                logger.error("User needs to logout and login again to refresh tokens")
-                return
+                logger.info("🔄 Attempting to use existing token refresh service...")
+
+                # Use the existing token refresh service
+                from app.services.token_refresh_service import token_refresh_service
+                refreshed = await token_refresh_service.refresh_user_tokens(db, user)
+
+                if refreshed:
+                    try:
+                        # Refresh the page object from database
+                        db.refresh(page)
+                        page_access_token = decrypt_token(page.page_access_token)
+                        logger.info("✅ Tokens refreshed successfully using existing service")
+                    except Exception as refresh_error:
+                        logger.error(f"❌ Token refresh failed: {refresh_error}")
+                        return
+                else:
+                    logger.error("❌ Token refresh failed - user may need to re-authenticate")
+                    return
 
             logger.info(f"Attempting to send auto-reply to sender_id: {sender_id}")
             logger.info(f"Using Instagram Business ID: {page.ig_business_id}")
