@@ -153,6 +153,7 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
 
         logger.info(f"Processing message - Sender ID: {sender_id}, Recipient ID: {recipient_id}, Message ID: {message_id}, Text: {message_text}")
         logger.info(f"Page Instagram Business ID: {page.ig_business_id}")
+        logger.info(f"User: {user.name} (ID: {user.id}) - Page: {page.page_name} (@{page.instagram_username})")
 
         if not sender_id or not message_id or not message_text:
             logger.warning(f"Incomplete message data - Sender ID: {sender_id}, Message ID: {message_id}, Text: '{message_text}'")
@@ -183,21 +184,24 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
         from datetime import timedelta
         recent_cutoff = datetime.utcnow() - timedelta(minutes=10)  # Extended to 10 minutes for better coverage
 
-        # Check for exact match with recent responses
+        # FIXED: Check for exact match with recent responses FROM THE SAME INSTAGRAM ACCOUNT
+        # This prevents cross-account message filtering when user has multiple IG accounts
         recent_response = db.query(Message).filter(
             Message.user_id == user.id,
+            Message.ig_user_id == sender_id,  # IMPORTANT: Only check responses to the SAME sender
             Message.response_text == message_text,
             Message.reply_sent_at >= recent_cutoff
         ).first()
 
         if recent_response:
-            logger.info(f"Ignoring message that exactly matches our recent response: '{message_text}' (sent at {recent_response.reply_sent_at})")
+            logger.info(f"Ignoring message that exactly matches our recent response to same sender: '{message_text}' (sent at {recent_response.reply_sent_at})")
             return
 
-        # Additional check: Look for similar responses (in case of slight variations)
-        # This is more comprehensive than exact match
+        # FIXED: Additional check for similar responses - only from the SAME INSTAGRAM ACCOUNT
+        # This prevents filtering legitimate messages between different IG accounts owned by same user
         recent_responses = db.query(Message).filter(
             Message.user_id == user.id,
+            Message.ig_user_id == sender_id,  # IMPORTANT: Only check responses to the SAME sender
             Message.response_text.isnot(None),
             Message.reply_sent_at >= recent_cutoff
         ).all()
@@ -209,7 +213,7 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
                 # Check if message text is contained in response or vice versa (with some tolerance)
                 if (message_text.lower().strip() in response.response_text.lower().strip() or
                     response.response_text.lower().strip() in message_text.lower().strip()):
-                    logger.info(f"Ignoring message that appears to be our recent response (similarity check): '{message_text}' vs recent response: '{response.response_text}'")
+                    logger.info(f"Ignoring message that appears to be our recent response to same sender (similarity check): '{message_text}' vs recent response: '{response.response_text}'")
                     return
         
         # Create message record - explicitly mark as incoming message
