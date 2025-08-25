@@ -145,18 +145,24 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
         sender = messaging_event.get("sender", {})
         recipient = messaging_event.get("recipient", {})
         timestamp = messaging_event.get("timestamp")
-        
+
         sender_id = sender.get("id")
         recipient_id = recipient.get("id")
         message_id = message_data.get("mid")
         message_text = message_data.get("text", "")
+        is_echo = message_data.get("is_echo", False)
 
-        logger.info(f"Processing message - Sender ID: {sender_id}, Recipient ID: {recipient_id}, Message ID: {message_id}, Text: {message_text}")
+        logger.info(f"Processing message - Sender ID: {sender_id}, Recipient ID: {recipient_id}, Message ID: {message_id}, Text: {message_text}, Is Echo: {is_echo}")
         logger.info(f"Page Instagram Business ID: {page.ig_business_id}")
         logger.info(f"User: {user.name} (ID: {user.id}) - Page: {page.page_name} (@{page.instagram_username})")
 
         if not sender_id or not message_id or not message_text:
             logger.warning(f"Incomplete message data - Sender ID: {sender_id}, Message ID: {message_id}, Text: '{message_text}'")
+            return
+
+        # IMPORTANT: Check for echo messages first (Instagram's built-in echo detection)
+        if is_echo:
+            logger.info(f"Ignoring echo message (is_echo=true): '{message_text}'")
             return
 
         # IMPORTANT: Ignore messages sent by our own bot
