@@ -10,19 +10,19 @@ export default function ForcePermissionsPage() {
   const forceUrls = [
     {
       name: "Method 1: Force Re-request",
-      url: "https://www.facebook.com/v18.0/dialog/oauth?client_id=2032087817551720&redirect_uri=https%3A%2F%2Fautonique.in%2Fauth%2Fcallback&scope=pages_messaging%2Cinstagram_basic%2Cinstagram_manage_messages%2Cpages_show_list%2Cbusiness_management&response_type=code&auth_type=rerequest&display=popup&force_login=true"
+      url: "https://www.facebook.com/v18.0/dialog/oauth?client_id=2032087817551720&redirect_uri=https%3A%2F%2Fautonique.in%2Fauth%2Fcallback&scope=pages_messaging%2Cinstagram_basic%2Cinstagram_manage_messages%2Cpages_show_list%2Cbusiness_management%2Cpages_manage_metadata&response_type=code&auth_type=rerequest&display=popup&force_login=true"
     },
     {
       name: "Method 2: Force Login + Re-request", 
-      url: "https://www.facebook.com/v18.0/dialog/oauth?client_id=2032087817551720&redirect_uri=https%3A%2F%2Fautonique.in%2Fauth%2Fcallback&scope=pages_messaging%2Cinstagram_basic%2Cinstagram_manage_messages%2Cpages_show_list%2Cbusiness_management&response_type=code&auth_type=rerequest&display=page&force_login=true&reauthorize=true"
+      url: "https://www.facebook.com/v18.0/dialog/oauth?client_id=2032087817551720&redirect_uri=https%3A%2F%2Fautonique.in%2Fauth%2Fcallback&scope=pages_messaging%2Cinstagram_basic%2Cinstagram_manage_messages%2Cpages_show_list%2Cbusiness_management%2Cpages_manage_metadata&response_type=code&auth_type=rerequest&display=page&force_login=true&reauthorize=true"
     },
     {
       name: "Method 3: Different Display Mode",
-      url: "https://www.facebook.com/v18.0/dialog/oauth?client_id=2032087817551720&redirect_uri=https%3A%2F%2Fautonique.in%2Fauth%2Fcallback&scope=pages_messaging%2Cinstagram_basic%2Cinstagram_manage_messages%2Cpages_show_list%2Cbusiness_management&response_type=code&auth_type=rerequest&display=page"
+      url: "https://www.facebook.com/v18.0/dialog/oauth?client_id=2032087817551720&redirect_uri=https%3A%2F%2Fautonique.in%2Fauth%2Fcallback&scope=pages_messaging%2Cinstagram_basic%2Cinstagram_manage_messages%2Cpages_show_list%2Cbusiness_management%2Cpages_manage_metadata&response_type=code&auth_type=rerequest&display=page"
     },
     {
       name: "Method 4: With State Parameter",
-      url: "https://www.facebook.com/v18.0/dialog/oauth?client_id=2032087817551720&redirect_uri=https%3A%2F%2Fautonique.in%2Fauth%2Fcallback&scope=pages_messaging%2Cinstagram_basic%2Cinstagram_manage_messages%2Cpages_show_list%2Cbusiness_management&response_type=code&auth_type=rerequest&display=popup&state=force_permissions_reset"
+      url: "https://www.facebook.com/v18.0/dialog/oauth?client_id=2032087817551720&redirect_uri=https%3A%2F%2Fautonique.in%2Fauth%2Fcallback&scope=pages_messaging%2Cinstagram_basic%2Cinstagram_manage_messages%2Cpages_show_list%2Cbusiness_management%2Cpages_manage_metadata&response_type=code&auth_type=rerequest&display=popup&state=force_permissions_reset"
     }
   ];
 
@@ -97,7 +97,7 @@ export default function ForcePermissionsPage() {
               Facebook is only granting: <code>pages_messaging, instagram_basic, instagram_manage_messages</code>
             </p>
             <p className="text-red-700">
-              Missing: <code>pages_show_list, business_management</code>
+              Missing: <code>pages_show_list, business_management, pages_manage_metadata</code>
             </p>
           </div>
 
@@ -186,8 +186,8 @@ export default function ForcePermissionsPage() {
             </h3>
             <div className="space-y-2 text-green-800">
               <p>✅ Facebook should show ALL permission requests</p>
-              <p>✅ You should see requests for "Manage Pages" and "Business Management"</p>
-              <p>✅ Backend logs should show all 5 permissions granted</p>
+              <p>✅ You should see requests for "Manage Pages", "Business Management", and "Page Metadata"</p>
+              <p>✅ Backend logs should show all 6 permissions granted</p>
               <p>✅ You should see your Facebook pages listed</p>
             </div>
           </div>
@@ -199,7 +199,7 @@ export default function ForcePermissionsPage() {
             </h3>
             <div className="space-y-2 text-sm text-gray-700 font-mono">
               <p><strong>App ID:</strong> 2032087817551720</p>
-              <p><strong>Required Scope:</strong> pages_messaging,instagram_basic,instagram_manage_messages,pages_show_list,business_management</p>
+              <p><strong>Required Scope:</strong> pages_messaging,instagram_basic,instagram_manage_messages,pages_show_list,business_management,pages_manage_metadata</p>
               <p><strong>Redirect URI:</strong> https://autonique.in/auth/callback</p>
               <p><strong>API Version:</strong> v18.0</p>
             </div>
