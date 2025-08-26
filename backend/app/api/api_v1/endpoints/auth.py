@@ -42,7 +42,21 @@ async def facebook_callback(
 
         # Log token info for debugging
         expires_in = long_lived_data.get("expires_in", "No expiration info")
-        logger.info(f"Long-lived user token obtained - expires in: {expires_in} seconds")
+        logger.info(f"✅ Long-lived user token obtained - expires in: {expires_in} seconds")
+
+        # Test token encryption immediately
+        try:
+            encrypted_test = encrypt_token(access_token)
+            from app.core.security import decrypt_token
+            decrypted_test = decrypt_token(encrypted_test)
+            if access_token == decrypted_test:
+                logger.info("✅ Token encryption/decryption test passed")
+            else:
+                logger.error("❌ Token encryption/decryption test failed")
+                raise HTTPException(status_code=500, detail="Token encryption error")
+        except Exception as e:
+            logger.error(f"❌ Token encryption test failed: {e}")
+            raise HTTPException(status_code=500, detail="Token encryption error")
 
         # Log permissions for debugging
         try:

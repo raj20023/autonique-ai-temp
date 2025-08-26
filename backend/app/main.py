@@ -148,10 +148,18 @@ def ready():
 async def health_check():
     """Health check endpoint that doesn't depend on database"""
     try:
+        # Test token encryption/decryption
+        from app.core.security import encrypt_token, decrypt_token
+        test_token = "health_check_token"
+        encrypted = encrypt_token(test_token)
+        decrypted = decrypt_token(encrypted)
+        encryption_ok = (test_token == decrypted)
+
         return {
             "status": "healthy",
             "timestamp": time.time(),
-            "service": "autonique-backend"
+            "service": "autonique-backend",
+            "encryption": "ok" if encryption_ok else "error"
         }
     except Exception as e:
         return {

@@ -20,39 +20,51 @@ class TokenRefreshService:
         """Refresh tokens for a specific user"""
         try:
             logger.info(f"Refreshing tokens for user: {user.name} (ID: {user.id})")
-            
+
             # Decrypt current user access token
-            current_token = decrypt_token(user.access_token)
-            
-            # Exchange for long-lived token
-            fresh_token_data = await self.facebook_service.exchange_for_long_lived_token(current_token)
-            fresh_user_token = fresh_token_data["access_token"]
-            
-            # Update user token
-            user.access_token = encrypt_token(fresh_user_token)
-            
-            # Refresh page tokens
-            pages = db.query(Page).filter(Page.user_id == user.id).all()
-            for page in pages:
-                try:
-                    if page.page_access_token:
-                        # Get fresh page token
-                        page_token_data = await self.facebook_service.get_page_access_token(
-                            page.fb_page_id, fresh_user_token
-                        )
-                        
-                        if page_token_data:
-                            fresh_page_token = page_token_data.get("access_token")
-                            if fresh_page_token:
-                                page.page_access_token = encrypt_token(fresh_page_token)
-                                logger.info(f"Refreshed token for page: {page.page_name}")
-                        
-                except Exception as e:
-                    logger.error(f"Failed to refresh token for page {page.page_name}: {e}")
-            
-            db.commit()
-            logger.info(f"Successfully refreshed tokens for user: {user.name}")
-            return True
+            try:
+                current_token = decrypt_token(user.access_token)
+            except Exception as decrypt_error:
+                logger.error(f"Failed to decrypt user token: {decrypt_error}")
+                return False
+
+            # For long-lived tokens, we don't need to exchange them again
+            # Just verify they're still valid and refresh page tokens
+            try:
+                # Test if user token is still valid
+                user_info = await self.facebook_service.get_user_info(current_token)
+                if not user_info:
+                    logger.error("User token is invalid")
+                    return False
+
+                logger.info("User token is still valid")
+
+                # Refresh page tokens using the valid user token
+                pages = db.query(Page).filter(Page.user_id == user.id).all()
+                for page in pages:
+                    try:
+                        if page.page_access_token:
+                            # Get fresh page token using current user token
+                            page_token_data = await self.facebook_service.get_page_access_token(
+                                page.fb_page_id, current_token
+                            )
+
+                            if page_token_data:
+                                fresh_page_token = page_token_data.get("access_token")
+                                if fresh_page_token:
+                                    page.page_access_token = encrypt_token(fresh_page_token)
+                                    logger.info(f"Refreshed token for page: {page.page_name}")
+
+                    except Exception as e:
+                        logger.error(f"Failed to refresh token for page {page.page_name}: {e}")
+
+                db.commit()
+                logger.info(f"Successfully refreshed page tokens for user: {user.name}")
+                return True
+
+            except Exception as e:
+                logger.error(f"Token validation failed: {e}")
+                return False
             
         except Exception as e:
             logger.error(f"Failed to refresh tokens for user {user.name}: {e}")

@@ -16,11 +16,16 @@ def get_encryption_key() -> bytes:
     """Get or generate encryption key for token storage"""
     key = os.environ.get("ENCRYPTION_KEY")
     if not key:
-        key = Fernet.generate_key()
-        # In production, store this securely
-        os.environ["ENCRYPTION_KEY"] = base64.b64encode(key).decode()
+        # Use JWT secret as base for encryption key to ensure consistency
+        jwt_secret = settings.JWT_SECRET_KEY.encode()
+        # Pad or truncate to 32 bytes for Fernet
+        if len(jwt_secret) < 32:
+            jwt_secret = jwt_secret + b'0' * (32 - len(jwt_secret))
+        else:
+            jwt_secret = jwt_secret[:32]
+        key = base64.urlsafe_b64encode(jwt_secret)
     else:
-        key = base64.b64decode(key.encode())
+        key = key.encode()
     return key
 
 fernet = Fernet(get_encryption_key())
@@ -51,7 +56,14 @@ def encrypt_token(token: str) -> str:
 
 def decrypt_token(encrypted_token: str) -> str:
     """Decrypt tokens from database"""
-    return fernet.decrypt(encrypted_token.encode()).decode()
+    try:
+        return fernet.decrypt(encrypted_token.encode()).decode()
+    except Exception as e:
+        # Log the specific error for debugging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Token decryption failed: {e}")
+        raise Exception(f"Token decryption failed - user may need to re-authenticate")
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify password against hash"""

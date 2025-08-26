@@ -146,6 +146,22 @@ class FacebookService:
             response.raise_for_status()
             return response.json()
 
+    async def get_user_info(self, access_token: str) -> Dict:
+        """Get basic user info to validate token"""
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    f"{self.graph_url}/me",
+                    params={
+                        "access_token": access_token,
+                        "fields": "id,name"
+                    }
+                )
+                response.raise_for_status()
+                return response.json()
+        except Exception:
+            return None
+
     async def get_instagram_account_info(self, ig_business_id: str, access_token: str) -> Dict:
         """Get Instagram business account information"""
         async with httpx.AsyncClient() as client:
