@@ -11,6 +11,7 @@ from app.models.user import User
 from app.models.page import Page
 from app.schemas.auth import Token, FacebookAuthResponse
 from app.services.facebook_service import FacebookService
+from app.config.facebook import facebook_config
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -267,13 +268,9 @@ async def get_permission_reset_guide():
         "alternative_method": {
             "title": "Alternative: Use Re-authorization Link",
             "description": "Click the button below to force Facebook to re-request all permissions",
-            "url": f"https://www.facebook.com/v18.0/dialog/oauth?client_id={settings.FACEBOOK_APP_ID}&redirect_uri=https://autonique.in/auth/callback&scope=pages_messaging,instagram_basic,instagram_manage_messages,pages_show_list,business_management&response_type=code&auth_type=rerequest&display=popup"
+            "url": f"https://www.facebook.com/v18.0/dialog/oauth?client_id={settings.FACEBOOK_APP_ID}&redirect_uri=https://autonique.in/auth/callback&scope={facebook_config.OAUTH_SCOPE}&response_type=code&auth_type=rerequest&display=popup"
         },
         "required_permissions": [
-            "pages_messaging - Send messages to your pages",
-            "instagram_basic - Access basic Instagram info",
-            "instagram_manage_messages - Manage Instagram messages",
-            "pages_show_list - Access your Facebook pages list",
-            "business_management - Manage business assets"
+            f"{perm} - {desc}" for perm, desc in facebook_config.PERMISSION_DESCRIPTIONS.items()
         ]
     }

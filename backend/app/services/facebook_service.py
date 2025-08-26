@@ -3,6 +3,7 @@ from typing import Dict, List, Optional
 import logging
 
 from app.core.config import settings
+from app.config.facebook import facebook_config
 
 logger = logging.getLogger(__name__)
 
@@ -49,8 +50,7 @@ class FacebookService:
                     logger.info(f"✅ Granted permissions: {granted_perms}")
 
                     # Check if we have the required permissions
-                    required_perms = ["pages_show_list", "pages_messaging", "instagram_basic", "instagram_manage_messages"]
-                    missing_perms = [p for p in required_perms if p not in granted_perms]
+                    missing_perms = facebook_config.get_missing_permissions(granted_perms)
                     if missing_perms:
                         logger.warning(f"⚠️  Missing permissions: {missing_perms}")
                         logger.info("💡 To fix this:")
@@ -155,8 +155,8 @@ class FacebookService:
         params = {
             "client_id": self.app_id,
             "redirect_uri": redirect_uri,
-            "scope": "pages_messaging,instagram_basic,instagram_manage_messages",
-            "response_type": "code"
+            "scope": facebook_config.OAUTH_SCOPE,
+            **facebook_config.OAUTH_PARAMS
         }
         if state:
             params["state"] = state

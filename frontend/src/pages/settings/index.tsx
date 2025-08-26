@@ -6,6 +6,7 @@ import { isAuthenticated } from '@/utils/auth';
 import { userApi, pagesApi } from '@/utils/api';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import styles from '@/styles/settings.module.css';
+import { buildFacebookOAuthUrl, getRedirectUri } from '@/config/facebook';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -75,14 +76,14 @@ export default function SettingsPage() {
   };
 
   const reconnectInstagram = () => {
-    const appId = '2032087817551720';
-    const frontendUrl = 'https://autonique.in';
-    const redirectUri = `${frontendUrl}/auth/callback`;
-    const scope = 'pages_messaging,instagram_basic,instagram_manage_messages';
-
-    const loginUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&response_type=code&auth_type=rerequest`;
-
-    window.location.href = loginUrl;
+    try {
+      const redirectUri = getRedirectUri();
+      const loginUrl = buildFacebookOAuthUrl(redirectUri);
+      window.location.href = loginUrl;
+    } catch (error) {
+      console.error('Failed to build OAuth URL:', error);
+      toast.error('Configuration error. Please check environment variables.');
+    }
   };
 
   if (!isClient) {

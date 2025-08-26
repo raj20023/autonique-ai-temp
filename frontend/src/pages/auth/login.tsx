@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { motion } from 'framer-motion';
 import { Instagram, ArrowLeft, Shield, Zap, MessageCircle } from 'lucide-react';
 import { isAuthenticated } from '@/utils/auth';
+import { buildFacebookOAuthUrl, getRedirectUri } from '@/config/facebook';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,14 +16,14 @@ export default function LoginPage() {
   }, [router]);
 
   const handleFacebookLogin = () => {
-    const appId = '2032087817551720';
-    const frontendUrl = 'https://autonique.in';
-    const redirectUri = `${frontendUrl}/auth/callback`;
-    const scope = 'pages_messaging,instagram_basic,instagram_manage_messages,pages_show_list,business_management';
-
-    const loginUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&response_type=code&auth_type=rerequest&display=popup`;
-
-    window.location.href = loginUrl;
+    try {
+      const redirectUri = getRedirectUri();
+      const loginUrl = buildFacebookOAuthUrl(redirectUri);
+      window.location.href = loginUrl;
+    } catch (error) {
+      console.error('Failed to build OAuth URL:', error);
+      alert('Configuration error. Please check environment variables.');
+    }
   };
 
 
