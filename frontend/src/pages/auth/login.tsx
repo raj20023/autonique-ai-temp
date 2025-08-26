@@ -20,7 +20,7 @@ export default function LoginPage() {
     const redirectUri = `${frontendUrl}/auth/callback`;
     const scope = 'pages_messaging,instagram_basic,instagram_manage_messages,pages_show_list,business_management';
 
-    const loginUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&response_type=code&auth_type=rerequest`;
+    const loginUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&response_type=code&auth_type=rerequest&display=popup`;
 
     window.location.href = loginUrl;
   };

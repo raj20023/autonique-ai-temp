@@ -231,3 +231,49 @@ async def get_setup_guide():
             }
         ]
     }
+
+@router.get("/permission-reset-guide")
+async def get_permission_reset_guide():
+    """Get guide for resetting Facebook permissions"""
+    return {
+        "title": "Reset Facebook Permissions",
+        "message": "To grant the new permissions required by AutoniqueAI, you need to reset your Facebook app permissions.",
+        "steps": [
+            {
+                "step": 1,
+                "title": "Go to Facebook Settings",
+                "description": "Visit Facebook Settings > Apps and Websites",
+                "url": "https://www.facebook.com/settings?tab=applications"
+            },
+            {
+                "step": 2,
+                "title": "Find AutoniqueAI",
+                "description": "Look for 'AutoniqueAI' in your connected apps list",
+                "action": "Click on 'AutoniqueAI'"
+            },
+            {
+                "step": 3,
+                "title": "Remove the App",
+                "description": "Click 'Remove' to disconnect AutoniqueAI from your Facebook account",
+                "action": "This will reset all permissions"
+            },
+            {
+                "step": 4,
+                "title": "Log in Again",
+                "description": "Return to AutoniqueAI and log in again to grant the new permissions",
+                "url": "/auth/login"
+            }
+        ],
+        "alternative_method": {
+            "title": "Alternative: Use Re-authorization Link",
+            "description": "Click the button below to force Facebook to re-request all permissions",
+            "url": f"https://www.facebook.com/v18.0/dialog/oauth?client_id={settings.FACEBOOK_APP_ID}&redirect_uri=https://autonique.in/auth/callback&scope=pages_messaging,instagram_basic,instagram_manage_messages,pages_show_list,business_management&response_type=code&auth_type=rerequest&display=popup"
+        },
+        "required_permissions": [
+            "pages_messaging - Send messages to your pages",
+            "instagram_basic - Access basic Instagram info",
+            "instagram_manage_messages - Manage Instagram messages",
+            "pages_show_list - Access your Facebook pages list",
+            "business_management - Manage business assets"
+        ]
+    }

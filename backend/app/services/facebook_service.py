@@ -53,6 +53,10 @@ class FacebookService:
                     missing_perms = [p for p in required_perms if p not in granted_perms]
                     if missing_perms:
                         logger.warning(f"⚠️  Missing permissions: {missing_perms}")
+                        logger.info("💡 To fix this:")
+                        logger.info("   1. Visit: https://autonique.in/permission-reset")
+                        logger.info("   2. Or go to Facebook Settings > Apps and remove AutoniqueAI")
+                        logger.info("   3. Then log in again to grant new permissions")
                     else:
                         logger.info("✅ All required permissions granted")
 

@@ -65,7 +65,16 @@ export default function CallbackPage() {
         if (error.message?.includes('CORS')) {
           errorMessage = 'Server configuration error. Please contact support.';
         } else if (error.response?.status === 400) {
-          errorMessage = error.response?.data?.detail || 'Invalid authorization code. Please try logging in again.';
+          const detail = error.response?.data?.detail || '';
+          if (detail.includes('permissions') || detail.includes('Missing')) {
+            errorMessage = 'Missing required permissions. Please reset your Facebook app permissions and try again.';
+            // Show permission reset link after a delay
+            setTimeout(() => {
+              router.push('/permission-reset');
+            }, 3000);
+          } else {
+            errorMessage = detail || 'Invalid authorization code. Please try logging in again.';
+          }
         } else if (error.response?.status === 500) {
           errorMessage = 'Server error. Please try again later.';
         } else if (error.message.includes('Network Error') || error.code === 'ERR_NETWORK') {
