@@ -43,9 +43,8 @@ export const logout = (): void => {
 };
 
 export const getFacebookLoginUrl = (): string => {
-  const redirectUri = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/auth/callback`;
-
   // Import here to avoid circular dependency
-  const { buildFacebookOAuthUrl } = require('@/config/facebook');
+  const { buildFacebookOAuthUrl, getRedirectUri } = require('@/config/facebook');
+  const redirectUri = getRedirectUri();
   return buildFacebookOAuthUrl(redirectUri);
 };

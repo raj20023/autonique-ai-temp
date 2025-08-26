@@ -34,24 +34,30 @@ export const FACEBOOK_CONFIG = {
 
 // Helper function to build OAuth URL
 export const buildFacebookOAuthUrl = (redirectUri: string): string => {
-  const appId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID;
-  
-  if (!appId) {
-    throw new Error('NEXT_PUBLIC_FACEBOOK_APP_ID environment variable is not set');
-  }
-  
+  // Hardcoded values since Railway env vars aren't working properly
+  const appId = '2032087817551720';
+
+  console.log('🔧 Building OAuth URL with hardcoded values:');
+  console.log('App ID:', appId);
+  console.log('Redirect URI:', redirectUri);
+  console.log('Scope:', FACEBOOK_CONFIG.OAUTH_SCOPE);
+
   const params = new URLSearchParams({
     client_id: appId,
     redirect_uri: redirectUri,
     scope: FACEBOOK_CONFIG.OAUTH_SCOPE,
     ...FACEBOOK_CONFIG.OAUTH_PARAMS
   });
-  
-  return `https://www.facebook.com/${FACEBOOK_CONFIG.API_VERSION}/dialog/oauth?${params.toString()}`;
+
+  const url = `https://www.facebook.com/${FACEBOOK_CONFIG.API_VERSION}/dialog/oauth?${params.toString()}`;
+  console.log('🚀 Final OAuth URL:', url);
+
+  return url;
 };
 
 // Helper function to get redirect URI
 export const getRedirectUri = (): string => {
-  const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'https://autonique.in';
+  // Hardcoded since Railway env vars aren't working properly
+  const frontendUrl = 'https://autonique.in';
   return `${frontendUrl}/auth/callback`;
 };
