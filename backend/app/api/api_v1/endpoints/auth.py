@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
+import httpx
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from datetime import timedelta
@@ -274,3 +275,52 @@ async def get_permission_reset_guide():
             f"{perm} - {desc}" for perm, desc in facebook_config.PERMISSION_DESCRIPTIONS.items()
         ]
     }
+
+@router.get("/check-permissions")
+async def check_user_permissions(access_token: str = Query(...)):
+    """Check what permissions are currently granted for a user"""
+    try:
+        facebook_service = FacebookService()
+
+        async with httpx.AsyncClient() as client:
+            # Check permissions
+            permissions_response = await client.get(
+                f"{facebook_service.graph_url}/me/permissions",
+                params={"access_token": access_token}
+            )
+
+            if permissions_response.status_code != 200:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Failed to check permissions: {permissions_response.text}"
+                )
+
+            permissions_data = permissions_response.json()
+            granted_perms = [p["permission"] for p in permissions_data.get("data", []) if p.get("status") == "granted"]
+            declined_perms = [p["permission"] for p in permissions_data.get("data", []) if p.get("status") == "declined"]
+
+            missing_perms = facebook_config.get_missing_permissions(granted_perms)
+
+            return {
+                "granted_permissions": granted_perms,
+                "declined_permissions": declined_perms,
+                "missing_permissions": missing_perms,
+                "required_permissions": facebook_config.REQUIRED_PERMISSIONS,
+                "has_all_required": len(missing_perms) == 0,
+                "permission_details": {
+                    perm: {
+                        "granted": perm in granted_perms,
+                        "declined": perm in declined_perms,
+                        "description": facebook_config.PERMISSION_DESCRIPTIONS.get(perm, "Unknown permission")
+                    }
+                    for perm in facebook_config.REQUIRED_PERMISSIONS
+                },
+                "force_reset_urls": [
+                    f"https://www.facebook.com/v18.0/dialog/oauth?client_id={settings.FACEBOOK_APP_ID}&redirect_uri=https://autonique.in/auth/callback&scope={facebook_config.OAUTH_SCOPE}&response_type=code&auth_type=rerequest&display=popup&force_login=true",
+                    f"https://www.facebook.com/v18.0/dialog/oauth?client_id={settings.FACEBOOK_APP_ID}&redirect_uri=https://autonique.in/auth/callback&scope={facebook_config.OAUTH_SCOPE}&response_type=code&auth_type=rerequest&display=page&force_login=true&reauthorize=true"
+                ]
+            }
+
+    except Exception as e:
+        logger.error(f"Error checking permissions: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
