@@ -70,8 +70,7 @@ export default function LiveMonitor() {
       if (response.ok) {
         const data = await response.json();
 
-        // Debug logging
-        console.log('Live monitor data:', data);
+
 
         // Set messages
         setMessages(data.messages || []);
@@ -91,13 +90,8 @@ export default function LiveMonitor() {
           system_status: data.system_status,
           last_updated: data.last_updated
         });
-      } else {
-        console.error('Response not ok:', response.status, response.statusText);
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
       setIsAuthenticated(false);
       // Set default values to prevent undefined errors
       setStats({

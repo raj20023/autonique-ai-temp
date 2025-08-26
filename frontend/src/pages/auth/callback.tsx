@@ -46,7 +46,6 @@ export default function CallbackPage() {
         }, 2000);
 
       } catch (error: any) {
-        console.error('Callback error details:', error);
         setStatus('error');
 
         let errorMessage = 'Failed to connect your Instagram account. Please try again.';

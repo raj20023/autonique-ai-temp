@@ -154,9 +154,7 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
         message_text = message_data.get("text", "")
         is_echo = message_data.get("is_echo", False)
 
-        logger.info(f"Processing message - Sender ID: {sender_id}, Recipient ID: {recipient_id}, Message ID: {message_id}, Text: {message_text}, Is Echo: {is_echo}")
-        logger.info(f"Page Instagram Business ID: {page.ig_business_id}")
-        logger.info(f"User: {user.name} (ID: {user.id}) - Page: {page.page_name} (@{page.instagram_username})")
+        logger.info(f"Processing message from {sender_id} to {recipient_id}")
 
         if not sender_id or not message_id or not message_text:
             logger.warning(f"Incomplete message data - Sender ID: {sender_id}, Message ID: {message_id}, Text: '{message_text}'")

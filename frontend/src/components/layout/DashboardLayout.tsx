@@ -54,7 +54,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
           }
         }
       } catch (error) {
-        console.error('Error fetching Instagram profile:', error);
+        // Error fetching Instagram profile - silently fail
       }
     };
 

@@ -11,7 +11,6 @@ from app.models.message import Message
 from app.models.faq import FAQ
 from app.models.page import Page
 from app.schemas.user import UserResponse, UserUpdate
-from app.core.security import encrypt_token
 from pydantic import BaseModel
 
 router = APIRouter()

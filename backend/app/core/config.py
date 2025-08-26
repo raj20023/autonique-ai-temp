@@ -35,8 +35,8 @@ class Settings(BaseSettings):
     ENABLE_CACHING: bool = True
     
     # Environment
-    ENVIRONMENT: str = "development"
-    DEBUG: bool = True
+    ENVIRONMENT: str = "production"
+    DEBUG: bool = False
     
     # CORS
     ALLOWED_ORIGINS: Union[str, List[str]] = "http://localhost:3000,https://autonique.in,https://www.autonique.in"

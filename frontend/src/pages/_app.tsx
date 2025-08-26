@@ -1,6 +1,5 @@
 import type { AppProps } from 'next/app';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { ReactQueryDevtools } from 'react-query/devtools';
 import { Toaster } from 'react-hot-toast';
 import { useState } from 'react';
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -47,7 +46,7 @@ export default function App({ Component, pageProps }: AppProps) {
           },
         }}
       />
-      {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
+
       </QueryClientProvider>
     </ErrorBoundary>
   );
