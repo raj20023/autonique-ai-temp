@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 
 export default function CallbackPage() {
   const router = useRouter();
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'setup_required' | 'error'>('loading');
   const [message, setMessage] = useState('Connecting your Instagram account...');
 
   useEffect(() => {
@@ -33,17 +33,29 @@ export default function CallbackPage() {
         const response = await authApi.handleCallback(code as string, redirectUri);
 
         setMessage('Setting up your account...');
-        
+
         // Store the token
         setAuthToken(response.data.access_token);
 
-        setStatus('success');
-        setMessage('Successfully connected! Redirecting to dashboard...');
+        // Check if setup is required (no Facebook pages)
+        const responseData = response.data as any;
+        if (responseData.setup_required) {
+          setStatus('setup_required');
+          setMessage(responseData.message || 'Please complete your Instagram Business account setup.');
 
-        // Redirect to dashboard after a short delay
-        setTimeout(() => {
-          router.push('/dashboard');
-        }, 2000);
+          // Redirect to setup guide after a short delay
+          setTimeout(() => {
+            router.push('/setup-guide');
+          }, 3000);
+        } else {
+          setStatus('success');
+          setMessage('Successfully connected! Redirecting to dashboard...');
+
+          // Redirect to dashboard after a short delay
+          setTimeout(() => {
+            router.push('/dashboard');
+          }, 2000);
+        }
 
       } catch (error: any) {
         setStatus('error');
@@ -121,6 +133,17 @@ export default function CallbackPage() {
                   <CheckCircle className="w-8 h-8 text-green-600" />
                 </motion.div>
               )}
+
+              {status === 'setup_required' && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.5, type: "spring" }}
+                  className="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center"
+                >
+                  <AlertCircle className="w-8 h-8 text-orange-600" />
+                </motion.div>
+              )}
               
               {status === 'error' && (
                 <motion.div
@@ -138,6 +161,7 @@ export default function CallbackPage() {
             <h1 className="text-xl font-semibold text-gray-900 mb-4">
               {status === 'loading' && 'Connecting Your Account'}
               {status === 'success' && 'Successfully Connected!'}
+              {status === 'setup_required' && 'Setup Required'}
               {status === 'error' && 'Connection Failed'}
             </h1>
 
@@ -166,8 +190,17 @@ export default function CallbackPage() {
             {status === 'success' && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <p className="text-sm text-green-800">
-                  🎉 Your Instagram Business account is now connected! 
+                  🎉 Your Instagram Business account is now connected!
                   You can start uploading FAQs and automating your customer service.
+                </p>
+              </div>
+            )}
+
+            {status === 'setup_required' && (
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                <p className="text-sm text-orange-800">
+                  📋 You need to set up your Facebook Page and Instagram Business account first.
+                  We'll guide you through the process step by step.
                 </p>
               </div>
             )}

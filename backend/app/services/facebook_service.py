@@ -30,13 +30,36 @@ class FacebookService:
         url = f"{self.graph_url}/me/accounts"
         params = {
             "access_token": access_token,
-            "fields": "id,name,access_token,instagram_business_account"
+            "fields": "id,name,access_token,instagram_business_account{id,username,name,profile_picture_url,followers_count},category,tasks"
         }
 
         logger.info(f"Fetching pages from: {url}")
         logger.info(f"Using Graph API version: {self.graph_url}")
 
         async with httpx.AsyncClient() as client:
+            # First, check user permissions
+            try:
+                permissions_response = await client.get(
+                    f"{self.graph_url}/me/permissions",
+                    params={"access_token": access_token}
+                )
+                if permissions_response.status_code == 200:
+                    permissions_data = permissions_response.json()
+                    granted_perms = [p["permission"] for p in permissions_data.get("data", []) if p.get("status") == "granted"]
+                    logger.info(f"✅ Granted permissions: {granted_perms}")
+
+                    # Check if we have the required permissions
+                    required_perms = ["pages_show_list", "pages_messaging", "instagram_basic", "instagram_manage_messages"]
+                    missing_perms = [p for p in required_perms if p not in granted_perms]
+                    if missing_perms:
+                        logger.warning(f"⚠️  Missing permissions: {missing_perms}")
+                    else:
+                        logger.info("✅ All required permissions granted")
+
+            except Exception as e:
+                logger.warning(f"Could not check permissions: {e}")
+
+            # Fetch pages
             response = await client.get(url, params=params)
             logger.info(f"Facebook API response status: {response.status_code}")
 
@@ -48,8 +71,24 @@ class FacebookService:
             pages = data.get("data", [])
             logger.info(f"Found {len(pages)} pages from Facebook API")
 
-            for page in pages:
-                logger.info(f"Page: {page.get('name')} - Has Instagram: {bool(page.get('instagram_business_account'))}")
+            if len(pages) == 0:
+                logger.warning("⚠️  No Facebook pages found for this user")
+                logger.info("💡 Possible reasons:")
+                logger.info("   1. User doesn't have any Facebook Pages")
+                logger.info("   2. User is not admin of any Pages")
+                logger.info("   3. Pages are not published/active")
+                logger.info("   4. Missing 'pages_show_list' permission")
+            else:
+                logger.info(f"📄 Pages found:")
+                for page in pages:
+                    page_name = page.get('name', 'Unknown')
+                    ig_account = page.get('instagram_business_account')
+                    if ig_account:
+                        ig_username = ig_account.get('username', 'Unknown')
+                        ig_followers = ig_account.get('followers_count', 'Unknown')
+                        logger.info(f"   • {page_name} → @{ig_username} ({ig_followers} followers)")
+                    else:
+                        logger.info(f"   • {page_name} (No Instagram connected)")
 
             return pages
 

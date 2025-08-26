@@ -99,6 +99,28 @@ async def facebook_callback(
         # Get user's pages and Instagram accounts
         pages = await facebook_service.get_user_pages(access_token)
 
+        if not pages:
+            logger.warning(f"⚠️  No Facebook pages found for user: {name}")
+            # Still create the user but they'll need to set up pages later
+            db.commit()
+
+            # Create JWT token for the user even without pages
+            access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+            jwt_token = create_access_token(
+                data={"sub": str(user.id)}, expires_delta=access_token_expires
+            )
+
+            return {
+                "access_token": jwt_token,
+                "token_type": "bearer",
+                "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+                "user_id": str(user.id),
+                "name": user.name,
+                "email": user.email,
+                "setup_required": True,
+                "message": "Account created successfully. Please set up your Facebook Page and Instagram Business account."
+            }
+
         for page_data in pages:
             page_id = page_data["id"]
             page_name = page_data["name"]
@@ -165,3 +187,47 @@ async def facebook_callback(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Authentication failed"
         )
+
+@router.get("/setup-guide")
+async def get_setup_guide():
+    """Get setup guide for users without Facebook pages"""
+    return {
+        "title": "Instagram Business Setup Required",
+        "message": "To use AutoniqueAI, you need a Facebook Page connected to an Instagram Business account.",
+        "steps": [
+            {
+                "step": 1,
+                "title": "Create a Facebook Page",
+                "description": "Go to facebook.com/pages/create and create a business page",
+                "url": "https://www.facebook.com/pages/create"
+            },
+            {
+                "step": 2,
+                "title": "Convert to Instagram Business Account",
+                "description": "In Instagram app: Settings > Account > Switch to Professional Account > Business",
+                "url": "https://help.instagram.com/502981923235522"
+            },
+            {
+                "step": 3,
+                "title": "Connect Instagram to Facebook Page",
+                "description": "In Instagram: Settings > Account > Linked Accounts > Facebook",
+                "url": "https://help.instagram.com/399237934150902"
+            },
+            {
+                "step": 4,
+                "title": "Log in to AutoniqueAI Again",
+                "description": "Once setup is complete, log in again to connect your accounts",
+                "url": "/auth/login"
+            }
+        ],
+        "help_links": [
+            {
+                "title": "Instagram Business Account Help",
+                "url": "https://help.instagram.com/502981923235522"
+            },
+            {
+                "title": "Connect Instagram to Facebook Page",
+                "url": "https://help.instagram.com/399237934150902"
+            }
+        ]
+    }
