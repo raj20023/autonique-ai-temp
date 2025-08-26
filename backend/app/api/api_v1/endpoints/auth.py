@@ -80,17 +80,21 @@ async def facebook_callback(
                 fb_user_id=fb_user_id,
                 name=name,
                 email=email,
-                access_token=encrypt_token(access_token)
+                access_token=encrypt_token(access_token),
+                is_active=True
             )
             db.add(user)
             db.commit()
             db.refresh(user)
+            logger.info(f"✅ Created new user: {name} (ID: {user.id})")
         else:
-            # Update existing user
+            # Update existing user and reactivate
             user.access_token = encrypt_token(access_token)
             user.name = name
             user.email = email
+            user.is_active = True
             db.commit()
+            logger.info(f"✅ Updated existing user: {name} (ID: {user.id})")
         
         # Get user's pages and Instagram accounts
         pages = await facebook_service.get_user_pages(access_token)
@@ -129,13 +133,17 @@ async def facebook_callback(
                     ig_business_id=ig_business_id,
                     page_name=page_name,
                     page_access_token=encrypt_token(page_access_token),
-                    instagram_username=instagram_username
+                    instagram_username=instagram_username,
+                    is_active=True
                 )
                 db.add(page)
+                logger.info(f"✅ Created new page: {page_name}")
             else:
                 existing_page.page_access_token = encrypt_token(page_access_token)
                 existing_page.ig_business_id = ig_business_id
                 existing_page.instagram_username = instagram_username
+                existing_page.is_active = True
+                logger.info(f"✅ Updated existing page: {page_name}")
         
         db.commit()
         

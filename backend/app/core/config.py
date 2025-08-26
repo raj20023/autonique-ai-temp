@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     # Facebook/Instagram API
     FACEBOOK_APP_ID: str
     FACEBOOK_APP_SECRET: str
-    FACEBOOK_GRAPH_API_VERSION: str = "v19.0"
+    FACEBOOK_GRAPH_API_VERSION: str = "v18.0"
     
     # Google Gemini
     GOOGLE_API_KEY: str
@@ -35,8 +35,8 @@ class Settings(BaseSettings):
     ENABLE_CACHING: bool = True
     
     # Environment
-    ENVIRONMENT: str = "production"
-    DEBUG: bool = False
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "production")
+    DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
     
     # CORS
     ALLOWED_ORIGINS: Union[str, List[str]] = "http://localhost:3000,https://autonique.in,https://www.autonique.in"
