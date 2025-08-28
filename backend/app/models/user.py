@@ -32,13 +32,13 @@ class User(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # User Management fields (added by migration)
-    role = Column(Enum(UserRole), default=UserRole.FREE_TRIAL)
+    role = Column(String, default="free_trial")  # Using String instead of Enum for flexibility
     is_beta_user = Column(Boolean, default=False)
     beta_user_number = Column(Integer, nullable=True)
     trial_start_date = Column(DateTime, nullable=True)
     trial_end_date = Column(DateTime, nullable=True)
     trial_days_remaining = Column(Integer, default=14)
-    subscription_status = Column(Enum(SubscriptionStatus), default=SubscriptionStatus.PENDING)
+    subscription_status = Column(String, default="pending")  # Using String instead of Enum
     subscription_start_date = Column(DateTime, nullable=True)
     subscription_end_date = Column(DateTime, nullable=True)
     last_login = Column(DateTime, nullable=True)
@@ -64,13 +64,13 @@ class User(Base):
 
     def can_access_features(self):
         """Check if user can access premium features"""
-        if self.role == UserRole.ADMIN:
+        if self.role == "admin":
             return True
-        if self.role == UserRole.BETA:
+        if self.role == "beta":
             return True
-        if self.role == UserRole.PAID and self.subscription_status == SubscriptionStatus.ACTIVE:
+        if self.role == "paid" and self.subscription_status == "active":
             return True
-        if self.role == UserRole.FREE_TRIAL and not self.is_trial_expired():
+        if self.role == "free_trial" and not self.is_trial_expired():
             return True
         return False
 

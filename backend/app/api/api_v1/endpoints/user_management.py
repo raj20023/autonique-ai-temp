@@ -5,7 +5,7 @@ import logging
 
 from app.core.database import get_db
 from app.services.user_management_service import UserManagementService
-from app.models.user import User, UserRole
+from app.models.user import User
 from app.api.deps import get_current_user
 
 router = APIRouter()
@@ -51,7 +51,7 @@ async def get_user_profile(
             "status": managed_user.subscription_status.value if managed_user.subscription_status else None,
             "trial_start_date": managed_user.trial_start_date,
             "trial_end_date": managed_user.trial_end_date,
-            "trial_days_remaining": managed_user.days_remaining_in_trial() if managed_user.role == UserRole.FREE_TRIAL else None,
+            "trial_days_remaining": managed_user.days_remaining_in_trial() if managed_user.role == "free_trial" else None,
             "subscription_start_date": managed_user.subscription_start_date,
             "subscription_end_date": managed_user.subscription_end_date
         },
@@ -95,7 +95,7 @@ async def upgrade_to_paid(
         profile_picture=""
     )
 
-    if managed_user.role == UserRole.PAID:
+    if managed_user.role == "paid":
         raise HTTPException(
             status_code=400,
             detail="User already has paid subscription"
@@ -148,7 +148,7 @@ async def get_all_users(
         profile_picture=""
     )
 
-    if managed_user.role != UserRole.ADMIN:
+    if managed_user.role != "admin":
         raise HTTPException(
             status_code=403,
             detail="Admin access required"
@@ -174,15 +174,15 @@ async def get_admin_settings(
         profile_picture=""
     )
 
-    if managed_user.role != UserRole.ADMIN:
+    if managed_user.role != "admin":
         raise HTTPException(
             status_code=403,
             detail="Admin access required"
         )
-    
+
     user_service = UserManagementService(db)
     settings = user_service.get_admin_settings()
-    
+
     return {"settings": settings}
 
 @router.put("/admin/settings/{key}")
@@ -203,7 +203,7 @@ async def update_admin_setting(
         profile_picture=""
     )
 
-    if managed_user.role != UserRole.ADMIN:
+    if managed_user.role != "admin":
         raise HTTPException(
             status_code=403,
             detail="Admin access required"
@@ -236,7 +236,7 @@ async def admin_upgrade_user(
         profile_picture=""
     )
 
-    if managed_user.role != UserRole.ADMIN:
+    if managed_user.role != "admin":
         raise HTTPException(
             status_code=403,
             detail="Admin access required"
@@ -268,7 +268,7 @@ async def deactivate_user(
         profile_picture=""
     )
 
-    if managed_user.role != UserRole.ADMIN:
+    if managed_user.role != "admin":
         raise HTTPException(
             status_code=403,
             detail="Admin access required"
@@ -280,10 +280,10 @@ async def deactivate_user(
             status_code=404,
             detail="User not found"
         )
-    
+
     user.is_active = False
     db.commit()
-    
+
     return {"message": "User deactivated successfully"}
 
 @router.put("/admin/users/{user_id}/activate")
@@ -303,7 +303,7 @@ async def activate_user(
         profile_picture=""
     )
 
-    if managed_user.role != UserRole.ADMIN:
+    if managed_user.role != "admin":
         raise HTTPException(
             status_code=403,
             detail="Admin access required"
@@ -337,7 +337,7 @@ async def get_admin_stats(
         profile_picture=""
     )
 
-    if managed_user.role != UserRole.ADMIN:
+    if managed_user.role != "admin":
         raise HTTPException(
             status_code=403,
             detail="Admin access required"
@@ -345,9 +345,9 @@ async def get_admin_stats(
 
     # Get user counts by role
     total_users = db.query(User).count()
-    beta_users = db.query(User).filter(User.role == UserRole.BETA).count()
-    trial_users = db.query(User).filter(User.role == UserRole.FREE_TRIAL).count()
-    paid_users = db.query(User).filter(User.role == UserRole.PAID).count()
+    beta_users = db.query(User).filter(User.role == "beta").count()
+    trial_users = db.query(User).filter(User.role == "free_trial").count()
+    paid_users = db.query(User).filter(User.role == "paid").count()
     active_users = db.query(User).filter(User.is_active == True).count()
     
     return {

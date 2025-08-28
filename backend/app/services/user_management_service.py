@@ -29,13 +29,13 @@ class UserManagementService:
 
             if beta_count < 20:
                 # Make them a beta user
-                user.role = UserRole.BETA
+                user.role = "beta"
                 user.is_beta_user = True
                 user.beta_user_number = beta_count + 1
                 logger.info(f"Set beta user #{user.beta_user_number}: {name}")
             else:
                 # Start free trial
-                user.role = UserRole.FREE_TRIAL
+                user.role = "free_trial"
                 user.trial_start_date = datetime.utcnow()
                 user.trial_end_date = datetime.utcnow() + timedelta(days=14)
                 user.trial_days_remaining = 14
@@ -92,13 +92,13 @@ class UserManagementService:
         user = self.db.query(User).filter(User.id == user_id).first()
         if not user:
             return False
-        
-        user.role = UserRole.PAID
-        user.subscription_status = SubscriptionStatus.ACTIVE
+
+        user.role = "paid"
+        user.subscription_status = "active"
         user.subscription_start_date = datetime.utcnow()
         # Set to 1 year from now (adjust as needed)
         user.subscription_end_date = datetime.utcnow() + timedelta(days=365)
-        
+
         self.db.commit()
         logger.info(f"User {user.name} upgraded to paid subscription")
         return True
