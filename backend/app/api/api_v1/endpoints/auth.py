@@ -12,6 +12,7 @@ from app.models.user import User
 from app.models.page import Page
 from app.schemas.auth import Token, FacebookAuthResponse
 from app.services.facebook_service import FacebookService
+from app.services.user_management_service import UserManagementService
 from app.config.facebook import facebook_config
 
 router = APIRouter()
@@ -97,6 +98,20 @@ async def facebook_callback(
             user.is_active = True
             db.commit()
             logger.info(f"✅ Updated existing user: {name} (ID: {user.id})")
+
+        # Initialize user management for new users
+        user_service = UserManagementService(db)
+
+        # Create or update user in the new user management system
+        managed_user = user_service.get_or_create_user(
+            facebook_id=fb_user_id,
+            email=email or "",
+            name=name,
+            profile_picture=user_info.get("picture", {}).get("data", {}).get("url")
+        )
+
+        # Check user access status
+        access_info = user_service.check_user_access(managed_user.id)
         
         # Get user's pages and Instagram accounts
         pages = await facebook_service.get_user_pages(access_token)
@@ -120,7 +135,12 @@ async def facebook_callback(
                 "name": user.name,
                 "email": user.email,
                 "setup_required": True,
-                "message": "Account created successfully. Please set up your Facebook Page and Instagram Business account."
+                "message": "Account created successfully. Please set up your Facebook Page and Instagram Business account.",
+                "user_role": managed_user.role.value,
+                "is_beta_user": managed_user.is_beta_user,
+                "beta_user_number": managed_user.beta_user_number,
+                "access_info": access_info,
+                "trial_days_remaining": managed_user.days_remaining_in_trial() if managed_user.role.value == 'free_trial' else None
             }
 
         for page_data in pages:
@@ -177,11 +197,20 @@ async def facebook_callback(
             data={"sub": str(user.id)}, expires_delta=access_token_expires
         )
         
-        return Token(
-            access_token=jwt_token,
-            token_type="bearer",
-            expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
-        )
+        return {
+            "access_token": jwt_token,
+            "token_type": "bearer",
+            "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+            "user_id": str(user.id),
+            "name": user.name,
+            "email": user.email,
+            "user_role": managed_user.role.value,
+            "is_beta_user": managed_user.is_beta_user,
+            "beta_user_number": managed_user.beta_user_number,
+            "access_info": access_info,
+            "trial_days_remaining": managed_user.days_remaining_in_trial() if managed_user.role.value == 'free_trial' else None,
+            "setup_required": False
+        }
         
     except Exception as e:
         logger.error(f"Facebook callback error: {e}")

@@ -19,14 +19,14 @@ export default function LoginPage() {
     try {
       const redirectUri = getRedirectUri();
       const loginUrl = buildFacebookOAuthUrl(redirectUri);
-      console.log('🚀 Redirecting to:', loginUrl);
+
       window.location.href = loginUrl;
     } catch (error) {
       console.error('Failed to build OAuth URL:', error);
 
       // Fallback to hardcoded URL if centralized config fails
       const fallbackUrl = 'https://www.facebook.com/v18.0/dialog/oauth?client_id=2032087817551720&redirect_uri=https%3A%2F%2Fautonique.in%2Fauth%2Fcallback&scope=pages_messaging%2Cinstagram_basic%2Cinstagram_manage_messages%2Cpages_show_list%2Cbusiness_management%2Cpages_manage_metadata&response_type=code&auth_type=rerequest&display=popup';
-      console.log('🔄 Using fallback URL:', fallbackUrl);
+
       window.location.href = fallbackUrl;
     }
   };

@@ -19,6 +19,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { pagesApi } from '@/utils/api';
 import { isAuthenticated } from '@/utils/auth';
 import toast from 'react-hot-toast';
+import SubscriptionBanner from '@/components/SubscriptionBanner';
+import { BetaUserBadge, AccessStatusIndicator } from '@/components/SubscriptionBanner';
 
 // API function to get user statistics
 const getUserStats = async () => {
@@ -162,6 +164,8 @@ export default function DashboardPage() {
         <title>Dashboard - AutoniqueAI</title>
         <meta name="description" content="Manage your Instagram auto-reply system" />
       </Head>
+
+      <SubscriptionBanner />
 
       <DashboardLayout title="Dashboard">
         <div className="space-y-8">

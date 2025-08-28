@@ -39,10 +39,7 @@ export const buildFacebookOAuthUrl = (redirectUri: string): string => {
   // Hardcoded values since Railway env vars aren't working properly
   const appId = '2032087817551720';
 
-  console.log('🔧 Building OAuth URL with hardcoded values:');
-  console.log('App ID:', appId);
-  console.log('Redirect URI:', redirectUri);
-  console.log('Scope:', FACEBOOK_CONFIG.OAUTH_SCOPE);
+
 
   const params = new URLSearchParams({
     client_id: appId,
@@ -52,7 +49,6 @@ export const buildFacebookOAuthUrl = (redirectUri: string): string => {
   });
 
   const url = `https://www.facebook.com/${FACEBOOK_CONFIG.API_VERSION}/dialog/oauth?${params.toString()}`;
-  console.log('🚀 Final OAuth URL:', url);
 
   return url;
 };
