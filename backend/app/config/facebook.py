@@ -5,7 +5,7 @@ class FacebookConfig:
     """Centralized Facebook OAuth configuration"""
     
     # OAuth Permissions - Keep this in sync with frontend
-    OAUTH_SCOPE = "pages_messaging,instagram_basic,instagram_manage_messages,pages_show_list,business_management,pages_manage_metadata"
+    OAUTH_SCOPE = "pages_messaging,instagram_basic,instagram_manage_messages,pages_show_list,pages_manage_metadata"
     
     # Required Permissions List
     REQUIRED_PERMISSIONS: List[str] = [
@@ -13,7 +13,6 @@ class FacebookConfig:
         "instagram_basic",
         "instagram_manage_messages",
         "pages_show_list",
-        "business_management",
         "pages_manage_metadata"
     ]
     
@@ -23,7 +22,6 @@ class FacebookConfig:
         "instagram_basic": "Access basic Instagram info",
         "instagram_manage_messages": "Manage Instagram messages",
         "pages_show_list": "Access your Facebook pages list",
-        "business_management": "Manage business assets",
         "pages_manage_metadata": "Manage page metadata and Instagram Business account access"
     }
     
