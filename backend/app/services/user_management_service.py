@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from typing import Optional, List
 import logging
 
-from app.models.user import User, UserRole, SubscriptionStatus
+from app.models.user import User
 from app.models.user_management import UsageStats, AdminSettings
 from app.core.database import get_db
 
@@ -158,11 +158,11 @@ class UserManagementService:
                 "id": user.id,
                 "name": user.name,
                 "email": user.email,
-                "role": user.role.value,
+                "role": user.role,
                 "is_beta_user": user.is_beta_user,
                 "beta_user_number": user.beta_user_number,
-                "subscription_status": user.subscription_status.value if user.subscription_status else None,
-                "trial_days_remaining": user.days_remaining_in_trial() if user.role == UserRole.FREE_TRIAL else None,
+                "subscription_status": user.subscription_status if user.subscription_status else None,
+                "trial_days_remaining": user.days_remaining_in_trial() if user.role == "free_trial" else None,
                 "created_at": user.created_at,
                 "last_login": user.last_login,
                 "has_access": access_info.get("has_access", False),

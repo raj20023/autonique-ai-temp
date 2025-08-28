@@ -41,14 +41,14 @@ async def get_user_profile(
             "name": managed_user.name,
             "email": managed_user.email,
             "profile_picture": managed_user.profile_picture,
-            "role": managed_user.role.value,
+            "role": managed_user.role,
             "is_beta_user": managed_user.is_beta_user,
             "beta_user_number": managed_user.beta_user_number,
             "created_at": managed_user.created_at,
             "last_login": managed_user.last_login
         },
         "subscription": {
-            "status": managed_user.subscription_status.value if managed_user.subscription_status else None,
+            "status": managed_user.subscription_status if managed_user.subscription_status else None,
             "trial_start_date": managed_user.trial_start_date,
             "trial_end_date": managed_user.trial_end_date,
             "trial_days_remaining": managed_user.days_remaining_in_trial() if managed_user.role == "free_trial" else None,

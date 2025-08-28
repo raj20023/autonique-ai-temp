@@ -136,11 +136,11 @@ async def facebook_callback(
                 "email": user.email,
                 "setup_required": True,
                 "message": "Account created successfully. Please set up your Facebook Page and Instagram Business account.",
-                "user_role": managed_user.role.value,
+                "user_role": managed_user.role,
                 "is_beta_user": managed_user.is_beta_user,
                 "beta_user_number": managed_user.beta_user_number,
                 "access_info": access_info,
-                "trial_days_remaining": managed_user.days_remaining_in_trial() if managed_user.role.value == 'free_trial' else None
+                "trial_days_remaining": managed_user.days_remaining_in_trial() if managed_user.role == 'free_trial' else None
             }
 
         for page_data in pages:
@@ -204,11 +204,11 @@ async def facebook_callback(
             "user_id": str(user.id),
             "name": user.name,
             "email": user.email,
-            "user_role": managed_user.role.value,
+            "user_role": managed_user.role,
             "is_beta_user": managed_user.is_beta_user,
             "beta_user_number": managed_user.beta_user_number,
             "access_info": access_info,
-            "trial_days_remaining": managed_user.days_remaining_in_trial() if managed_user.role.value == 'free_trial' else None,
+            "trial_days_remaining": managed_user.days_remaining_in_trial() if managed_user.role == 'free_trial' else None,
             "setup_required": False
         }
         
