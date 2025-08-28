@@ -1,22 +1,8 @@
-from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean, Enum
+from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from datetime import datetime, timedelta
-import enum
 from app.core.database import Base
-
-# User management enums
-class UserRole(enum.Enum):
-    BETA = "beta"
-    FREE_TRIAL = "free_trial"
-    PAID = "paid"
-    ADMIN = "admin"
-
-class SubscriptionStatus(enum.Enum):
-    ACTIVE = "active"
-    EXPIRED = "expired"
-    CANCELLED = "cancelled"
-    PENDING = "pending"
 
 class User(Base):
     __tablename__ = "users"
