@@ -5,7 +5,6 @@ import logging
 
 from app.models.user import User
 from app.models.user_management import UsageStats, AdminSettings
-from app.core.database import get_db
 
 logger = logging.getLogger(__name__)
 
@@ -60,16 +59,16 @@ class UserManagementService:
         if not user.is_active:
             return {"has_access": False, "reason": "Account deactivated"}
         
-        if user.role == UserRole.ADMIN:
+        if user.role == "admin":
             return {"has_access": True, "reason": "Admin access", "unlimited": True}
-        
-        if user.role == UserRole.BETA:
+
+        if user.role == "beta":
             return {"has_access": True, "reason": "Beta user access", "unlimited": True}
-        
-        if user.role == UserRole.PAID and user.subscription_status == SubscriptionStatus.ACTIVE:
+
+        if user.role == "paid" and user.subscription_status == "active":
             return {"has_access": True, "reason": "Paid subscription", "unlimited": False}
-        
-        if user.role == UserRole.FREE_TRIAL:
+
+        if user.role == "free_trial":
             if user.is_trial_expired():
                 return {
                     "has_access": False, 
