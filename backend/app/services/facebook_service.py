@@ -27,11 +27,12 @@ class FacebookService:
             return response.json()
 
     async def get_user_pages(self, access_token: str) -> List[Dict]:
-        """Get user's Facebook pages"""
+        """Get user's Facebook pages using two-step approach to avoid business_management dependency"""
+        # Step 1: Get basic page info without Instagram data (only requires pages_show_list)
         url = f"{self.graph_url}/me/accounts"
         params = {
             "access_token": access_token,
-            "fields": "id,name,access_token,instagram_business_account{id,username,name,profile_picture_url,followers_count},category,tasks"
+            "fields": "id,name,access_token,category,tasks"  # Removed instagram_business_account to avoid business_management requirement
         }
 
         logger.info(f"Fetching pages from: {url}")
@@ -72,29 +73,65 @@ class FacebookService:
                 response.raise_for_status()
 
             data = response.json()
-            pages = data.get("data", [])
-            logger.info(f"Found {len(pages)} pages from Facebook API")
+            basic_pages = data.get("data", [])
+            logger.info(f"Found {len(basic_pages)} pages from Facebook API (Step 1)")
 
-            if len(pages) == 0:
+            if len(basic_pages) == 0:
                 logger.warning("⚠️  No Facebook pages found for this user")
                 logger.info("💡 Possible reasons:")
                 logger.info("   1. User doesn't have any Facebook Pages")
                 logger.info("   2. User is not admin of any Pages")
                 logger.info("   3. Pages are not published/active")
                 logger.info("   4. Missing 'pages_show_list' permission")
-            else:
-                logger.info(f"📄 Pages found:")
-                for page in pages:
-                    page_name = page.get('name', 'Unknown')
-                    ig_account = page.get('instagram_business_account')
-                    if ig_account:
-                        ig_username = ig_account.get('username', 'Unknown')
-                        ig_followers = ig_account.get('followers_count', 'Unknown')
-                        logger.info(f"   • {page_name} → @{ig_username} ({ig_followers} followers)")
-                    else:
-                        logger.info(f"   • {page_name} (No Instagram connected)")
+                return []
 
-            return pages
+            # Step 2: Get Instagram Business Account data for each page
+            logger.info("📄 Step 2: Fetching Instagram data for each page...")
+            enhanced_pages = []
+
+            for page in basic_pages:
+                page_id = page.get("id")
+                page_name = page.get("name", "Unknown")
+                page_access_token = page.get("access_token")
+
+                if not page_access_token:
+                    logger.warning(f"No page access token for {page_name}")
+                    enhanced_pages.append(page)
+                    continue
+
+                # Get Instagram Business Account for this page using page token
+                try:
+                    ig_response = await client.get(
+                        f"{self.graph_url}/{page_id}",
+                        params={
+                            "access_token": page_access_token,
+                            "fields": "instagram_business_account{id,username,name,profile_picture_url,followers_count}"
+                        }
+                    )
+
+                    if ig_response.status_code == 200:
+                        ig_data = ig_response.json()
+                        instagram_account = ig_data.get("instagram_business_account")
+
+                        if instagram_account:
+                            page["instagram_business_account"] = instagram_account
+                            ig_username = instagram_account.get("username", "Unknown")
+                            ig_followers = instagram_account.get("followers_count", "Unknown")
+                            logger.info(f"   • {page_name} → @{ig_username} ({ig_followers} followers)")
+                        else:
+                            logger.info(f"   • {page_name} (No Instagram connected)")
+                    else:
+                        logger.warning(f"Could not fetch Instagram data for {page_name}: {ig_response.status_code}")
+                        logger.info(f"   • {page_name} (Instagram fetch failed)")
+
+                except Exception as e:
+                    logger.error(f"Error fetching Instagram data for {page_name}: {e}")
+                    logger.info(f"   • {page_name} (Instagram error)")
+
+                enhanced_pages.append(page)
+
+            logger.info(f"✅ Two-step page fetch completed: {len(enhanced_pages)} pages processed")
+            return enhanced_pages
 
     async def get_instagram_business_account(self, page_id: str, page_access_token: str) -> Optional[Dict]:
         """Get Instagram Business Account connected to a Facebook page"""

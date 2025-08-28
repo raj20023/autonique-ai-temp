@@ -87,7 +87,7 @@ PORT=8000
 - ✅ Debug scripts removed
 - ✅ CORS configured for production domains
 - ✅ All hardcoded URLs updated to v23.0
-- ✅ Added business_management permission back for testing
+- ✅ Removed business_management dependency using two-step page fetch approach
 
 ## Frontend Deployment (Vercel)
 
