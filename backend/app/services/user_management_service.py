@@ -17,8 +17,8 @@ class UserManagementService:
         user = self.db.query(User).filter(User.fb_user_id == facebook_id).first()
 
         if not user:
-            # This shouldn't happen since auth creates the user first
-            logger.error(f"User not found for facebook_id: {facebook_id}")
+            # User doesn't exist yet, just return None and let auth handle user creation
+            logger.info(f"User not found for facebook_id: {facebook_id}, will be created by auth system")
             return None
 
         # Initialize user management fields if not set
@@ -59,6 +59,27 @@ class UserManagementService:
         if not user.is_active:
             return {"has_access": False, "reason": "Account deactivated"}
         
+        # If user has no role set, initialize it
+        if user.role is None:
+            # Determine user role
+            beta_count = self.db.query(User).filter(User.is_beta_user == True).count()
+
+            if beta_count < 20:
+                # Make them a beta user
+                user.role = "beta"
+                user.is_beta_user = True
+                user.beta_user_number = beta_count + 1
+                logger.info(f"Set beta user #{user.beta_user_number}: {user.name}")
+            else:
+                # Start free trial
+                user.role = "free_trial"
+                user.trial_start_date = datetime.utcnow()
+                user.trial_end_date = datetime.utcnow() + timedelta(days=14)
+                user.trial_days_remaining = 14
+                logger.info(f"Set trial user: {user.name} (14 days trial)")
+
+            self.db.commit()
+
         if user.role == "admin":
             return {"has_access": True, "reason": "Admin access", "unlimited": True}
 

@@ -99,10 +99,10 @@ async def facebook_callback(
             db.commit()
             logger.info(f"✅ Updated existing user: {name} (ID: {user.id})")
 
-        # Initialize user management for new users
+        # Initialize user management for existing users
         user_service = UserManagementService(db)
 
-        # Create or update user in the new user management system
+        # Try to get managed user (will be None for new users)
         managed_user = user_service.get_or_create_user(
             facebook_id=fb_user_id,
             email=email or "",
@@ -110,8 +110,9 @@ async def facebook_callback(
             profile_picture=user_info.get("picture", {}).get("data", {}).get("url")
         )
 
-        # Check user access status
-        access_info = user_service.check_user_access(managed_user.id)
+        # Check user access status (use the main user.id if managed_user is None)
+        user_id_for_access = managed_user.id if managed_user else user.id
+        access_info = user_service.check_user_access(user_id_for_access)
         
         # Get user's pages and Instagram accounts
         pages = await facebook_service.get_user_pages(access_token)
@@ -136,11 +137,11 @@ async def facebook_callback(
                 "email": user.email,
                 "setup_required": True,
                 "message": "Account created successfully. Please set up your Facebook Page and Instagram Business account.",
-                "user_role": managed_user.role,
-                "is_beta_user": managed_user.is_beta_user,
-                "beta_user_number": managed_user.beta_user_number,
+                "user_role": managed_user.role if managed_user else "free_trial",
+                "is_beta_user": managed_user.is_beta_user if managed_user else False,
+                "beta_user_number": managed_user.beta_user_number if managed_user else None,
                 "access_info": access_info,
-                "trial_days_remaining": managed_user.days_remaining_in_trial() if managed_user.role == 'free_trial' else None
+                "trial_days_remaining": managed_user.days_remaining_in_trial() if managed_user and managed_user.role == 'free_trial' else 14
             }
 
         for page_data in pages:
@@ -204,11 +205,11 @@ async def facebook_callback(
             "user_id": str(user.id),
             "name": user.name,
             "email": user.email,
-            "user_role": managed_user.role,
-            "is_beta_user": managed_user.is_beta_user,
-            "beta_user_number": managed_user.beta_user_number,
+            "user_role": managed_user.role if managed_user else "free_trial",
+            "is_beta_user": managed_user.is_beta_user if managed_user else False,
+            "beta_user_number": managed_user.beta_user_number if managed_user else None,
             "access_info": access_info,
-            "trial_days_remaining": managed_user.days_remaining_in_trial() if managed_user.role == 'free_trial' else None,
+            "trial_days_remaining": managed_user.days_remaining_in_trial() if managed_user and managed_user.role == 'free_trial' else 14,
             "setup_required": False
         }
         
