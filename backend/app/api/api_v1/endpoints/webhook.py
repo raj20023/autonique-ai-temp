@@ -36,7 +36,8 @@ async def verify_webhook(
 
     if hub_mode == "subscribe" and hub_token == settings.WEBHOOK_VERIFY_TOKEN:
         logger.info("Webhook verified successfully")
-        return int(hub_challenge) if hub_challenge else 0
+        # Facebook sends challenge as string, return it as-is (not as int)
+        return hub_challenge if hub_challenge else "0"
     else:
         logger.error(f"Webhook verification failed. Expected token: {settings.WEBHOOK_VERIFY_TOKEN}, Got: {hub_token}")
         # Return more detailed error for debugging

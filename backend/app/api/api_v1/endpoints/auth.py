@@ -299,7 +299,7 @@ async def get_permission_reset_guide():
         "alternative_method": {
             "title": "Alternative: Use Re-authorization Link",
             "description": "Click the button below to force Facebook to re-request all permissions",
-            "url": f"https://www.facebook.com/v18.0/dialog/oauth?client_id={settings.FACEBOOK_APP_ID}&redirect_uri=https://autonique.in/auth/callback&scope={facebook_config.OAUTH_SCOPE}&response_type=code&auth_type=rerequest&display=popup"
+            "url": f"https://www.facebook.com/v23.0/dialog/oauth?client_id={settings.FACEBOOK_APP_ID}&redirect_uri=https://autonique.in/auth/callback&scope={facebook_config.OAUTH_SCOPE}&response_type=code&auth_type=rerequest&display=popup"
         },
         "required_permissions": [
             f"{perm} - {desc}" for perm, desc in facebook_config.PERMISSION_DESCRIPTIONS.items()
@@ -346,8 +346,8 @@ async def check_user_permissions(access_token: str = Query(...)):
                     for perm in facebook_config.REQUIRED_PERMISSIONS
                 },
                 "force_reset_urls": [
-                    f"https://www.facebook.com/v18.0/dialog/oauth?client_id={settings.FACEBOOK_APP_ID}&redirect_uri=https://autonique.in/auth/callback&scope={facebook_config.OAUTH_SCOPE}&response_type=code&auth_type=rerequest&display=popup&force_login=true",
-                    f"https://www.facebook.com/v18.0/dialog/oauth?client_id={settings.FACEBOOK_APP_ID}&redirect_uri=https://autonique.in/auth/callback&scope={facebook_config.OAUTH_SCOPE}&response_type=code&auth_type=rerequest&display=page&force_login=true&reauthorize=true"
+                    f"https://www.facebook.com/v23.0/dialog/oauth?client_id={settings.FACEBOOK_APP_ID}&redirect_uri=https://autonique.in/auth/callback&scope={facebook_config.OAUTH_SCOPE}&response_type=code&auth_type=rerequest&display=popup&force_login=true",
+                    f"https://www.facebook.com/v23.0/dialog/oauth?client_id={settings.FACEBOOK_APP_ID}&redirect_uri=https://autonique.in/auth/callback&scope={facebook_config.OAUTH_SCOPE}&response_type=code&auth_type=rerequest&display=page&force_login=true&reauthorize=true"
                 ]
             }
 

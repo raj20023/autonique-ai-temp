@@ -11,16 +11,16 @@ class InstagramService:
         self.graph_url = settings.FACEBOOK_GRAPH_URL
 
     async def send_message(self, ig_business_id: str, recipient_id: str, message_text: str, access_token: str) -> bool:
-        """Send a message via Instagram Messaging API"""
+        """Send a message via Instagram Messaging API (v23.0)"""
         try:
-            # Use the correct endpoint as per Facebook documentation
+            # Use the correct endpoint for Instagram messaging
             url = f"{self.graph_url}/me/messages"
             payload = {
                 "recipient": {"id": recipient_id},
                 "message": {"text": message_text}
             }
 
-            logger.info(f"Attempting to send message to {recipient_id}")
+            logger.info(f"Sending Instagram message via v23.0 API to {recipient_id}")
             logger.info(f"URL: {url}")
             logger.info(f"Instagram Business ID: {ig_business_id}")
             logger.info(f"Message: {message_text}")
