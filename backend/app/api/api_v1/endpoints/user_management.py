@@ -5,8 +5,9 @@ import logging
 
 from app.core.database import get_db
 from app.services.user_management_service import UserManagementService
-from app.models.user_management import User, UserRole
-from app.core.auth import get_current_user
+from app.models.user_management import User as ManagedUser, UserRole
+from app.models.user import User  # Original user model
+from app.api.deps import get_current_user
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -20,28 +21,37 @@ async def get_user_profile(
 ):
     """Get current user's profile and subscription status"""
     user_service = UserManagementService(db)
-    access_info = user_service.check_user_access(current_user.id)
-    stats = user_service.get_user_stats(current_user.id)
+
+    # Get or create managed user
+    managed_user = user_service.get_or_create_user(
+        facebook_id=current_user.fb_user_id,
+        email=current_user.email or "",
+        name=current_user.name,
+        profile_picture=""
+    )
+
+    access_info = user_service.check_user_access(managed_user.id)
+    stats = user_service.get_user_stats(managed_user.id)
     
     return {
         "user": {
-            "id": current_user.id,
-            "name": current_user.name,
-            "email": current_user.email,
-            "profile_picture": current_user.profile_picture,
-            "role": current_user.role.value,
-            "is_beta_user": current_user.is_beta_user,
-            "beta_user_number": current_user.beta_user_number,
-            "created_at": current_user.created_at,
-            "last_login": current_user.last_login
+            "id": managed_user.id,
+            "name": managed_user.name,
+            "email": managed_user.email,
+            "profile_picture": managed_user.profile_picture,
+            "role": managed_user.role.value,
+            "is_beta_user": managed_user.is_beta_user,
+            "beta_user_number": managed_user.beta_user_number,
+            "created_at": managed_user.created_at,
+            "last_login": managed_user.last_login
         },
         "subscription": {
-            "status": current_user.subscription_status.value if current_user.subscription_status else None,
-            "trial_start_date": current_user.trial_start_date,
-            "trial_end_date": current_user.trial_end_date,
-            "trial_days_remaining": current_user.days_remaining_in_trial() if current_user.role == UserRole.FREE_TRIAL else None,
-            "subscription_start_date": current_user.subscription_start_date,
-            "subscription_end_date": current_user.subscription_end_date
+            "status": managed_user.subscription_status.value if managed_user.subscription_status else None,
+            "trial_start_date": managed_user.trial_start_date,
+            "trial_end_date": managed_user.trial_end_date,
+            "trial_days_remaining": managed_user.days_remaining_in_trial() if managed_user.role == UserRole.FREE_TRIAL else None,
+            "subscription_start_date": managed_user.subscription_start_date,
+            "subscription_end_date": managed_user.subscription_end_date
         },
         "access": access_info,
         "usage": stats
@@ -54,8 +64,17 @@ async def check_access(
 ):
     """Check if user has access to premium features"""
     user_service = UserManagementService(db)
-    access_info = user_service.check_user_access(current_user.id)
-    
+
+    # Get or create managed user
+    managed_user = user_service.get_or_create_user(
+        facebook_id=current_user.fb_user_id,
+        email=current_user.email or "",
+        name=current_user.name,
+        profile_picture=""
+    )
+
+    access_info = user_service.check_user_access(managed_user.id)
+
     return access_info
 
 @router.post("/upgrade-to-paid")
@@ -65,14 +84,22 @@ async def upgrade_to_paid(
 ):
     """Upgrade user to paid subscription"""
     user_service = UserManagementService(db)
-    
-    if current_user.role == UserRole.PAID:
+
+    # Get or create managed user
+    managed_user = user_service.get_or_create_user(
+        facebook_id=current_user.fb_user_id,
+        email=current_user.email or "",
+        name=current_user.name,
+        profile_picture=""
+    )
+
+    if managed_user.role == UserRole.PAID:
         raise HTTPException(
             status_code=400,
             detail="User already has paid subscription"
         )
-    
-    success = user_service.upgrade_to_paid(current_user.id)
+
+    success = user_service.upgrade_to_paid(managed_user.id)
     
     if not success:
         raise HTTPException(
@@ -89,8 +116,17 @@ async def get_usage_stats(
 ):
     """Get user's usage statistics"""
     user_service = UserManagementService(db)
-    stats = user_service.get_user_stats(current_user.id)
-    
+
+    # Get or create managed user
+    managed_user = user_service.get_or_create_user(
+        facebook_id=current_user.fb_user_id,
+        email=current_user.email or "",
+        name=current_user.name,
+        profile_picture=""
+    )
+
+    stats = user_service.get_user_stats(managed_user.id)
+
     return stats
 
 # Admin endpoints
@@ -100,15 +136,24 @@ async def get_all_users(
     db: Session = Depends(get_db)
 ):
     """Get all users for admin panel (Admin only)"""
-    if current_user.role != UserRole.ADMIN:
+    user_service = UserManagementService(db)
+
+    # Get or create managed user
+    managed_user = user_service.get_or_create_user(
+        facebook_id=current_user.fb_user_id,
+        email=current_user.email or "",
+        name=current_user.name,
+        profile_picture=""
+    )
+
+    if managed_user.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=403,
             detail="Admin access required"
         )
     
-    user_service = UserManagementService(db)
     users = user_service.get_all_users_for_admin()
-    
+
     return {"users": users}
 
 @router.get("/admin/settings")
@@ -117,7 +162,17 @@ async def get_admin_settings(
     db: Session = Depends(get_db)
 ):
     """Get admin settings (Admin only)"""
-    if current_user.role != UserRole.ADMIN:
+    user_service = UserManagementService(db)
+
+    # Get or create managed user
+    managed_user = user_service.get_or_create_user(
+        facebook_id=current_user.fb_user_id,
+        email=current_user.email or "",
+        name=current_user.name,
+        profile_picture=""
+    )
+
+    if managed_user.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=403,
             detail="Admin access required"
@@ -136,13 +191,22 @@ async def update_admin_setting(
     db: Session = Depends(get_db)
 ):
     """Update admin setting (Admin only)"""
-    if current_user.role != UserRole.ADMIN:
+    user_service = UserManagementService(db)
+
+    # Get or create managed user
+    managed_user = user_service.get_or_create_user(
+        facebook_id=current_user.fb_user_id,
+        email=current_user.email or "",
+        name=current_user.name,
+        profile_picture=""
+    )
+
+    if managed_user.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=403,
             detail="Admin access required"
         )
     
-    user_service = UserManagementService(db)
     success = user_service.update_admin_setting(key, value)
     
     if not success:
@@ -160,13 +224,21 @@ async def admin_upgrade_user(
     db: Session = Depends(get_db)
 ):
     """Upgrade user to paid subscription (Admin only)"""
-    if current_user.role != UserRole.ADMIN:
+    user_service = UserManagementService(db)
+
+    # Get or create managed user
+    managed_user = user_service.get_or_create_user(
+        facebook_id=current_user.fb_user_id,
+        email=current_user.email or "",
+        name=current_user.name,
+        profile_picture=""
+    )
+
+    if managed_user.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=403,
             detail="Admin access required"
         )
-    
-    user_service = UserManagementService(db)
     success = user_service.upgrade_to_paid(user_id)
     
     if not success:
@@ -184,13 +256,23 @@ async def deactivate_user(
     db: Session = Depends(get_db)
 ):
     """Deactivate user account (Admin only)"""
-    if current_user.role != UserRole.ADMIN:
+    user_service = UserManagementService(db)
+
+    # Get or create managed user
+    managed_user = user_service.get_or_create_user(
+        facebook_id=current_user.fb_user_id,
+        email=current_user.email or "",
+        name=current_user.name,
+        profile_picture=""
+    )
+
+    if managed_user.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=403,
             detail="Admin access required"
         )
-    
-    user = db.query(User).filter(User.id == user_id).first()
+
+    user = db.query(ManagedUser).filter(ManagedUser.id == user_id).first()
     if not user:
         raise HTTPException(
             status_code=404,
@@ -209,13 +291,23 @@ async def activate_user(
     db: Session = Depends(get_db)
 ):
     """Activate user account (Admin only)"""
-    if current_user.role != UserRole.ADMIN:
+    user_service = UserManagementService(db)
+
+    # Get or create managed user
+    managed_user = user_service.get_or_create_user(
+        facebook_id=current_user.fb_user_id,
+        email=current_user.email or "",
+        name=current_user.name,
+        profile_picture=""
+    )
+
+    if managed_user.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=403,
             detail="Admin access required"
         )
-    
-    user = db.query(User).filter(User.id == user_id).first()
+
+    user = db.query(ManagedUser).filter(ManagedUser.id == user_id).first()
     if not user:
         raise HTTPException(
             status_code=404,
@@ -233,18 +325,28 @@ async def get_admin_stats(
     db: Session = Depends(get_db)
 ):
     """Get admin dashboard statistics"""
-    if current_user.role != UserRole.ADMIN:
+    user_service = UserManagementService(db)
+
+    # Get or create managed user
+    managed_user = user_service.get_or_create_user(
+        facebook_id=current_user.fb_user_id,
+        email=current_user.email or "",
+        name=current_user.name,
+        profile_picture=""
+    )
+
+    if managed_user.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=403,
             detail="Admin access required"
         )
-    
+
     # Get user counts by role
-    total_users = db.query(User).count()
-    beta_users = db.query(User).filter(User.role == UserRole.BETA).count()
-    trial_users = db.query(User).filter(User.role == UserRole.FREE_TRIAL).count()
-    paid_users = db.query(User).filter(User.role == UserRole.PAID).count()
-    active_users = db.query(User).filter(User.is_active == True).count()
+    total_users = db.query(ManagedUser).count()
+    beta_users = db.query(ManagedUser).filter(ManagedUser.role == UserRole.BETA).count()
+    trial_users = db.query(ManagedUser).filter(ManagedUser.role == UserRole.FREE_TRIAL).count()
+    paid_users = db.query(ManagedUser).filter(ManagedUser.role == UserRole.PAID).count()
+    active_users = db.query(ManagedUser).filter(ManagedUser.is_active == True).count()
     
     return {
         "total_users": total_users,
