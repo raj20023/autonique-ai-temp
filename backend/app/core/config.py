@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     # JWT
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080  # 7 days (7 * 24 * 60)
     
     # Webhook
     WEBHOOK_VERIFY_TOKEN: str = "autonique_webhook_2024_secure_token_xyz789"

@@ -232,6 +232,20 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
             created_at=datetime.fromtimestamp(timestamp / 1000) if timestamp else datetime.utcnow()
         )
         
+        # Check user access to auto-reply features
+        from app.services.user_management_service import UserManagementService
+        user_service = UserManagementService(db)
+        access_info = user_service.check_user_access(user.id)
+
+        if not access_info.get("has_access", False):
+            logger.warning(f"User {user.name} (ID: {user.id}) doesn't have access to auto-reply features. Reason: {access_info.get('reason', 'Unknown')}")
+            # Still save the message but don't send auto-reply
+            db.add(message_record)
+            db.commit()
+            return
+
+        logger.info(f"User {user.name} has access to auto-reply features. Reason: {access_info.get('reason', 'Unknown')}")
+
         # Check if user has any FAQs
         from app.models.faq import FAQ
         faq_count = db.query(FAQ).filter(FAQ.user_id == user.id, FAQ.is_active == True).count()

@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { AuthToken, User, Page, FAQ, Message, FAQCreateData, FAQUpdateData } from '@/types';
+import { tokenManager } from './tokenManager';
 
 // Force production API URL since Railway env vars aren't working
 const API_BASE_URL = 'https://api.autonique.in';
@@ -13,8 +14,8 @@ const api = axios.create({
 });
 
 // Request interceptor to add auth token
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token');
+api.interceptors.request.use(async (config) => {
+  const token = await tokenManager.getValidToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -26,8 +27,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('access_token');
-      window.location.href = '/';
+      console.log('🚨 API received 401, refreshing token...');
+      tokenManager.refreshToken();
     }
     return Promise.reject(error);
   }

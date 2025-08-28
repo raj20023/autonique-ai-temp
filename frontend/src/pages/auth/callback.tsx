@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Instagram, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { authApi } from '@/utils/api';
 import { setAuthToken } from '@/utils/auth';
+import { tokenManager } from '@/utils/tokenManager';
 import toast from 'react-hot-toast';
 
 export default function CallbackPage() {
@@ -34,8 +35,9 @@ export default function CallbackPage() {
 
         setMessage('Setting up your account...');
 
-        // Store the token
+        // Store the token using token manager
         setAuthToken(response.data.access_token);
+        tokenManager.setToken(response.data);
 
         // Check if setup is required (no Facebook pages)
         const responseData = response.data as any;
