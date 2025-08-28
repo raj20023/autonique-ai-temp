@@ -1,7 +1,22 @@
-from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+from datetime import datetime, timedelta
+import enum
 from app.core.database import Base
+
+# User management enums
+class UserRole(enum.Enum):
+    BETA = "beta"
+    FREE_TRIAL = "free_trial"
+    PAID = "paid"
+    ADMIN = "admin"
+
+class SubscriptionStatus(enum.Enum):
+    ACTIVE = "active"
+    EXPIRED = "expired"
+    CANCELLED = "cancelled"
+    PENDING = "pending"
 
 class User(Base):
     __tablename__ = "users"
@@ -16,10 +31,48 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
+    # User Management fields (added by migration)
+    role = Column(Enum(UserRole), default=UserRole.FREE_TRIAL)
+    is_beta_user = Column(Boolean, default=False)
+    beta_user_number = Column(Integer, nullable=True)
+    trial_start_date = Column(DateTime, nullable=True)
+    trial_end_date = Column(DateTime, nullable=True)
+    trial_days_remaining = Column(Integer, default=14)
+    subscription_status = Column(Enum(SubscriptionStatus), default=SubscriptionStatus.PENDING)
+    subscription_start_date = Column(DateTime, nullable=True)
+    subscription_end_date = Column(DateTime, nullable=True)
+    last_login = Column(DateTime, nullable=True)
+    profile_picture = Column(String, nullable=True)
+
     # Relationships
     pages = relationship("Page", back_populates="user", cascade="all, delete-orphan")
     faqs = relationship("FAQ", back_populates="user", cascade="all, delete-orphan")
     messages = relationship("Message", back_populates="user", cascade="all, delete-orphan")
+
+    def is_trial_expired(self):
+        """Check if trial period has expired"""
+        if not self.trial_end_date:
+            return False
+        return datetime.utcnow() > self.trial_end_date
+
+    def days_remaining_in_trial(self):
+        """Get remaining days in trial"""
+        if not self.trial_end_date:
+            return 0
+        remaining = self.trial_end_date - datetime.utcnow()
+        return max(0, remaining.days)
+
+    def can_access_features(self):
+        """Check if user can access premium features"""
+        if self.role == UserRole.ADMIN:
+            return True
+        if self.role == UserRole.BETA:
+            return True
+        if self.role == UserRole.PAID and self.subscription_status == SubscriptionStatus.ACTIVE:
+            return True
+        if self.role == UserRole.FREE_TRIAL and not self.is_trial_expired():
+            return True
+        return False
 
     def __repr__(self):
         return f"<User(id={self.id}, name='{self.name}', fb_user_id='{self.fb_user_id}')>"

@@ -3,7 +3,8 @@ from datetime import datetime, timedelta
 from typing import Optional, List
 import logging
 
-from app.models.user_management import User, UserRole, SubscriptionStatus, UsageStats, AdminSettings
+from app.models.user import User, UserRole, SubscriptionStatus
+from app.models.user_management import UsageStats, AdminSettings
 from app.core.database import get_db
 
 logger = logging.getLogger(__name__)
@@ -13,45 +14,41 @@ class UserManagementService:
         self.db = db
     
     def get_or_create_user(self, facebook_id: str, email: str, name: str, profile_picture: str = None) -> User:
-        """Get existing user or create new user with appropriate role"""
-        user = self.db.query(User).filter(User.facebook_id == facebook_id).first()
-        
-        if user:
-            # Update last login
-            user.last_login = datetime.utcnow()
-            self.db.commit()
-            return user
-        
-        # Create new user
-        user = User(
-            facebook_id=facebook_id,
-            email=email,
-            name=name,
-            profile_picture=profile_picture,
-            last_login=datetime.utcnow()
-        )
-        
-        # Determine user role
-        beta_count = self.db.query(User).filter(User.is_beta_user == True).count()
-        
-        if beta_count < 20:
-            # Make them a beta user
-            user.role = UserRole.BETA
-            user.is_beta_user = True
-            user.beta_user_number = beta_count + 1
-            logger.info(f"Created beta user #{user.beta_user_number}: {name}")
-        else:
-            # Start free trial
-            user.role = UserRole.FREE_TRIAL
-            user.trial_start_date = datetime.utcnow()
-            user.trial_end_date = datetime.utcnow() + timedelta(days=14)
-            user.trial_days_remaining = 14
-            logger.info(f"Created trial user: {name} (14 days trial)")
-        
-        self.db.add(user)
+        """Get existing user or initialize user management fields"""
+        user = self.db.query(User).filter(User.fb_user_id == facebook_id).first()
+
+        if not user:
+            # This shouldn't happen since auth creates the user first
+            logger.error(f"User not found for facebook_id: {facebook_id}")
+            return None
+
+        # Initialize user management fields if not set
+        if user.role is None:
+            # Determine user role
+            beta_count = self.db.query(User).filter(User.is_beta_user == True).count()
+
+            if beta_count < 20:
+                # Make them a beta user
+                user.role = UserRole.BETA
+                user.is_beta_user = True
+                user.beta_user_number = beta_count + 1
+                logger.info(f"Set beta user #{user.beta_user_number}: {name}")
+            else:
+                # Start free trial
+                user.role = UserRole.FREE_TRIAL
+                user.trial_start_date = datetime.utcnow()
+                user.trial_end_date = datetime.utcnow() + timedelta(days=14)
+                user.trial_days_remaining = 14
+                logger.info(f"Set trial user: {name} (14 days trial)")
+
+        # Update last login and profile picture
+        user.last_login = datetime.utcnow()
+        if profile_picture:
+            user.profile_picture = profile_picture
+
         self.db.commit()
         self.db.refresh(user)
-        
+
         return user
     
     def check_user_access(self, user_id: int) -> dict:

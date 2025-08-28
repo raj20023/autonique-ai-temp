@@ -5,8 +5,7 @@ import logging
 
 from app.core.database import get_db
 from app.services.user_management_service import UserManagementService
-from app.models.user_management import User as ManagedUser, UserRole
-from app.models.user import User  # Original user model
+from app.models.user import User, UserRole
 from app.api.deps import get_current_user
 
 router = APIRouter()
@@ -22,13 +21,16 @@ async def get_user_profile(
     """Get current user's profile and subscription status"""
     user_service = UserManagementService(db)
 
-    # Get or create managed user
-    managed_user = user_service.get_or_create_user(
-        facebook_id=current_user.fb_user_id,
-        email=current_user.email or "",
-        name=current_user.name,
-        profile_picture=""
-    )
+    # Initialize user management fields if needed
+    if current_user.role is None:
+        managed_user = user_service.get_or_create_user(
+            facebook_id=current_user.fb_user_id,
+            email=current_user.email or "",
+            name=current_user.name,
+            profile_picture=current_user.profile_picture or ""
+        )
+    else:
+        managed_user = current_user
 
     access_info = user_service.check_user_access(managed_user.id)
     stats = user_service.get_user_stats(managed_user.id)
@@ -272,7 +274,7 @@ async def deactivate_user(
             detail="Admin access required"
         )
 
-    user = db.query(ManagedUser).filter(ManagedUser.id == user_id).first()
+    user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(
             status_code=404,
@@ -307,7 +309,7 @@ async def activate_user(
             detail="Admin access required"
         )
 
-    user = db.query(ManagedUser).filter(ManagedUser.id == user_id).first()
+    user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(
             status_code=404,
@@ -342,11 +344,11 @@ async def get_admin_stats(
         )
 
     # Get user counts by role
-    total_users = db.query(ManagedUser).count()
-    beta_users = db.query(ManagedUser).filter(ManagedUser.role == UserRole.BETA).count()
-    trial_users = db.query(ManagedUser).filter(ManagedUser.role == UserRole.FREE_TRIAL).count()
-    paid_users = db.query(ManagedUser).filter(ManagedUser.role == UserRole.PAID).count()
-    active_users = db.query(ManagedUser).filter(ManagedUser.is_active == True).count()
+    total_users = db.query(User).count()
+    beta_users = db.query(User).filter(User.role == UserRole.BETA).count()
+    trial_users = db.query(User).filter(User.role == UserRole.FREE_TRIAL).count()
+    paid_users = db.query(User).filter(User.role == UserRole.PAID).count()
+    active_users = db.query(User).filter(User.is_active == True).count()
     
     return {
         "total_users": total_users,
