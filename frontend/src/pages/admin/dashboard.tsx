@@ -67,40 +67,78 @@ export default function AdminDashboard() {
   const checkAdminAccess = async () => {
     try {
       const token = localStorage.getItem('access_token');
+      console.log('🔑 Token found:', !!token);
+      console.log('🌐 API URL:', process.env.NEXT_PUBLIC_API_URL);
+
       if (!token) {
         setError('No authentication token found. Please login.');
         setLoading(false);
         return;
       }
 
+      // First, let's check current user info
+      console.log('👤 Checking current user...');
+      const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      console.log('👤 User response status:', userResponse.status);
+
+      if (userResponse.ok) {
+        const userData = await userResponse.json();
+        console.log('👤 Current user:', userData);
+        console.log('👤 User role:', userData.role);
+
+        if (userData.role !== 'admin') {
+          setError(`Access denied. Your role is '${userData.role}' but admin role is required.`);
+          setLoading(false);
+          return;
+        }
+      } else {
+        console.error('👤 User check failed:', await userResponse.text());
+        setError('Failed to verify user information. Please login again.');
+        setLoading(false);
+        return;
+      }
+
       // Try to fetch admin stats to check if user is admin
+      console.log('📊 Checking admin stats access...');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user-management/admin/stats`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
+      console.log('📊 Admin stats response status:', response.status);
+
       if (response.status === 403) {
+        const errorText = await response.text();
+        console.error('📊 Admin access denied:', errorText);
         setError('Admin access required. You do not have permission to view this page.');
         setLoading(false);
         return;
       }
 
       if (response.status === 401) {
+        const errorText = await response.text();
+        console.error('📊 Authentication failed:', errorText);
         setError('Authentication failed. Please login again.');
         setLoading(false);
         return;
       }
 
       if (response.ok) {
+        console.log('✅ Admin access verified!');
         setIsAdmin(true);
         fetchAdminData();
       } else {
-        setError(`Failed to verify admin access: ${response.status}`);
+        const errorText = await response.text();
+        console.error('📊 Unexpected response:', errorText);
+        setError(`Failed to verify admin access: ${response.status} - ${errorText}`);
         setLoading(false);
       }
 
     } catch (error) {
-      console.error('Admin access check failed:', error);
-      setError('Failed to verify admin access. Please check your connection.');
+      console.error('❌ Admin access check failed:', error);
+      setError(`Failed to verify admin access: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setLoading(false);
     }
   };
