@@ -57,39 +57,97 @@ export default function AdminDashboard() {
   const [settings, setSettings] = useState<AdminSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [error, setError] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    fetchAdminData();
+    checkAdminAccess();
   }, []);
+
+  const checkAdminAccess = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        setError('No authentication token found. Please login.');
+        setLoading(false);
+        return;
+      }
+
+      // Try to fetch admin stats to check if user is admin
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user-management/admin/stats`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.status === 403) {
+        setError('Admin access required. You do not have permission to view this page.');
+        setLoading(false);
+        return;
+      }
+
+      if (response.status === 401) {
+        setError('Authentication failed. Please login again.');
+        setLoading(false);
+        return;
+      }
+
+      if (response.ok) {
+        setIsAdmin(true);
+        fetchAdminData();
+      } else {
+        setError(`Failed to verify admin access: ${response.status}`);
+        setLoading(false);
+      }
+
+    } catch (error) {
+      console.error('Admin access check failed:', error);
+      setError('Failed to verify admin access. Please check your connection.');
+      setLoading(false);
+    }
+  };
 
   const fetchAdminData = async () => {
     try {
       const token = localStorage.getItem('access_token');
       const headers = { 'Authorization': `Bearer ${token}` };
 
+      console.log('🔍 Fetching admin data...');
+
       // Fetch stats
       const statsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user-management/admin/stats`, { headers });
+      console.log('📊 Stats response:', statsResponse.status);
       if (statsResponse.ok) {
         const statsData = await statsResponse.json();
+        console.log('📊 Stats data:', statsData);
         setStats(statsData);
+      } else {
+        console.error('📊 Stats failed:', await statsResponse.text());
       }
 
       // Fetch users
       const usersResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user-management/admin/users`, { headers });
+      console.log('👥 Users response:', usersResponse.status);
       if (usersResponse.ok) {
         const usersData = await usersResponse.json();
-        setUsers(usersData.users);
+        console.log('👥 Users data:', usersData);
+        setUsers(usersData.users || []);
+      } else {
+        console.error('👥 Users failed:', await usersResponse.text());
       }
 
       // Fetch settings
       const settingsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user-management/admin/settings`, { headers });
+      console.log('⚙️ Settings response:', settingsResponse.status);
       if (settingsResponse.ok) {
         const settingsData = await settingsResponse.json();
+        console.log('⚙️ Settings data:', settingsData);
         setSettings(settingsData.settings);
+      } else {
+        console.error('⚙️ Settings failed:', await settingsResponse.text());
       }
 
     } catch (error) {
-      console.error('Failed to fetch admin data:', error);
+      console.error('❌ Failed to fetch admin data:', error);
+      setError('Failed to fetch admin data. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -141,7 +199,41 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking admin access...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md mx-auto text-center">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-lg font-semibold text-red-800 mb-2">Access Denied</h2>
+            <p className="text-red-600 mb-4">{error}</p>
+            <button
+              onClick={() => window.location.href = '/dashboard'}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            >
+              Go to Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-600">Verifying admin access...</p>
+        </div>
       </div>
     );
   }
@@ -299,20 +391,32 @@ export default function AdminDashboard() {
 
               {activeTab === 'users' && (
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">User Management</h3>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usage</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {users.map((user) => (
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    User Management ({users.length} users)
+                  </h3>
+
+                  {users.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-500">No users found</p>
+                      <p className="text-sm text-gray-400 mt-2">
+                        Users will appear here once they register
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usage</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {users.map((user) => (
                           <tr key={user.id}>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div>
@@ -364,10 +468,11 @@ export default function AdminDashboard() {
                               </button>
                             </td>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
               )}
 
