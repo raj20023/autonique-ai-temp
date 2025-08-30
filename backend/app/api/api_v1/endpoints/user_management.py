@@ -179,12 +179,14 @@ async def get_admin_settings(
             detail="Admin access required"
         )
 
-    # Return basic admin settings
+    # Return basic admin settings with frontend-compatible field names
     settings = {
-        "beta_slots_limit": 20,
-        "trial_duration_days": 7,
-        "auto_approve_beta": False,
-        "maintenance_mode": False
+        "beta_users_limit": "20",
+        "trial_days": "7",
+        "monthly_message_limit_trial": "100",
+        "monthly_message_limit_paid": "1000",
+        "app_maintenance_mode": "false",
+        "auto_approve_beta": "false"
     }
 
     return {"settings": settings}
@@ -209,7 +211,14 @@ async def update_admin_setting(
     value = request.get("value", "")
 
     # For now, just return success (settings can be stored in database later)
-    allowed_keys = ["beta_slots_limit", "trial_duration_days", "auto_approve_beta", "maintenance_mode"]
+    allowed_keys = [
+        "beta_users_limit",
+        "trial_days",
+        "monthly_message_limit_trial",
+        "monthly_message_limit_paid",
+        "auto_approve_beta",
+        "maintenance_mode"
+    ]
 
     if key not in allowed_keys:
         raise HTTPException(
@@ -247,6 +256,55 @@ async def admin_upgrade_user(
     db.commit()
 
     return {"message": f"User {user.name} upgraded to paid successfully"}
+
+@router.put("/admin/users/{user_id}/role")
+async def change_user_role(
+    user_id: int,
+    request: dict,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Change user role (Admin only)"""
+
+    # Check if current user is admin
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Admin access required"
+        )
+
+    # Get new role from request body
+    new_role = request.get("role", "")
+
+    # Validate role
+    valid_roles = ["trial", "beta", "paid", "admin"]
+    if new_role not in valid_roles:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid role. Valid roles: {', '.join(valid_roles)}"
+        )
+
+    # Find the user to change role
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    # Update user role
+    old_role = user.role
+    user.role = new_role
+
+    # Update beta user status if needed
+    if new_role == "beta":
+        user.is_beta_user = True
+    elif new_role != "beta" and user.is_beta_user:
+        user.is_beta_user = False
+
+    db.commit()
+
+    return {"message": f"User {user.name} role changed from {old_role} to {new_role} successfully"}
 
 @router.put("/admin/users/{user_id}/deactivate")
 async def deactivate_user(

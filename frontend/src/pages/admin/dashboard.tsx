@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import {
   Users,
   Crown,
+  Activity,
   Clock,
   CreditCard,
   Settings,
@@ -208,27 +209,29 @@ export default function AdminDashboard() {
     }
   };
 
-  const upgradeUser = async (userId: number) => {
+  const changeUserRole = async (userId: number, newRole: string) => {
     try {
       const API_URL = 'https://api.autonique.in';
-      const response = await fetch(`${API_URL}/api/v1/user-management/admin/users/${userId}/upgrade`, {
-        method: 'POST',
+      const response = await fetch(`${API_URL}/api/v1/user-management/admin/users/${userId}/role`, {
+        method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        }
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ role: newRole })
       });
 
       if (response.ok) {
-        alert('User upgraded successfully!');
+        alert(`User role changed to ${newRole} successfully!`);
         fetchAdminData();
       } else {
         const errorText = await response.text();
-        console.error('Upgrade failed:', response.status, errorText);
-        alert(`Failed to upgrade user: ${response.status} - ${errorText}`);
+        console.error('Role change failed:', response.status, errorText);
+        alert(`Failed to change user role: ${response.status} - ${errorText}`);
       }
     } catch (error) {
-      console.error('Failed to upgrade user:', error);
-      alert('Failed to upgrade user');
+      console.error('Failed to change user role:', error);
+      alert('Failed to change user role');
     }
   };
 
@@ -266,8 +269,10 @@ export default function AdminDashboard() {
 
       // Save each setting individually
       const settingsToSave = [
-        { key: 'beta_slots_limit', value: editableSettings.beta_users_limit },
-        { key: 'trial_duration_days', value: editableSettings.trial_days },
+        { key: 'beta_users_limit', value: editableSettings.beta_users_limit },
+        { key: 'trial_days', value: editableSettings.trial_days },
+        { key: 'monthly_message_limit_trial', value: editableSettings.monthly_message_limit_trial },
+        { key: 'monthly_message_limit_paid', value: editableSettings.monthly_message_limit_paid },
         { key: 'auto_approve_beta', value: editableSettings.auto_approve_beta || 'false' },
         { key: 'maintenance_mode', value: editableSettings.app_maintenance_mode || 'false' }
       ];
@@ -535,52 +540,75 @@ export default function AdminDashboard() {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
-                                {user.is_beta_user && (
-                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 mr-2">
-                                    <Crown className="h-3 w-3 mr-1" />
-                                    Beta #{user.beta_user_number}
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mr-2 ${
+                                  user.role === 'admin' ? 'bg-purple-100 text-purple-800' :
+                                  user.role === 'paid' ? 'bg-green-100 text-green-800' :
+                                  user.role === 'beta' ? 'bg-blue-100 text-blue-800' :
+                                  'bg-gray-100 text-gray-800'
+                                }`}>
+                                  {user.role?.charAt(0).toUpperCase() + user.role?.slice(1) || 'Unknown'}
+                                </span>
+                                {user.is_beta_user && user.beta_user_number && (
+                                  <span className="text-xs text-gray-500">
+                                    #{user.beta_user_number}
                                   </span>
                                 )}
-                                <span className="text-sm text-gray-900 capitalize">{user.role.replace('_', ' ')}</span>
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                user.has_access ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                              }`}>
-                                {user.has_access ? 'Active' : 'Limited'}
-                              </span>
-                              {user.trial_days_remaining !== undefined && (
-                                <div className="text-xs text-gray-500 mt-1">
-                                  {user.trial_days_remaining} days left
-                                </div>
-                              )}
+                              <div>
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                  user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                }`}>
+                                  {user.is_active ? 'Active' : 'Inactive'}
+                                </span>
+                                {user.trial_days_remaining !== undefined && (
+                                  <div className="text-xs text-gray-500 mt-1">
+                                    Trial: {user.trial_days_remaining} days left
+                                  </div>
+                                )}
+                                {user.subscription_status && (
+                                  <div className="text-xs text-gray-500 mt-1">
+                                    {user.subscription_status}
+                                  </div>
+                                )}
+                              </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               <div>Sent: {user.usage_stats?.messages_sent || 0}</div>
                               <div>Received: {user.usage_stats?.messages_received || 0}</div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                              {user.role !== 'paid' && (
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                              <div className="flex items-center space-x-2">
+                                <select
+                                  value={user.role}
+                                  onChange={(e) => {
+                                    if (e.target.value !== user.role) {
+                                      console.log('Changing user role:', user, 'to:', e.target.value);
+                                      changeUserRole(user.id, e.target.value);
+                                    }
+                                  }}
+                                  className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-blue-500 focus:border-blue-500"
+                                >
+                                  <option value="trial">Trial</option>
+                                  <option value="beta">Beta</option>
+                                  <option value="paid">Paid</option>
+                                  <option value="admin">Admin</option>
+                                </select>
                                 <button
                                   onClick={() => {
-                                    console.log('Upgrading user:', user);
-                                    upgradeUser(user.id);
+                                    console.log('Toggling user status:', user);
+                                    toggleUserStatus(user.id, !user.is_active);
                                   }}
-                                  className="text-green-600 hover:text-green-900 mr-2"
+                                  className={`px-2 py-1 text-xs rounded ${
+                                    user.is_active
+                                      ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                                      : 'bg-green-100 text-green-700 hover:bg-green-200'
+                                  }`}
                                 >
-                                  Upgrade
+                                  {user.is_active ? 'Deactivate' : 'Activate'}
                                 </button>
-                              )}
-                              <button
-                                onClick={() => {
-                                  console.log('Toggling user status:', user);
-                                  toggleUserStatus(user.id, !user.is_active);
-                                }}
-                                className={user.is_active ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}
-                              >
-                                {user.is_active ? 'Deactivate' : 'Activate'}
-                              </button>
+                              </div>
                             </td>
                           </tr>
                           ))}
