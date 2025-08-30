@@ -192,7 +192,7 @@ async def get_admin_settings(
 @router.put("/admin/settings/{key}")
 async def update_admin_setting(
     key: str,
-    value: str,
+    request: dict,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -204,6 +204,9 @@ async def update_admin_setting(
             status_code=403,
             detail="Admin access required"
         )
+
+    # Get value from request body
+    value = request.get("value", "")
 
     # For now, just return success (settings can be stored in database later)
     allowed_keys = ["beta_slots_limit", "trial_duration_days", "auto_approve_beta", "maintenance_mode"]

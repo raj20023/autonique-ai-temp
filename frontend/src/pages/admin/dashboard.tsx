@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { motion } from 'framer-motion';
-import { 
-  Users, 
-  Crown, 
-  Clock, 
-  CreditCard, 
+import {
+  Users,
+  Crown,
+  Clock,
+  CreditCard,
   Settings,
-  UserCheck,
-  UserX,
   TrendingUp,
   Shield,
   AlertTriangle
@@ -28,6 +26,7 @@ interface UserData {
   name: string;
   email: string;
   role: string;
+  is_active: boolean;
   is_beta_user: boolean;
   beta_user_number?: number;
   subscription_status?: string;
@@ -36,7 +35,7 @@ interface UserData {
   last_login?: string;
   has_access: boolean;
   access_reason: string;
-  usage_stats: {
+  usage_stats?: {
     messages_sent: number;
     messages_received: number;
     api_calls_made: number;
@@ -49,6 +48,7 @@ interface AdminSettings {
   monthly_message_limit_trial: string;
   monthly_message_limit_paid: string;
   app_maintenance_mode: string;
+  auto_approve_beta?: string;
 }
 
 export default function AdminDashboard() {
@@ -59,6 +59,8 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [error, setError] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [editableSettings, setEditableSettings] = useState<AdminSettings | null>(null);
+  const [savingSettings, setSavingSettings] = useState(false);
 
   useEffect(() => {
     checkAdminAccess();
@@ -193,6 +195,7 @@ export default function AdminDashboard() {
         const settingsData = await settingsResponse.json();
         console.log('⚙️ Settings data:', settingsData);
         setSettings(settingsData.settings);
+        setEditableSettings(settingsData.settings); // Initialize editable settings
       } else {
         console.error('⚙️ Settings failed:', await settingsResponse.text());
       }
@@ -219,7 +222,9 @@ export default function AdminDashboard() {
         alert('User upgraded successfully!');
         fetchAdminData();
       } else {
-        alert('Failed to upgrade user');
+        const errorText = await response.text();
+        console.error('Upgrade failed:', response.status, errorText);
+        alert(`Failed to upgrade user: ${response.status} - ${errorText}`);
       }
     } catch (error) {
       console.error('Failed to upgrade user:', error);
@@ -242,12 +247,62 @@ export default function AdminDashboard() {
         alert(`User ${action}d successfully!`);
         fetchAdminData();
       } else {
-        alert(`Failed to ${action} user`);
+        const errorText = await response.text();
+        console.error(`${action} failed:`, response.status, errorText);
+        alert(`Failed to ${action} user: ${response.status} - ${errorText}`);
       }
     } catch (error) {
       console.error(`Failed to ${activate ? 'activate' : 'deactivate'} user:`, error);
       alert(`Failed to ${activate ? 'activate' : 'deactivate'} user`);
     }
+  };
+
+  const saveSettings = async () => {
+    if (!editableSettings) return;
+
+    setSavingSettings(true);
+    try {
+      const API_URL = 'https://api.autonique.in';
+
+      // Save each setting individually
+      const settingsToSave = [
+        { key: 'beta_slots_limit', value: editableSettings.beta_users_limit },
+        { key: 'trial_duration_days', value: editableSettings.trial_days },
+        { key: 'auto_approve_beta', value: editableSettings.auto_approve_beta || 'false' },
+        { key: 'maintenance_mode', value: editableSettings.app_maintenance_mode || 'false' }
+      ];
+
+      for (const setting of settingsToSave) {
+        const response = await fetch(`${API_URL}/api/v1/user-management/admin/settings/${setting.key}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ value: setting.value })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`Failed to save ${setting.key}:`, errorText);
+          throw new Error(`Failed to save ${setting.key}`);
+        }
+      }
+
+      // Update the main settings state
+      setSettings(editableSettings);
+      alert('Settings saved successfully!');
+
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      alert('Failed to save settings. Please try again.');
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
+  const resetSettings = () => {
+    setEditableSettings(settings);
   };
 
   if (loading) {
@@ -502,23 +557,29 @@ export default function AdminDashboard() {
                               )}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              <div>Sent: {user.usage_stats.messages_sent}</div>
-                              <div>Received: {user.usage_stats.messages_received}</div>
+                              <div>Sent: {user.usage_stats?.messages_sent || 0}</div>
+                              <div>Received: {user.usage_stats?.messages_received || 0}</div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                               {user.role !== 'paid' && (
                                 <button
-                                  onClick={() => upgradeUser(user.id)}
-                                  className="text-green-600 hover:text-green-900"
+                                  onClick={() => {
+                                    console.log('Upgrading user:', user);
+                                    upgradeUser(user.id);
+                                  }}
+                                  className="text-green-600 hover:text-green-900 mr-2"
                                 >
                                   Upgrade
                                 </button>
                               )}
                               <button
-                                onClick={() => toggleUserStatus(user.id, !user.has_access)}
-                                className={user.has_access ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}
+                                onClick={() => {
+                                  console.log('Toggling user status:', user);
+                                  toggleUserStatus(user.id, !user.is_active);
+                                }}
+                                className={user.is_active ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}
                               >
-                                {user.has_access ? 'Deactivate' : 'Activate'}
+                                {user.is_active ? 'Deactivate' : 'Activate'}
                               </button>
                             </td>
                           </tr>
@@ -530,9 +591,26 @@ export default function AdminDashboard() {
                 </div>
               )}
 
-              {activeTab === 'settings' && settings && (
+              {activeTab === 'settings' && settings && editableSettings && (
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">System Settings</h3>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-medium text-gray-900">System Settings</h3>
+                    <div className="space-x-2">
+                      <button
+                        onClick={resetSettings}
+                        className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
+                      >
+                        Reset
+                      </button>
+                      <button
+                        onClick={saveSettings}
+                        disabled={savingSettings}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                      >
+                        {savingSettings ? 'Saving...' : 'Save Changes'}
+                      </button>
+                    </div>
+                  </div>
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
@@ -541,21 +619,27 @@ export default function AdminDashboard() {
                         </label>
                         <input
                           type="number"
-                          value={settings.beta_users_limit}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                          readOnly
+                          value={editableSettings.beta_users_limit}
+                          onChange={(e) => setEditableSettings({
+                            ...editableSettings,
+                            beta_users_limit: e.target.value
+                          })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
-                      
+
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Trial Days
                         </label>
                         <input
                           type="number"
-                          value={settings.trial_days}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                          readOnly
+                          value={editableSettings.trial_days}
+                          onChange={(e) => setEditableSettings({
+                            ...editableSettings,
+                            trial_days: e.target.value
+                          })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
                       
@@ -565,30 +649,70 @@ export default function AdminDashboard() {
                         </label>
                         <input
                           type="number"
-                          value={settings.monthly_message_limit_trial}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                          readOnly
+                          value={editableSettings.monthly_message_limit_trial}
+                          onChange={(e) => setEditableSettings({
+                            ...editableSettings,
+                            monthly_message_limit_trial: e.target.value
+                          })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
-                      
+
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Paid Message Limit
                         </label>
                         <input
                           type="number"
-                          value={settings.monthly_message_limit_paid}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                          readOnly
+                          value={editableSettings.monthly_message_limit_paid}
+                          onChange={(e) => setEditableSettings({
+                            ...editableSettings,
+                            monthly_message_limit_paid: e.target.value
+                          })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Maintenance Mode
+                        </label>
+                        <select
+                          value={editableSettings.app_maintenance_mode}
+                          onChange={(e) => setEditableSettings({
+                            ...editableSettings,
+                            app_maintenance_mode: e.target.value
+                          })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="false">Disabled</option>
+                          <option value="true">Enabled</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Auto Approve Beta Users
+                        </label>
+                        <select
+                          value={editableSettings.auto_approve_beta || 'false'}
+                          onChange={(e) => setEditableSettings({
+                            ...editableSettings,
+                            auto_approve_beta: e.target.value
+                          })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="false">Manual Approval</option>
+                          <option value="true">Auto Approve</option>
+                        </select>
+                      </div>
                     </div>
-                    
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                       <div className="flex items-center">
-                        <AlertTriangle className="h-5 w-5 text-yellow-600 mr-2" />
-                        <span className="text-sm text-yellow-800">
-                          Settings are currently read-only. Contact development team to modify system settings.
+                        <Settings className="h-5 w-5 text-green-600 mr-2" />
+                        <span className="text-sm text-green-800">
+                          Settings are now editable. Make changes and click "Save Changes" to apply.
                         </span>
                       </div>
                     </div>
