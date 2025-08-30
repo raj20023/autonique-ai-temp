@@ -68,7 +68,10 @@ export default function AdminDashboard() {
     try {
       const token = localStorage.getItem('access_token');
       console.log('🔑 Token found:', !!token);
-      console.log('🌐 API URL:', process.env.NEXT_PUBLIC_API_URL);
+
+      // Use the same hardcoded API URL as the main app
+      const API_URL = 'https://api.autonique.in';
+      console.log('🌐 API URL:', API_URL);
 
       if (!token) {
         setError('No authentication token found. Please login.');
@@ -78,7 +81,7 @@ export default function AdminDashboard() {
 
       // First, let's check current user info
       console.log('👤 Checking current user...');
-      const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me`, {
+      const userResponse = await fetch(`${API_URL}/api/v1/users/me`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
@@ -111,7 +114,7 @@ export default function AdminDashboard() {
 
       // Try to fetch admin stats to check if user is admin
       console.log('📊 Checking admin stats access...');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user-management/admin/stats`, {
+      const response = await fetch(`${API_URL}/api/v1/user-management/admin/stats`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
@@ -156,10 +159,13 @@ export default function AdminDashboard() {
       const token = localStorage.getItem('access_token');
       const headers = { 'Authorization': `Bearer ${token}` };
 
+      // Use the same hardcoded API URL as the main app
+      const API_URL = 'https://api.autonique.in';
+
       console.log('🔍 Fetching admin data...');
 
       // Fetch stats
-      const statsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user-management/admin/stats`, { headers });
+      const statsResponse = await fetch(`${API_URL}/api/v1/user-management/admin/stats`, { headers });
       console.log('📊 Stats response:', statsResponse.status);
       if (statsResponse.ok) {
         const statsData = await statsResponse.json();
@@ -170,7 +176,7 @@ export default function AdminDashboard() {
       }
 
       // Fetch users
-      const usersResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user-management/admin/users`, { headers });
+      const usersResponse = await fetch(`${API_URL}/api/v1/user-management/admin/users`, { headers });
       console.log('👥 Users response:', usersResponse.status);
       if (usersResponse.ok) {
         const usersData = await usersResponse.json();
@@ -181,7 +187,7 @@ export default function AdminDashboard() {
       }
 
       // Fetch settings
-      const settingsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user-management/admin/settings`, { headers });
+      const settingsResponse = await fetch(`${API_URL}/api/v1/user-management/admin/settings`, { headers });
       console.log('⚙️ Settings response:', settingsResponse.status);
       if (settingsResponse.ok) {
         const settingsData = await settingsResponse.json();
@@ -201,7 +207,8 @@ export default function AdminDashboard() {
 
   const upgradeUser = async (userId: number) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user-management/admin/users/${userId}/upgrade`, {
+      const API_URL = 'https://api.autonique.in';
+      const response = await fetch(`${API_URL}/api/v1/user-management/admin/users/${userId}/upgrade`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`
@@ -222,8 +229,9 @@ export default function AdminDashboard() {
 
   const toggleUserStatus = async (userId: number, activate: boolean) => {
     try {
+      const API_URL = 'https://api.autonique.in';
       const action = activate ? 'activate' : 'deactivate';
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user-management/admin/users/${userId}/${action}`, {
+      const response = await fetch(`${API_URL}/api/v1/user-management/admin/users/${userId}/${action}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`

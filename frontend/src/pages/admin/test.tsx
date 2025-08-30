@@ -24,14 +24,17 @@ export default function AdminTest() {
       }
 
       addResult(`🔍 Token length: ${token.length} characters`);
-      addResult(`🌐 API URL: ${process.env.NEXT_PUBLIC_API_URL}`);
+
+      // Use the same hardcoded API URL as the main app
+      const API_URL = 'https://api.autonique.in';
+      addResult(`🌐 API URL: ${API_URL}`);
 
       const headers = { 'Authorization': `Bearer ${token}` };
 
       // Test 1: Check /users/me
       addResult('1️⃣ Testing /users/me...');
       try {
-        const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me`, { headers });
+        const userResponse = await fetch(`${API_URL}/api/v1/users/me`, { headers });
         addResult(`   Status: ${userResponse.status}`);
         
         if (userResponse.ok) {
@@ -56,9 +59,9 @@ export default function AdminTest() {
       // Test 2: Check admin stats
       addResult('2️⃣ Testing /admin/stats...');
       try {
-        const statsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user-management/admin/stats`, { headers });
+        const statsResponse = await fetch(`${API_URL}/api/v1/user-management/admin/stats`, { headers });
         addResult(`   Status: ${statsResponse.status}`);
-        
+
         if (statsResponse.ok) {
           const statsData = await statsResponse.json();
           addResult(`   ✅ Stats: ${JSON.stringify(statsData)}`);
@@ -73,7 +76,7 @@ export default function AdminTest() {
       // Test 3: Check admin users
       addResult('3️⃣ Testing /admin/users...');
       try {
-        const usersResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user-management/admin/users`, { headers });
+        const usersResponse = await fetch(`${API_URL}/api/v1/user-management/admin/users`, { headers });
         addResult(`   Status: ${usersResponse.status}`);
         
         if (usersResponse.ok) {
