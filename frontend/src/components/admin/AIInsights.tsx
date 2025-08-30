@@ -45,7 +45,11 @@ const AIInsights: React.FC<AIInsightsProps> = ({ insights, onDismiss, onAction }
   };
 
   const handleDismiss = (id: string) => {
-    setDismissedInsights(prev => new Set([...prev, id]));
+    setDismissedInsights(prev => {
+      const newSet = new Set(prev);
+      newSet.add(id);
+      return newSet;
+    });
     onDismiss?.(id);
   };
 
