@@ -132,6 +132,30 @@ async def get_usage_stats(
     return stats
 
 # Admin endpoints
+@router.get("/admin/check")
+async def check_admin_access(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Check if current user has admin access"""
+
+    # Check if current user is admin
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Admin access required"
+        )
+
+    return {
+        "message": "Admin access confirmed",
+        "user": {
+            "id": current_user.id,
+            "name": current_user.name,
+            "email": current_user.email,
+            "role": current_user.role
+        }
+    }
+
 @router.get("/admin/users")
 async def get_all_users(
     current_user: User = Depends(get_current_user),
@@ -306,6 +330,48 @@ async def change_user_role(
 
     return {"message": f"User {user.name} role changed from {old_role} to {new_role} successfully"}
 
+@router.put("/admin/users/{user_id}/status")
+async def change_user_status(
+    user_id: int,
+    request: dict,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Change user status (Admin only)"""
+
+    # Check if current user is admin
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Admin access required"
+        )
+
+    # Get new status from request body
+    new_status = request.get("is_active")
+
+    if new_status is None:
+        raise HTTPException(
+            status_code=400,
+            detail="is_active field is required"
+        )
+
+    # Find the user to change status
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    # Update user status
+    old_status = user.is_active
+    user.is_active = new_status
+
+    db.commit()
+
+    status_text = "activated" if new_status else "deactivated"
+    return {"message": f"User {user.name} {status_text} successfully"}
+
 @router.put("/admin/users/{user_id}/deactivate")
 async def deactivate_user(
     user_id: int,
@@ -382,10 +448,12 @@ async def get_admin_stats(
     active_users = db.query(User).filter(User.is_active == True).count()
     
     return {
-        "total_users": total_users,
-        "beta_users": beta_users,
-        "trial_users": trial_users,
-        "paid_users": paid_users,
-        "active_users": active_users,
-        "beta_slots_remaining": max(0, 20 - beta_users)
+        "stats": {
+            "total_users": total_users,
+            "beta_users": beta_users,
+            "trial_users": trial_users,
+            "paid_users": paid_users,
+            "active_users": active_users,
+            "beta_slots_remaining": max(0, 20 - beta_users)
+        }
     }
