@@ -27,6 +27,9 @@ class UserResponse(UserBase):
     is_active: bool
     created_at: datetime
     updated_at: Optional[datetime] = None
+    role: Optional[str] = None
+    is_beta_user: Optional[bool] = None
+    beta_user_number: Optional[int] = None
 
     class Config:
         from_attributes = True
