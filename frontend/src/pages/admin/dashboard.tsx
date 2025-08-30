@@ -90,13 +90,21 @@ export default function AdminDashboard() {
         console.log('👤 User role:', userData.role);
 
         if (userData.role !== 'admin') {
-          setError(`Access denied. Your role is '${userData.role}' but admin role is required.`);
+          setError(`Access denied. Your role is '${userData.role}' but admin role is required. Please contact support if you should have admin access.`);
           setLoading(false);
           return;
         }
+
+        console.log('✅ User verified as admin');
       } else {
-        console.error('👤 User check failed:', await userResponse.text());
-        setError('Failed to verify user information. Please login again.');
+        const errorText = await userResponse.text();
+        console.error('👤 User check failed:', errorText);
+
+        if (userResponse.status === 401) {
+          setError('Authentication expired. Please login again.');
+        } else {
+          setError(`Failed to verify user information: ${userResponse.status}`);
+        }
         setLoading(false);
         return;
       }
