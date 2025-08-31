@@ -133,32 +133,81 @@ class FacebookService:
             logger.info(f"✅ Two-step page fetch completed: {len(enhanced_pages)} pages processed")
             return enhanced_pages
 
-    async def get_instagram_business_account(self, page_id: str, page_access_token: str) -> Optional[Dict]:
+    async def get_instagram_business_account(self, page_id: str, page_access_token: str, user_access_token: str = None) -> Optional[Dict]:
         """Get Instagram Business Account connected to a Facebook page"""
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
-                f"{self.graph_url}/{page_id}",
-                params={
-                    "access_token": page_access_token,
-                    "fields": "instagram_business_account"
-                }
-            )
-            response.raise_for_status()
-            data = response.json()
-            return data.get("instagram_business_account")
+        try:
+            # Try with page access token first
+            async with httpx.AsyncClient() as client:
+                # First attempt: Use page access token
+                response = await client.get(
+                    f"{self.graph_url}/{page_id}",
+                    params={
+                        "access_token": page_access_token,
+                        "fields": "instagram_business_account{id,username,name,profile_picture_url,followers_count}"
+                    }
+                )
+
+                if response.status_code == 200:
+                    data = response.json()
+                    ig_account = data.get("instagram_business_account")
+                    if ig_account:
+                        logger.info(f"✅ Found Instagram Business Account for page {page_id}: {ig_account.get('username', 'Unknown')}")
+                        return ig_account
+
+                # Second attempt: Use user access token if page token failed
+                if user_access_token and response.status_code != 200:
+                    logger.info(f"Retrying Instagram fetch for page {page_id} with user access token...")
+                    response = await client.get(
+                        f"{self.graph_url}/{page_id}",
+                        params={
+                            "access_token": user_access_token,
+                            "fields": "instagram_business_account{id,username,name,profile_picture_url,followers_count}"
+                        }
+                    )
+
+                    if response.status_code == 200:
+                        data = response.json()
+                        ig_account = data.get("instagram_business_account")
+                        if ig_account:
+                            logger.info(f"✅ Found Instagram Business Account for page {page_id} with user token: {ig_account.get('username', 'Unknown')}")
+                            return ig_account
+
+                # Log the error details for debugging
+                logger.warning(f"Could not fetch Instagram Business Account for page {page_id}: {response.status_code}")
+                if response.status_code != 200:
+                    try:
+                        error_data = response.json()
+                        logger.warning(f"Error details: {error_data}")
+                    except:
+                        logger.warning(f"Error response: {response.text}")
+
+                return None
+
+        except Exception as e:
+            logger.warning(f"Error fetching Instagram Business Account for page {page_id}: {str(e)}")
+            return None
 
     async def get_instagram_account_info(self, ig_business_id: str, access_token: str) -> Dict:
         """Get Instagram account information"""
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
-                f"{self.graph_url}/{ig_business_id}",
-                params={
-                    "access_token": access_token,
-                    "fields": "id,username,name,profile_picture_url"
-                }
-            )
-            response.raise_for_status()
-            return response.json()
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    f"{self.graph_url}/{ig_business_id}",
+                    params={
+                        "access_token": access_token,
+                        "fields": "id,username,name,profile_picture_url"
+                    }
+                )
+
+                if response.status_code == 200:
+                    return response.json()
+                else:
+                    logger.warning(f"Could not fetch Instagram account info for {ig_business_id}: {response.status_code}")
+                    return {}
+
+        except Exception as e:
+            logger.warning(f"Error fetching Instagram account info for {ig_business_id}: {str(e)}")
+            return {}
 
     async def subscribe_to_webhooks(self, page_id: str, page_access_token: str) -> bool:
         """Subscribe page to Instagram messaging webhooks"""

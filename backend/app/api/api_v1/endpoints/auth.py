@@ -154,19 +154,19 @@ async def facebook_callback(
             
             # Check for Instagram Business Account
             ig_account = await facebook_service.get_instagram_business_account(
-                page_id, page_access_token
+                page_id, page_access_token, access_token
             )
             
             ig_business_id = None
             instagram_username = None
-            
+
             if ig_account:
                 ig_business_id = ig_account["id"]
-                # Get Instagram account details
-                ig_info = await facebook_service.get_instagram_account_info(
-                    ig_business_id, page_access_token
-                )
-                instagram_username = ig_info.get("username")
+                # Instagram account details are already included in ig_account
+                instagram_username = ig_account.get("username")
+                logger.info(f"✅ Instagram account found for {page_name}: @{instagram_username}")
+            else:
+                logger.info(f"ℹ️ No Instagram Business Account connected to {page_name} - this is optional")
 
             # Create or update page record
             existing_page = db.query(Page).filter(Page.fb_page_id == page_id).first()
