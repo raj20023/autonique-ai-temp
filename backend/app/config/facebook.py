@@ -4,18 +4,14 @@ from typing import List
 class FacebookConfig:
     """Centralized Facebook OAuth configuration"""
     
-    # OAuth Permissions - Keep this in sync with frontend
-    OAUTH_SCOPE = "pages_messaging,instagram_basic,instagram_manage_messages,pages_show_list,business_management,pages_manage_metadata,pages_read_engagement"
+    # OAuth Permissions - Minimal required permissions
+    OAUTH_SCOPE = "pages_messaging,instagram_basic,instagram_manage_messages"
 
-    # Required Permissions List
+    # Required Permissions List - Only essential permissions
     REQUIRED_PERMISSIONS: List[str] = [
         "pages_messaging",
         "instagram_basic",
-        "instagram_manage_messages",
-        "pages_show_list",
-        "business_management",
-        "pages_manage_metadata",
-        "pages_read_engagement"
+        "instagram_manage_messages"
     ]
     
     # Permission Descriptions

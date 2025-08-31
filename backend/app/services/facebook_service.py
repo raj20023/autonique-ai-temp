@@ -209,6 +209,38 @@ class FacebookService:
             logger.warning(f"Error fetching Instagram account info for {ig_business_id}: {str(e)}")
             return {}
 
+    async def get_user_instagram_accounts(self, access_token: str) -> List[Dict]:
+        """Get user's Instagram accounts directly (simpler approach)"""
+        try:
+            async with httpx.AsyncClient() as client:
+                # Try to get Instagram accounts from user's accounts
+                response = await client.get(
+                    f"{self.graph_url}/me/accounts",
+                    params={
+                        "access_token": access_token,
+                        "fields": "instagram_business_account{id,username,name,profile_picture_url}"
+                    }
+                )
+
+                if response.status_code == 200:
+                    data = response.json()
+                    instagram_accounts = []
+
+                    for account in data.get("data", []):
+                        ig_account = account.get("instagram_business_account")
+                        if ig_account:
+                            instagram_accounts.append(ig_account)
+
+                    logger.info(f"Found {len(instagram_accounts)} Instagram accounts directly from user")
+                    return instagram_accounts
+                else:
+                    logger.warning(f"Could not fetch user Instagram accounts: {response.status_code}")
+                    return []
+
+        except Exception as e:
+            logger.warning(f"Error fetching user Instagram accounts: {str(e)}")
+            return []
+
     async def subscribe_to_webhooks(self, page_id: str, page_access_token: str) -> bool:
         """Subscribe page to Instagram messaging webhooks"""
         async with httpx.AsyncClient() as client:
