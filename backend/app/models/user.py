@@ -8,11 +8,17 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    fb_user_id = Column(String, unique=True, index=True, nullable=False)
+    fb_user_id = Column(String, unique=True, index=True, nullable=True)  # Made nullable for Instagram-only users
     name = Column(String, nullable=False)
     email = Column(String, unique=True, index=True, nullable=True)
-    access_token = Column(Text, nullable=False)  # Encrypted Facebook access token
+    access_token = Column(Text, nullable=True)  # Made nullable for Instagram-only users
     token_expires_at = Column(DateTime, nullable=True)
+
+    # Instagram fields for direct Instagram authentication
+    instagram_user_id = Column(String, unique=True, index=True, nullable=True)
+    instagram_username = Column(String, unique=True, index=True, nullable=True)
+    instagram_access_token = Column(Text, nullable=True)
+
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

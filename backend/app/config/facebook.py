@@ -4,7 +4,18 @@ from typing import List
 class FacebookConfig:
     """Centralized Facebook OAuth configuration"""
     
-    # OAuth Permissions - Minimal required permissions
+    # Instagram Business OAuth - Direct Instagram approach like ManyChat
+    INSTAGRAM_OAUTH_SCOPE = "instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_manage_insights"
+
+    # Instagram Business Required Permissions
+    INSTAGRAM_REQUIRED_PERMISSIONS: List[str] = [
+        "instagram_business_basic",
+        "instagram_business_manage_messages",
+        "instagram_business_manage_comments",
+        "instagram_business_manage_insights"
+    ]
+
+    # Fallback Facebook OAuth (for users who prefer Facebook)
     OAUTH_SCOPE = "pages_messaging,instagram_basic,instagram_manage_messages"
 
     # Required Permissions List - Only essential permissions

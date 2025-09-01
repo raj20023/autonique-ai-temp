@@ -25,6 +25,95 @@ async def facebook_login(redirect_uri: str = Query(...)):
     login_url = facebook_service.get_login_url(redirect_uri)
     return {"login_url": login_url}
 
+@router.get("/instagram-callback")
+async def instagram_callback(
+    code: str,
+    state: str = None,
+    db: Session = Depends(get_db)
+):
+    """Handle Instagram Business OAuth callback - Direct Instagram approach like ManyChat"""
+    try:
+        logger.info(f"🔥 Instagram OAuth callback received with code: {code[:20]}...")
+
+        # Exchange code for access token using Instagram Business API
+        async with httpx.AsyncClient() as client:
+            token_response = await client.post(
+                "https://api.instagram.com/oauth/access_token",
+                data={
+                    "client_id": settings.FACEBOOK_APP_ID,
+                    "client_secret": settings.FACEBOOK_APP_SECRET,
+                    "grant_type": "authorization_code",
+                    "redirect_uri": "https://autonique.in/auth/instagram-callback",
+                    "code": code
+                }
+            )
+
+            if token_response.status_code != 200:
+                logger.error(f"Instagram token exchange failed: {token_response.status_code} - {token_response.text}")
+                raise HTTPException(status_code=400, detail="Instagram authentication failed")
+
+            token_data = token_response.json()
+            access_token = token_data.get("access_token")
+            user_id = token_data.get("user_id")
+
+            logger.info(f"✅ Instagram access token obtained for user: {user_id}")
+
+            # Get Instagram account info
+            account_response = await client.get(
+                f"https://graph.instagram.com/{user_id}",
+                params={
+                    "fields": "id,username,account_type,media_count",
+                    "access_token": access_token
+                }
+            )
+
+            if account_response.status_code != 200:
+                logger.error(f"Instagram account info failed: {account_response.status_code}")
+                raise HTTPException(status_code=400, detail="Failed to get Instagram account info")
+
+            account_data = account_response.json()
+            instagram_username = account_data.get("username")
+
+            logger.info(f"✅ Instagram account info: @{instagram_username}")
+
+            # Create or update user with Instagram data
+            user = db.query(User).filter(User.instagram_user_id == user_id).first()
+
+            if not user:
+                # Create new user with Instagram data
+                user = User(
+                    name=instagram_username,
+                    email=f"{instagram_username}@instagram.local",  # Placeholder email
+                    instagram_user_id=user_id,
+                    instagram_username=instagram_username,
+                    instagram_access_token=access_token,
+                    role="trial",
+                    is_active=True,
+                    is_beta_user=False
+                )
+                db.add(user)
+                logger.info(f"✅ Created new user from Instagram: @{instagram_username}")
+            else:
+                # Update existing user
+                user.instagram_access_token = access_token
+                user.instagram_username = instagram_username
+                logger.info(f"✅ Updated existing user: @{instagram_username}")
+
+            db.commit()
+
+            # Generate JWT token
+            access_token_jwt = create_access_token(data={"sub": str(user.id)})
+
+            # Redirect to dashboard with token
+            response = RedirectResponse(url=f"https://autonique.in/dashboard?token={access_token_jwt}")
+            return response
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Instagram callback error: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Instagram authentication failed: {str(e)}")
+
 @router.get("/callback")
 async def facebook_callback(
     code: str = Query(...),
