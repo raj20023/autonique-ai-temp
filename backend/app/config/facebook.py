@@ -4,25 +4,17 @@ from typing import List
 class FacebookConfig:
     """Centralized Facebook OAuth configuration"""
     
-    # Instagram Business OAuth - Direct Instagram approach like ManyChat
-    INSTAGRAM_OAUTH_SCOPE = "instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_manage_insights"
+    # OAuth Permissions - Keep this in sync with frontend
+    OAUTH_SCOPE = "pages_messaging,instagram_basic,instagram_manage_messages,pages_show_list,business_management,pages_manage_metadata"
 
-    # Instagram Business Required Permissions
-    INSTAGRAM_REQUIRED_PERMISSIONS: List[str] = [
-        "instagram_business_basic",
-        "instagram_business_manage_messages",
-        "instagram_business_manage_comments",
-        "instagram_business_manage_insights"
-    ]
-
-    # Fallback Facebook OAuth (for users who prefer Facebook)
-    OAUTH_SCOPE = "pages_messaging,instagram_basic,instagram_manage_messages"
-
-    # Required Permissions List - Only essential permissions
+    # Required Permissions List
     REQUIRED_PERMISSIONS: List[str] = [
         "pages_messaging",
         "instagram_basic",
-        "instagram_manage_messages"
+        "instagram_manage_messages",
+        "pages_show_list",
+        "business_management",
+        "pages_manage_metadata"
     ]
     
     # Permission Descriptions
@@ -32,8 +24,7 @@ class FacebookConfig:
         "instagram_manage_messages": "Manage Instagram messages",
         "pages_show_list": "Access your Facebook pages list",
         "business_management": "Manage business assets",
-        "pages_manage_metadata": "Manage page metadata and Instagram Business account access",
-        "pages_read_engagement": "Read page engagement data and Instagram Business account info"
+        "pages_manage_metadata": "Manage page metadata and Instagram Business account access"
     }
     
     # OAuth Parameters

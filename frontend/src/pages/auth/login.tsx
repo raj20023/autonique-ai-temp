@@ -17,24 +17,8 @@ export default function LoginPage() {
   }, [router]);
 
   const handleInstagramLogin = () => {
-    try {
-      // Direct Instagram Business OAuth - Same approach as ManyChat
-      const instagramOAuthUrl = `https://www.instagram.com/consent/?flow=ig_biz_login_oauth&params_json=${encodeURIComponent(JSON.stringify({
-        client_id: "2032087817551720",
-        redirect_uri: "https://autonique.in/auth/instagram-callback",
-        response_type: "code",
-        state: `auth_state::${Math.random().toString(36).substring(2)}`,
-        scope: "instagram_business_basic-instagram_business_manage_messages-instagram_business_manage_comments-instagram_business_manage_insights",
-        logger_id: Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2),
-        app_id: "2032087817551720",
-        platform_app_id: "2032087817551720"
-      }))}&source=oauth_permissions_page_www`;
-
-      window.location.href = instagramOAuthUrl;
-    } catch (error) {
-      console.error('Instagram login failed:', error);
-      setError('Instagram login failed. Please try again.');
-    }
+    // For now, use the same Facebook login flow
+    handleFacebookLogin();
   };
 
   const handleFacebookLogin = () => {
