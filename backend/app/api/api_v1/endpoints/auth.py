@@ -76,8 +76,19 @@ async def facebook_callback(
         name = user_info["name"]
         email = user_info.get("email")
         
-        # Check if user exists
-        user = db.query(User).filter(User.fb_user_id == fb_user_id).first()
+        # Check if user exists (with retry for database connection issues)
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                user = db.query(User).filter(User.fb_user_id == fb_user_id).first()
+                break
+            except Exception as db_error:
+                logger.warning(f"Database query attempt {attempt + 1} failed: {db_error}")
+                if attempt == max_retries - 1:
+                    raise HTTPException(status_code=500, detail="Database connection error")
+                # Wait a bit before retry
+                import time
+                time.sleep(1)
         
         if not user:
             # Create new user

@@ -8,13 +8,29 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-# Create SQLAlchemy engine
-engine = create_engine(
-    settings.DATABASE_URL,
-    poolclass=StaticPool,
-    connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {},
-    echo=False
-)
+# Create SQLAlchemy engine with better connection handling
+if "postgresql" in settings.DATABASE_URL:
+    # PostgreSQL specific configuration
+    engine = create_engine(
+        settings.DATABASE_URL,
+        pool_pre_ping=True,  # Verify connections before use
+        pool_recycle=300,    # Recycle connections every 5 minutes
+        pool_size=5,         # Connection pool size
+        max_overflow=10,     # Max overflow connections
+        connect_args={
+            "sslmode": "require",
+            "connect_timeout": 10,
+        },
+        echo=False
+    )
+else:
+    # SQLite or other databases
+    engine = create_engine(
+        settings.DATABASE_URL,
+        poolclass=StaticPool,
+        connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {},
+        echo=False
+    )
 
 # Create SessionLocal class
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
