@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Request, HTTPException, Query
+from fastapi import APIRouter, Request, HTTPException, Query, Header
 from sqlalchemy.orm import Session
 from datetime import datetime
 import logging
 import json
+import hmac
+import hashlib
 
 from app.core.database import get_db, SessionLocal
 from app.core.config import settings
@@ -16,6 +18,41 @@ from app.core.security import decrypt_token, encrypt_token
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+
+def verify_webhook_signature(payload: bytes, signature: str) -> bool:
+    """Verify the webhook signature from Facebook"""
+    if not signature:
+        logger.warning("No signature provided in webhook request")
+        return False
+
+    try:
+        # Facebook sends signature as 'sha256=<hash>'
+        if not signature.startswith('sha256='):
+            logger.warning(f"Invalid signature format: {signature}")
+            return False
+
+        # Extract the hash part
+        received_hash = signature[7:]  # Remove 'sha256=' prefix
+
+        # Calculate expected hash
+        app_secret = settings.FACEBOOK_APP_SECRET.encode('utf-8')
+        expected_hash = hmac.new(app_secret, payload, hashlib.sha256).hexdigest()
+
+        # Compare hashes securely
+        is_valid = hmac.compare_digest(expected_hash, received_hash)
+
+        if is_valid:
+            logger.info("✅ Webhook signature verification successful")
+        else:
+            logger.warning("❌ Webhook signature verification failed")
+            logger.warning(f"Expected: {expected_hash}")
+            logger.warning(f"Received: {received_hash}")
+
+        return is_valid
+
+    except Exception as e:
+        logger.error(f"Error verifying webhook signature: {e}")
+        return False
 
 
 
@@ -50,28 +87,46 @@ async def verify_webhook(
         }
 
 @router.post("/")
-async def handle_webhook(request: Request):
-    """Handle incoming Instagram messages"""
+async def handle_webhook(
+    request: Request,
+    x_hub_signature_256: str = Header(None, alias="X-Hub-Signature-256")
+):
+    """Handle incoming Instagram messages with signature verification"""
     try:
-        body = await request.json()
-        logger.info(f"Webhook received: {json.dumps(body, indent=2)}")
-        
+        # Get raw body for signature verification
+        raw_body = await request.body()
+
+        # Verify webhook signature for security (if enabled)
+        if settings.WEBHOOK_VERIFY_SIGNATURE:
+            if not verify_webhook_signature(raw_body, x_hub_signature_256):
+                logger.error("❌ Webhook signature verification failed - rejecting request")
+                raise HTTPException(status_code=403, detail="Invalid signature")
+        else:
+            logger.info("ℹ️ Webhook signature verification disabled")
+
+        # Parse JSON body
+        body = json.loads(raw_body.decode('utf-8'))
+        logger.info(f"📨 Webhook received: {json.dumps(body, indent=2)}")
+
         # Verify this is a page or instagram subscription
         webhook_object = body.get("object")
-        logger.info(f"Webhook object type: {webhook_object}")
+        logger.info(f"📄 Webhook object type: {webhook_object}")
 
         if webhook_object not in ["page", "instagram"]:
-            logger.info(f"Ignoring webhook object type: {webhook_object}")
+            logger.info(f"ℹ️ Ignoring webhook object type: {webhook_object}")
             return {"status": "ok"}
-        
+
         # Process each entry
         for entry in body.get("entry", []):
             await process_webhook_entry(entry)
-        
+
         return {"status": "ok"}
-        
+
+    except HTTPException:
+        # Re-raise HTTP exceptions (like signature verification failure)
+        raise
     except Exception as e:
-        logger.error(f"Webhook processing error: {e}")
+        logger.error(f"❌ Webhook processing error: {e}")
         return {"status": "error", "message": str(e)}
 
 # Add routes without trailing slash for Facebook compatibility
@@ -86,9 +141,12 @@ async def verify_webhook_no_slash(
     return await verify_webhook(request, hub_mode, hub_token, hub_challenge)
 
 @router.post("")
-async def handle_webhook_no_slash(request: Request):
+async def handle_webhook_no_slash(
+    request: Request,
+    x_hub_signature_256: str = Header(None, alias="X-Hub-Signature-256")
+):
     """Handle incoming Instagram messages (no trailing slash)"""
-    return await handle_webhook(request)
+    return await handle_webhook(request, x_hub_signature_256)
 
 async def process_webhook_entry(entry: dict):
     """Process a single webhook entry"""
