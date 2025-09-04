@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 import logging
+import httpx
 
 from app.core.database import get_db
 from app.api.deps import get_current_active_user
@@ -146,17 +147,18 @@ async def subscribe_webhook(
     
     facebook_service = FacebookService()
     page_access_token = decrypt_token(page.page_access_token)
+    user_access_token = decrypt_token(current_user.access_token)
 
     logger.info(f"🔗 Attempting webhook subscription for page {page.page_name} (FB Page ID: {page.fb_page_id})")
 
     success = await facebook_service.subscribe_to_webhooks(
-        page.fb_page_id, page_access_token
+        page.fb_page_id, page_access_token, user_access_token
     )
 
     if success:
         # Double-check the subscription status
         is_subscribed = await facebook_service.check_webhook_subscription(
-            page.fb_page_id, page_access_token
+            page.fb_page_id, page_access_token, user_access_token
         )
 
         page.webhook_subscribed = is_subscribed
@@ -198,9 +200,10 @@ async def refresh_webhook_status(
 
     facebook_service = FacebookService()
     page_access_token = decrypt_token(page.page_access_token)
+    user_access_token = decrypt_token(current_user.access_token)
 
     is_subscribed = await facebook_service.check_webhook_subscription(
-        page.fb_page_id, page_access_token
+        page.fb_page_id, page_access_token, user_access_token
     )
 
     page.webhook_subscribed = is_subscribed
@@ -211,3 +214,54 @@ async def refresh_webhook_status(
         "webhook_subscribed": is_subscribed,
         "message": f"Webhook status refreshed: {'Active' if is_subscribed else 'Inactive'}"
     }
+
+@router.get("/{page_id}/debug")
+async def debug_page_status(
+    page_id: int,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """Debug page status and token validity"""
+    page = db.query(Page).filter(
+        Page.id == page_id,
+        Page.user_id == current_user.id
+    ).first()
+
+    if not page:
+        raise HTTPException(status_code=404, detail="Page not found")
+
+    facebook_service = FacebookService()
+
+    try:
+        page_access_token = decrypt_token(page.page_access_token)
+
+        # Test page access token
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"https://graph.facebook.com/v23.0/{page.fb_page_id}",
+                params={
+                    "access_token": page_access_token,
+                    "fields": "id,name"
+                }
+            )
+
+            token_valid = response.status_code == 200
+
+            return {
+                "page_id": page_id,
+                "page_name": page.page_name,
+                "fb_page_id": page.fb_page_id,
+                "ig_business_id": page.ig_business_id,
+                "instagram_username": page.instagram_username,
+                "webhook_subscribed": page.webhook_subscribed,
+                "token_valid": token_valid,
+                "token_test_status": response.status_code,
+                "token_test_response": response.text[:200] if not token_valid else "Token is valid"
+            }
+
+    except Exception as e:
+        return {
+            "page_id": page_id,
+            "page_name": page.page_name,
+            "error": f"Failed to test token: {str(e)}"
+        }

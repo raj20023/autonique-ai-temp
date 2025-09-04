@@ -238,21 +238,37 @@ class FacebookService:
             logger.warning(f"Error fetching user Instagram accounts: {str(e)}")
             return []
 
-    async def subscribe_to_webhooks(self, page_id: str, page_access_token: str) -> bool:
-        """Subscribe page to Instagram messaging webhooks"""
+    async def subscribe_to_webhooks(self, page_id: str, page_access_token: str, user_access_token: str = None) -> bool:
+        """Subscribe page to Instagram messaging webhooks using user access token if page token fails"""
         try:
             async with httpx.AsyncClient() as client:
                 logger.info(f"🔗 Subscribing to webhooks for page {page_id}")
 
+                # Try with page access token first
                 response = await client.post(
                     f"{self.graph_url}/{page_id}/subscribed_apps",
                     data={
                         "access_token": page_access_token,
-                        "subscribed_fields": "messages,messaging_postbacks,messaging_optins,messaging_postbacks"
+                        "subscribed_fields": "messages,messaging_postbacks,messaging_optins"
                     }
                 )
 
-                logger.info(f"Webhook subscription response: {response.status_code}")
+                logger.info(f"Webhook subscription response (page token): {response.status_code}")
+
+                # If page token fails and we have user token, try with user token
+                if response.status_code != 200 and user_access_token:
+                    logger.info(f"🔄 Page token failed, trying with user access token...")
+
+                    response = await client.post(
+                        f"{self.graph_url}/{page_id}/subscribed_apps",
+                        data={
+                            "access_token": user_access_token,
+                            "subscribed_fields": "messages,messaging_postbacks,messaging_optins"
+                        }
+                    )
+
+                    logger.info(f"Webhook subscription response (user token): {response.status_code}")
+
                 if response.status_code == 200:
                     logger.info(f"✅ Successfully subscribed to webhooks for page {page_id}")
                     return True
@@ -269,16 +285,27 @@ class FacebookService:
             logger.error(f"Exception during webhook subscription for page {page_id}: {e}")
             return False
 
-    async def check_webhook_subscription(self, page_id: str, page_access_token: str) -> bool:
+    async def check_webhook_subscription(self, page_id: str, page_access_token: str, user_access_token: str = None) -> bool:
         """Check if page is subscribed to webhooks"""
         try:
             async with httpx.AsyncClient() as client:
+                # Try with page access token first
                 response = await client.get(
                     f"{self.graph_url}/{page_id}/subscribed_apps",
                     params={
                         "access_token": page_access_token
                     }
                 )
+
+                # If page token fails, try with user token
+                if response.status_code != 200 and user_access_token:
+                    logger.info(f"🔄 Page token failed for webhook check, trying user token...")
+                    response = await client.get(
+                        f"{self.graph_url}/{page_id}/subscribed_apps",
+                        params={
+                            "access_token": user_access_token
+                        }
+                    )
 
                 if response.status_code == 200:
                     data = response.json()
@@ -294,6 +321,11 @@ class FacebookService:
                     return False
                 else:
                     logger.warning(f"Failed to check webhook subscription for page {page_id}: {response.status_code}")
+                    try:
+                        error_data = response.json()
+                        logger.warning(f"Error details: {error_data}")
+                    except:
+                        logger.warning(f"Error response: {response.text}")
                     return False
 
         except Exception as e:
