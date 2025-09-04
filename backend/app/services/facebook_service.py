@@ -138,48 +138,44 @@ class FacebookService:
         try:
             async with httpx.AsyncClient() as client:
                 # Method 1: Try to get Instagram accounts directly from user's accounts
-                logger.info(f"🔍 Searching for Instagram Business accounts for user...")
+                logger.info(f"🔍 Searching for Instagram Business account for page {page_id}...")
 
                 user_response = await client.get(
                     f"{self.graph_url}/me/accounts",
                     params={
                         "access_token": user_access_token or page_access_token,
-                        "fields": "id,name,category,instagram_business_account{id,username,name}"
+                        "fields": "id,name,category,instagram_business_account{id,username,name,profile_picture_url,followers_count}"
                     }
                 )
 
                 if user_response.status_code == 200:
                     accounts_data = user_response.json()
                     for account in accounts_data.get("data", []):
-                        # Check if this account has Instagram Business Account
-                        ig_account = account.get("instagram_business_account")
-                        if ig_account and account.get("id") == page_id:
-                            logger.info(f"✅ Found Instagram Business Account via user accounts: @{ig_account.get('username', 'Unknown')}")
-                            return ig_account
+                        # Check if this account matches our page ID AND has Instagram Business Account
+                        if account.get("id") == page_id:
+                            ig_account = account.get("instagram_business_account")
+                            if ig_account:
+                                logger.info(f"✅ Found Instagram Business Account for page {page_id}: @{ig_account.get('username', 'Unknown')}")
+                                return ig_account
+                            else:
+                                logger.info(f"ℹ️ Page {page_id} has no Instagram Business Account connected")
+                                return None
 
-                # Method 2: Try Instagram Basic Display approach
-                logger.info(f"🔍 Trying Instagram Basic Display approach...")
+                # Method 2: Try alternative approach using page access token
+                logger.info(f"🔍 Trying alternative approach for page {page_id}...")
 
-                # Get user's Instagram accounts using instagram_basic permission
-                ig_response = await client.get(
-                    f"{self.graph_url}/me",
+                # Try to get page info with Instagram fields (this might work with basic permissions)
+                page_response = await client.get(
+                    f"{self.graph_url}/{page_id}",
                     params={
-                        "access_token": user_access_token or page_access_token,
-                        "fields": "id,name"
+                        "access_token": page_access_token,
+                        "fields": "id,name,category"
                     }
                 )
 
-                if ig_response.status_code == 200:
-                    user_data = ig_response.json()
-                    logger.info(f"✅ User authenticated, checking for Instagram connection...")
-
-                    # For now, return a placeholder indicating Instagram is available
-                    # This avoids the pages_read_engagement requirement
-                    return {
-                        "id": f"ig_placeholder_{page_id}",
-                        "username": "instagram_connected",
-                        "name": "Instagram Business Account"
-                    }
+                if page_response.status_code == 200:
+                    page_data = page_response.json()
+                    logger.info(f"✅ Page {page_id} exists but no Instagram connection method available with current permissions")
 
                 logger.info(f"ℹ️ No Instagram Business Account found for page {page_id} - this is optional")
                 return None

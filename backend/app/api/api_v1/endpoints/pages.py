@@ -138,9 +138,9 @@ async def subscribe_webhook(
     if not page:
         raise HTTPException(status_code=404, detail="Page not found")
     
-    if not page.ig_business_id:
+    if not page.ig_business_id or page.ig_business_id.startswith("ig_placeholder_"):
         raise HTTPException(
-            status_code=400, 
+            status_code=400,
             detail="No Instagram Business account connected to this page"
         )
     
