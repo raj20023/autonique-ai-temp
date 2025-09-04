@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request, HTTPException, Query, Header
+from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
 from datetime import datetime
 import logging
@@ -114,13 +115,13 @@ async def handle_webhook(
 
         if webhook_object not in ["page", "instagram"]:
             logger.info(f"ℹ️ Ignoring webhook object type: {webhook_object}")
-            return {"status": "ok"}
+            return PlainTextResponse("EVENT_RECEIVED", status_code=200)
 
         # Process each entry
         for entry in body.get("entry", []):
             await process_webhook_entry(entry)
 
-        return {"status": "ok"}
+        return PlainTextResponse("EVENT_RECEIVED", status_code=200)
 
     except HTTPException:
         # Re-raise HTTP exceptions (like signature verification failure)
