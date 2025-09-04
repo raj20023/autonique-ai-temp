@@ -1,7 +1,7 @@
 // Centralized Facebook OAuth configuration
 export const FACEBOOK_CONFIG = {
-  // OAuth Permissions - Keep this in sync with backend
-  OAUTH_SCOPE: 'pages_messaging,instagram_basic,instagram_manage_messages,pages_show_list,business_management,pages_manage_metadata,pages_read_engagement',
+  // OAuth Permissions - Keep this in sync with backend (removed pages_read_engagement)
+  OAUTH_SCOPE: 'pages_messaging,instagram_basic,instagram_manage_messages,pages_show_list,business_management,pages_manage_metadata',
   
   // API Version
   API_VERSION: 'v23.0',
@@ -20,8 +20,7 @@ export const FACEBOOK_CONFIG = {
     'instagram_manage_messages',
     'pages_show_list',
     'business_management',
-    'pages_manage_metadata',
-    'pages_read_engagement'
+    'pages_manage_metadata'
   ],
   
   // Permission Descriptions
@@ -31,8 +30,7 @@ export const FACEBOOK_CONFIG = {
     'instagram_manage_messages': 'Manage Instagram messages',
     'pages_show_list': 'Access your Facebook pages list',
     'business_management': 'Manage business assets',
-    'pages_manage_metadata': 'Manage page metadata and Instagram Business account access',
-    'pages_read_engagement': 'Read page engagement data and Instagram Business account info'
+    'pages_manage_metadata': 'Manage page metadata and Instagram Business account access'
   }
 } as const;
 

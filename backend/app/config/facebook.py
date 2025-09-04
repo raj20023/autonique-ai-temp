@@ -4,8 +4,8 @@ from typing import List
 class FacebookConfig:
     """Centralized Facebook OAuth configuration"""
     
-    # OAuth Permissions - Keep this in sync with frontend
-    OAUTH_SCOPE = "pages_messaging,instagram_basic,instagram_manage_messages,pages_show_list,business_management,pages_manage_metadata,pages_read_engagement"
+    # OAuth Permissions - Keep this in sync with frontend (removed pages_read_engagement)
+    OAUTH_SCOPE = "pages_messaging,instagram_basic,instagram_manage_messages,pages_show_list,business_management,pages_manage_metadata"
 
     # Required Permissions List
     REQUIRED_PERMISSIONS: List[str] = [
@@ -14,8 +14,7 @@ class FacebookConfig:
         "instagram_manage_messages",
         "pages_show_list",
         "business_management",
-        "pages_manage_metadata",
-        "pages_read_engagement"
+        "pages_manage_metadata"
     ]
     
     # Permission Descriptions
@@ -25,8 +24,7 @@ class FacebookConfig:
         "instagram_manage_messages": "Manage Instagram messages",
         "pages_show_list": "Access your Facebook pages list",
         "business_management": "Manage business assets",
-        "pages_manage_metadata": "Manage page metadata and Instagram Business account access",
-        "pages_read_engagement": "Read page engagement data and Instagram Business account info"
+        "pages_manage_metadata": "Manage page metadata and Instagram Business account access"
     }
     
     # OAuth Parameters
