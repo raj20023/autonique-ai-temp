@@ -240,15 +240,65 @@ class FacebookService:
 
     async def subscribe_to_webhooks(self, page_id: str, page_access_token: str) -> bool:
         """Subscribe page to Instagram messaging webhooks"""
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                f"{self.graph_url}/{page_id}/subscribed_apps",
-                data={
-                    "access_token": page_access_token,
-                    "subscribed_fields": "messages,messaging_postbacks"
-                }
-            )
-            return response.status_code == 200
+        try:
+            async with httpx.AsyncClient() as client:
+                logger.info(f"🔗 Subscribing to webhooks for page {page_id}")
+
+                response = await client.post(
+                    f"{self.graph_url}/{page_id}/subscribed_apps",
+                    data={
+                        "access_token": page_access_token,
+                        "subscribed_fields": "messages,messaging_postbacks,messaging_optins,messaging_postbacks"
+                    }
+                )
+
+                logger.info(f"Webhook subscription response: {response.status_code}")
+                if response.status_code == 200:
+                    logger.info(f"✅ Successfully subscribed to webhooks for page {page_id}")
+                    return True
+                else:
+                    logger.error(f"❌ Failed to subscribe to webhooks for page {page_id}: {response.status_code}")
+                    try:
+                        error_data = response.json()
+                        logger.error(f"Error details: {error_data}")
+                    except:
+                        logger.error(f"Error response: {response.text}")
+                    return False
+
+        except Exception as e:
+            logger.error(f"Exception during webhook subscription for page {page_id}: {e}")
+            return False
+
+    async def check_webhook_subscription(self, page_id: str, page_access_token: str) -> bool:
+        """Check if page is subscribed to webhooks"""
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    f"{self.graph_url}/{page_id}/subscribed_apps",
+                    params={
+                        "access_token": page_access_token
+                    }
+                )
+
+                if response.status_code == 200:
+                    data = response.json()
+                    subscribed_apps = data.get("data", [])
+
+                    # Check if our app is in the subscribed apps
+                    for app in subscribed_apps:
+                        if app.get("id") == self.app_id:
+                            logger.info(f"✅ Page {page_id} is subscribed to webhooks")
+                            return True
+
+                    logger.info(f"ℹ️ Page {page_id} is not subscribed to webhooks")
+                    return False
+                else:
+                    logger.warning(f"Failed to check webhook subscription for page {page_id}: {response.status_code}")
+                    return False
+
+        except Exception as e:
+            logger.error(f"Exception checking webhook subscription for page {page_id}: {e}")
+            return False
 
     async def exchange_code_for_token(self, code: str, redirect_uri: str) -> Dict:
         """Exchange authorization code for access token"""

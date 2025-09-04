@@ -146,17 +146,68 @@ async def subscribe_webhook(
     
     facebook_service = FacebookService()
     page_access_token = decrypt_token(page.page_access_token)
-    
+
+    logger.info(f"🔗 Attempting webhook subscription for page {page.page_name} (FB Page ID: {page.fb_page_id})")
+
     success = await facebook_service.subscribe_to_webhooks(
         page.fb_page_id, page_access_token
     )
-    
+
     if success:
-        page.webhook_subscribed = True
+        # Double-check the subscription status
+        is_subscribed = await facebook_service.check_webhook_subscription(
+            page.fb_page_id, page_access_token
+        )
+
+        page.webhook_subscribed = is_subscribed
         db.commit()
-        return {"message": "Webhook subscription successful"}
+
+        if is_subscribed:
+            logger.info(f"✅ Webhook subscription verified for page {page.page_name}")
+            return {"message": "Webhook subscription successful and verified"}
+        else:
+            logger.warning(f"⚠️ Webhook subscription may have failed for page {page.page_name}")
+            return {"message": "Webhook subscription completed but verification failed"}
     else:
+        logger.error(f"❌ Webhook subscription failed for page {page.page_name}")
         raise HTTPException(
             status_code=400,
             detail="Failed to subscribe to webhooks"
         )
+
+@router.post("/{page_id}/refresh-webhook-status")
+async def refresh_webhook_status(
+    page_id: int,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """Refresh webhook subscription status for a page"""
+    page = db.query(Page).filter(
+        Page.id == page_id,
+        Page.user_id == current_user.id
+    ).first()
+
+    if not page:
+        raise HTTPException(status_code=404, detail="Page not found")
+
+    if not page.ig_business_id or page.ig_business_id.startswith("ig_placeholder_"):
+        raise HTTPException(
+            status_code=400,
+            detail="No Instagram Business account connected to this page"
+        )
+
+    facebook_service = FacebookService()
+    page_access_token = decrypt_token(page.page_access_token)
+
+    is_subscribed = await facebook_service.check_webhook_subscription(
+        page.fb_page_id, page_access_token
+    )
+
+    page.webhook_subscribed = is_subscribed
+    db.commit()
+
+    return {
+        "page_id": page_id,
+        "webhook_subscribed": is_subscribed,
+        "message": f"Webhook status refreshed: {'Active' if is_subscribed else 'Inactive'}"
+    }
