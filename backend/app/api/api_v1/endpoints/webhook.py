@@ -26,8 +26,8 @@ async def get_page_access_token(page_id: str):
     try:
         db = SessionLocal()
 
-        # Find the page by page_id
-        page = db.query(Page).filter(Page.page_id == page_id).first()
+        # Find the page by fb_page_id
+        page = db.query(Page).filter(Page.fb_page_id == page_id).first()
 
         if not page:
             db.close()
@@ -38,7 +38,7 @@ async def get_page_access_token(page_id: str):
 
         # Decrypt the access token
         try:
-            page_access_token = decrypt_token(page.access_token)
+            page_access_token = decrypt_token(page.page_access_token)
 
             # Verify token works by calling Facebook API
             import requests
@@ -49,9 +49,9 @@ async def get_page_access_token(page_id: str):
             page_info = response.json() if token_valid else None
 
             result = {
-                "page_id": page.page_id,
-                "page_name": page.name,
-                "instagram_business_account_id": page.instagram_business_account_id,
+                "page_id": page.fb_page_id,
+                "page_name": page.page_name,
+                "instagram_business_account_id": page.ig_business_id,
                 "instagram_username": page.instagram_username,
                 "page_access_token": page_access_token,
                 "user_email": user.email if user else None,
@@ -78,10 +78,10 @@ async def get_seasonart1_token():
     try:
         db = SessionLocal()
 
-        # Try to find seasonart1 by page_id first
-        page = db.query(Page).filter(Page.page_id == "709105118962659").first()
+        # Try to find seasonart1 by fb_page_id first
+        page = db.query(Page).filter(Page.fb_page_id == "709105118962659").first()
 
-        # If not found by page_id, try by Instagram username
+        # If not found by fb_page_id, try by Instagram username
         if not page:
             page = db.query(Page).filter(Page.instagram_username.ilike('%seasonart1%')).first()
 
@@ -91,8 +91,8 @@ async def get_seasonart1_token():
             all_pages = db.query(Page).all()
             available_pages = [
                 {
-                    "page_id": p.page_id,
-                    "name": p.name,
+                    "page_id": p.fb_page_id,
+                    "name": p.page_name,
                     "instagram_username": p.instagram_username
                 } for p in all_pages
             ]
@@ -110,28 +110,28 @@ async def get_seasonart1_token():
 
         # Decrypt the access token
         try:
-            page_access_token = decrypt_token(page.access_token)
+            page_access_token = decrypt_token(page.page_access_token)
 
             # Verify token and get Instagram account info
             import requests
 
             # Test 1: Verify page access
-            page_url = f"https://graph.facebook.com/v23.0/{page.page_id}?fields=name,id,instagram_business_account&access_token={page_access_token}"
+            page_url = f"https://graph.facebook.com/v23.0/{page.fb_page_id}?fields=name,id,instagram_business_account&access_token={page_access_token}"
             page_response = requests.get(page_url)
 
             # Test 2: Get Instagram account details
-            ig_url = f"https://graph.facebook.com/v23.0/{page.instagram_business_account_id}?fields=id,username,name,followers_count&access_token={page_access_token}"
+            ig_url = f"https://graph.facebook.com/v23.0/{page.ig_business_id}?fields=id,username,name,followers_count&access_token={page_access_token}"
             ig_response = requests.get(ig_url)
 
             # Test 3: Check webhook subscription
-            webhook_url = f"https://graph.facebook.com/v23.0/{page.page_id}/subscribed_apps?access_token={page_access_token}"
+            webhook_url = f"https://graph.facebook.com/v23.0/{page.fb_page_id}/subscribed_apps?access_token={page_access_token}"
             webhook_response = requests.get(webhook_url)
 
             result = {
                 "success": True,
-                "page_id": page.page_id,
-                "page_name": page.name,
-                "instagram_business_account_id": page.instagram_business_account_id,
+                "page_id": page.fb_page_id,
+                "page_name": page.page_name,
+                "instagram_business_account_id": page.ig_business_id,
                 "instagram_username": page.instagram_username,
                 "page_access_token": page_access_token,
                 "user_email": user.email if user else None,
@@ -176,9 +176,9 @@ async def list_all_pages():
         result = []
         for page in pages:
             result.append({
-                "page_id": page.page_id,
-                "page_name": page.name,
-                "instagram_business_account_id": page.instagram_business_account_id,
+                "page_id": page.fb_page_id,
+                "page_name": page.page_name,
+                "instagram_business_account_id": page.ig_business_id,
                 "instagram_username": page.instagram_username,
                 "user_email": users.get(page.user_id, "Unknown"),
                 "created_at": page.created_at.isoformat() if page.created_at else None
