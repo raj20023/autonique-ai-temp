@@ -27,8 +27,8 @@ export default function LoginPage() {
     } catch (error) {
       console.error('Failed to build OAuth URL:', error);
 
-      // Fallback to hardcoded URL with required permissions including pages_read_engagement
-      const fallbackUrl = 'https://www.facebook.com/v23.0/dialog/oauth?client_id=2032087817551720&redirect_uri=https%3A%2F%2Fautonique.in%2Fauth%2Fcallback&scope=pages_messaging%2Cinstagram_basic%2Cinstagram_manage_messages%2Cpages_show_list%2Cbusiness_management%2Cpages_manage_metadata%2Cpages_read_engagement&response_type=code&auth_type=rerequest&display=popup';
+      // Fallback to hardcoded URL with required permissions (removed pages_read_engagement)
+      const fallbackUrl = 'https://www.facebook.com/v23.0/dialog/oauth?client_id=2032087817551720&redirect_uri=https%3A%2F%2Fautonique.in%2Fauth%2Fcallback&scope=pages_messaging%2Cinstagram_basic%2Cinstagram_manage_messages%2Cpages_show_list%2Cbusiness_management%2Cpages_manage_metadata&response_type=code&auth_type=rerequest&display=popup';
 
       window.location.href = fallbackUrl;
     }
