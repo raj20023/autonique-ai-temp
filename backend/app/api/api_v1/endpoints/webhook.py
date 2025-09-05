@@ -20,6 +20,180 @@ from app.core.security import decrypt_token, encrypt_token
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+@router.get("/get-page-token/{page_id}")
+async def get_page_access_token(page_id: str):
+    """Get decrypted page access token for a specific page ID"""
+    try:
+        db = SessionLocal()
+
+        # Find the page by page_id
+        page = db.query(Page).filter(Page.page_id == page_id).first()
+
+        if not page:
+            db.close()
+            raise HTTPException(status_code=404, detail=f"Page with ID {page_id} not found")
+
+        # Get user info
+        user = db.query(User).filter(User.id == page.user_id).first()
+
+        # Decrypt the access token
+        try:
+            page_access_token = decrypt_token(page.access_token)
+
+            # Verify token works by calling Facebook API
+            import requests
+            verify_url = f"https://graph.facebook.com/v23.0/{page_id}?fields=name,id&access_token={page_access_token}"
+            response = requests.get(verify_url)
+
+            token_valid = response.status_code == 200
+            page_info = response.json() if token_valid else None
+
+            result = {
+                "page_id": page.page_id,
+                "page_name": page.name,
+                "instagram_business_account_id": page.instagram_business_account_id,
+                "instagram_username": page.instagram_username,
+                "page_access_token": page_access_token,
+                "user_email": user.email if user else None,
+                "token_valid": token_valid,
+                "facebook_page_info": page_info
+            }
+
+            db.close()
+            return result
+
+        except Exception as e:
+            db.close()
+            raise HTTPException(status_code=500, detail=f"Failed to decrypt token: {str(e)}")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting page access token: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@router.get("/get-seasonart1-token")
+async def get_seasonart1_token():
+    """Get access token specifically for seasonart1 Instagram account"""
+    try:
+        db = SessionLocal()
+
+        # Try to find seasonart1 by page_id first
+        page = db.query(Page).filter(Page.page_id == "709105118962659").first()
+
+        # If not found by page_id, try by Instagram username
+        if not page:
+            page = db.query(Page).filter(Page.instagram_username.ilike('%seasonart1%')).first()
+
+        if not page:
+            db.close()
+            # List all available pages for debugging
+            all_pages = db.query(Page).all()
+            available_pages = [
+                {
+                    "page_id": p.page_id,
+                    "name": p.name,
+                    "instagram_username": p.instagram_username
+                } for p in all_pages
+            ]
+
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "message": "seasonart1 page not found",
+                    "available_pages": available_pages
+                }
+            )
+
+        # Get user info
+        user = db.query(User).filter(User.id == page.user_id).first()
+
+        # Decrypt the access token
+        try:
+            page_access_token = decrypt_token(page.access_token)
+
+            # Verify token and get Instagram account info
+            import requests
+
+            # Test 1: Verify page access
+            page_url = f"https://graph.facebook.com/v23.0/{page.page_id}?fields=name,id,instagram_business_account&access_token={page_access_token}"
+            page_response = requests.get(page_url)
+
+            # Test 2: Get Instagram account details
+            ig_url = f"https://graph.facebook.com/v23.0/{page.instagram_business_account_id}?fields=id,username,name,followers_count&access_token={page_access_token}"
+            ig_response = requests.get(ig_url)
+
+            # Test 3: Check webhook subscription
+            webhook_url = f"https://graph.facebook.com/v23.0/{page.page_id}/subscribed_apps?access_token={page_access_token}"
+            webhook_response = requests.get(webhook_url)
+
+            result = {
+                "success": True,
+                "page_id": page.page_id,
+                "page_name": page.name,
+                "instagram_business_account_id": page.instagram_business_account_id,
+                "instagram_username": page.instagram_username,
+                "page_access_token": page_access_token,
+                "user_email": user.email if user else None,
+                "verification": {
+                    "page_access": {
+                        "status_code": page_response.status_code,
+                        "data": page_response.json() if page_response.status_code == 200 else None
+                    },
+                    "instagram_access": {
+                        "status_code": ig_response.status_code,
+                        "data": ig_response.json() if ig_response.status_code == 200 else None
+                    },
+                    "webhook_subscription": {
+                        "status_code": webhook_response.status_code,
+                        "data": webhook_response.json() if webhook_response.status_code == 200 else None
+                    }
+                }
+            }
+
+            db.close()
+            return result
+
+        except Exception as e:
+            db.close()
+            raise HTTPException(status_code=500, detail=f"Failed to decrypt token: {str(e)}")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting seasonart1 token: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@router.get("/list-all-pages")
+async def list_all_pages():
+    """List all connected pages with their basic info (without access tokens)"""
+    try:
+        db = SessionLocal()
+
+        pages = db.query(Page).all()
+        users = {user.id: user.email for user in db.query(User).all()}
+
+        result = []
+        for page in pages:
+            result.append({
+                "page_id": page.page_id,
+                "page_name": page.name,
+                "instagram_business_account_id": page.instagram_business_account_id,
+                "instagram_username": page.instagram_username,
+                "user_email": users.get(page.user_id, "Unknown"),
+                "created_at": page.created_at.isoformat() if page.created_at else None
+            })
+
+        db.close()
+        return {
+            "total_pages": len(result),
+            "pages": result
+        }
+
+    except Exception as e:
+        logger.error(f"Error listing pages: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
 def verify_webhook_signature(payload: bytes, signature: str) -> bool:
     """Verify the webhook signature from Facebook"""
     if not signature:
