@@ -20,39 +20,90 @@ from app.core.security import decrypt_token, encrypt_token
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-@router.get("/debug-page-model")
-async def debug_page_model():
-    """Debug endpoint to check Page model attributes"""
+@router.post("/subscribe-webhook/{page_id}")
+async def subscribe_webhook_to_page(page_id: str):
+    """Subscribe webhook to a specific page"""
     try:
         db = SessionLocal()
 
-        # Get first page to test
-        page = db.query(Page).first()
-
+        # Find the page
+        page = db.query(Page).filter(Page.fb_page_id == page_id).first()
         if not page:
             db.close()
-            return {"message": "No pages found in database"}
+            raise HTTPException(status_code=404, detail=f"Page {page_id} not found")
 
-        # Test accessing attributes
-        result = {
-            "page_found": True,
-            "page_id": getattr(page, 'id', 'MISSING'),
-            "fb_page_id": getattr(page, 'fb_page_id', 'MISSING'),
-            "page_name": getattr(page, 'page_name', 'MISSING'),
-            "ig_business_id": getattr(page, 'ig_business_id', 'MISSING'),
-            "instagram_username": getattr(page, 'instagram_username', 'MISSING'),
-            "page_access_token_exists": hasattr(page, 'page_access_token'),
-            "user_id": getattr(page, 'user_id', 'MISSING'),
-            "created_at": str(getattr(page, 'created_at', 'MISSING')),
-            "all_attributes": [attr for attr in dir(page) if not attr.startswith('_')]
+        # Get user
+        user = db.query(User).filter(User.id == page.user_id).first()
+        if not user:
+            db.close()
+            raise HTTPException(status_code=404, detail="User not found")
+
+        # Decrypt tokens
+        try:
+            page_access_token = decrypt_token(page.page_access_token)
+            user_access_token = decrypt_token(user.access_token)
+        except Exception as e:
+            db.close()
+            raise HTTPException(status_code=500, detail=f"Failed to decrypt tokens: {e}")
+
+        # Subscribe webhook using page access token
+        import requests
+
+        subscribe_url = f"https://graph.facebook.com/v23.0/{page_id}/subscribed_apps"
+        payload = {
+            "subscribed_fields": "messages,messaging_postbacks,messaging_optins,message_deliveries,message_reads"
         }
+
+        response = requests.post(
+            subscribe_url,
+            data=payload,
+            params={"access_token": page_access_token}
+        )
+
+        if response.status_code == 200:
+            # Update database
+            page.webhook_subscribed = True
+            db.commit()
+
+            result = {
+                "success": True,
+                "message": f"Webhook subscribed to page {page_id}",
+                "page_name": page.page_name,
+                "response": response.json()
+            }
+        else:
+            # Try with user access token as fallback
+            response2 = requests.post(
+                subscribe_url,
+                data=payload,
+                params={"access_token": user_access_token}
+            )
+
+            if response2.status_code == 200:
+                page.webhook_subscribed = True
+                db.commit()
+                result = {
+                    "success": True,
+                    "message": f"Webhook subscribed to page {page_id} (using user token)",
+                    "page_name": page.page_name,
+                    "response": response2.json()
+                }
+            else:
+                result = {
+                    "success": False,
+                    "message": f"Failed to subscribe webhook to page {page_id}",
+                    "page_token_error": response.text,
+                    "user_token_error": response2.text
+                }
 
         db.close()
         return result
 
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Debug error: {e}")
-        return {"error": str(e), "type": type(e).__name__}
+        logger.error(f"Error subscribing webhook: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/get-page-token/{page_id}")
 async def get_page_access_token(page_id: str):
@@ -157,9 +208,36 @@ async def get_seasonart1_token():
             ig_url = f"https://graph.facebook.com/v23.0/{page.ig_business_id}?fields=id,username,name,followers_count&access_token={page_access_token}"
             ig_response = requests.get(ig_url)
 
-            # Test 3: Check webhook subscription
+            # Test 3: Check webhook subscription - PROPERLY
             webhook_url = f"https://graph.facebook.com/v23.0/{page.fb_page_id}/subscribed_apps?access_token={page_access_token}"
             webhook_response = requests.get(webhook_url)
+
+            # FIXED: Actually check if our app is subscribed
+            webhook_status = {
+                "status_code": webhook_response.status_code,
+                "our_app_subscribed": False,
+                "subscribed_apps": [],
+                "error": None
+            }
+
+            if webhook_response.status_code == 200:
+                try:
+                    webhook_data = webhook_response.json()
+                    subscribed_apps = webhook_data.get('data', [])
+                    webhook_status["subscribed_apps"] = [{"id": app.get("id"), "name": app.get("name")} for app in subscribed_apps]
+
+                    # Check if OUR app is actually subscribed
+                    our_app_id = settings.FACEBOOK_APP_ID
+                    webhook_status["our_app_subscribed"] = any(app.get("id") == our_app_id for app in subscribed_apps)
+                    webhook_status["our_app_id"] = our_app_id
+
+                    if not webhook_status["our_app_subscribed"]:
+                        webhook_status["error"] = f"Our app ({our_app_id}) is NOT subscribed to this page"
+
+                except Exception as e:
+                    webhook_status["error"] = f"Failed to parse webhook response: {e}"
+            else:
+                webhook_status["error"] = f"Failed to check webhook subscription: {webhook_response.text}"
 
             result = {
                 "success": True,
@@ -178,10 +256,7 @@ async def get_seasonart1_token():
                         "status_code": ig_response.status_code,
                         "data": ig_response.json() if ig_response.status_code == 200 else None
                     },
-                    "webhook_subscription": {
-                        "status_code": webhook_response.status_code,
-                        "data": webhook_response.json() if webhook_response.status_code == 200 else None
-                    }
+                    "webhook_subscription": webhook_status
                 }
             }
 
