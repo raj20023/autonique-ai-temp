@@ -67,10 +67,18 @@ async def verify_webhook(
     hub_challenge: str = Query(alias="hub.challenge", default=None)
 ):
     """Verify webhook subscription with Facebook"""
-    logger.info(f"Webhook verification request: mode={hub_mode}, token={hub_token}, challenge={hub_challenge}")
-    logger.info(f"Request headers: {dict(request.headers)}")
-    logger.info(f"Expected token: {settings.WEBHOOK_VERIFY_TOKEN}")
-    logger.info(f"Token match: {hub_token == settings.WEBHOOK_VERIFY_TOKEN}")
+    # 🔍 WEBHOOK VERIFICATION REQUEST RECEIVED
+    logger.info("🔍 WEBHOOK GET VERIFICATION REQUEST RECEIVED!")
+    logger.info(f"📍 Request URL: {request.url}")
+    logger.info(f"📋 Request method: {request.method}")
+    logger.info(f"🔗 Request headers: {dict(request.headers)}")
+    logger.info(f"📡 Remote IP: {request.client.host if request.client else 'Unknown'}")
+    logger.info(f"🌐 User-Agent: {request.headers.get('user-agent', 'Not provided')}")
+    logger.info(f"🔧 Hub mode: {hub_mode}")
+    logger.info(f"🔑 Hub token: {hub_token}")
+    logger.info(f"🎯 Hub challenge: {hub_challenge}")
+    logger.info(f"✅ Expected token: {settings.WEBHOOK_VERIFY_TOKEN}")
+    logger.info(f"🔍 Token match: {hub_token == settings.WEBHOOK_VERIFY_TOKEN}")
 
     if hub_mode == "subscribe" and hub_token == settings.WEBHOOK_VERIFY_TOKEN:
         logger.info("Webhook verified successfully")
@@ -94,8 +102,19 @@ async def handle_webhook(
 ):
     """Handle incoming Instagram messages with signature verification"""
     try:
+        # 🚨 WEBHOOK RECEIVED - Log immediately when function is called
+        logger.info("🚨 WEBHOOK POST REQUEST RECEIVED!")
+        logger.info(f"📍 Request URL: {request.url}")
+        logger.info(f"📋 Request method: {request.method}")
+        logger.info(f"🔗 Request headers: {dict(request.headers)}")
+        logger.info(f"🔐 X-Hub-Signature-256: {x_hub_signature_256}")
+        logger.info(f"📊 Content-Type: {request.headers.get('content-type', 'Not provided')}")
+        logger.info(f"🌐 User-Agent: {request.headers.get('user-agent', 'Not provided')}")
+        logger.info(f"📡 Remote IP: {request.client.host if request.client else 'Unknown'}")
+
         # Get raw body for signature verification
         raw_body = await request.body()
+        logger.info(f"📦 Raw body length: {len(raw_body)} bytes")
 
         # Verify webhook signature for security (if enabled)
         if settings.WEBHOOK_VERIFY_SIGNATURE:
@@ -139,6 +158,7 @@ async def verify_webhook_no_slash(
     hub_challenge: str = Query(alias="hub.challenge", default=None)
 ):
     """Verify webhook subscription with Facebook (no trailing slash)"""
+    logger.info("🔍 WEBHOOK GET REQUEST (NO SLASH) - Redirecting to main handler")
     return await verify_webhook(request, hub_mode, hub_token, hub_challenge)
 
 @router.post("")
@@ -147,6 +167,7 @@ async def handle_webhook_no_slash(
     x_hub_signature_256: str = Header(None, alias="X-Hub-Signature-256")
 ):
     """Handle incoming Instagram messages (no trailing slash)"""
+    logger.info("🚨 WEBHOOK POST REQUEST (NO SLASH) - Redirecting to main handler")
     return await handle_webhook(request, x_hub_signature_256)
 
 async def process_webhook_entry(entry: dict):
