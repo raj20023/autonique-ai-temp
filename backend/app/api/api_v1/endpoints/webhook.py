@@ -107,9 +107,7 @@ async def handle_webhook(
         logger.info(f"📍 Request URL: {request.url}")
         logger.info(f"📋 Request method: {request.method}")
         logger.info(f"🔗 Request headers: {dict(request.headers)}")
-        logger.info(f"🔐 X-Hub-Signature-256 (FastAPI param): {x_hub_signature_256}")
-        logger.info(f"🔐 X-Hub-Signature-256 (direct header): {request.headers.get('X-Hub-Signature-256')}")
-        logger.info(f"🔐 x-hub-signature-256 (lowercase): {request.headers.get('x-hub-signature-256')}")
+        logger.info(f"🔐 X-Hub-Signature-256: {x_hub_signature_256}")
         logger.info(f"📊 Content-Type: {request.headers.get('content-type', 'Not provided')}")
         logger.info(f"🌐 User-Agent: {request.headers.get('user-agent', 'Not provided')}")
         logger.info(f"📡 Remote IP: {request.client.host if request.client else 'Unknown'}")
@@ -120,13 +118,11 @@ async def handle_webhook(
 
         # Verify webhook signature for security (if enabled)
         if settings.WEBHOOK_VERIFY_SIGNATURE:
-            logger.info("🔐 Signature verification ENABLED - checking signature")
             if not verify_webhook_signature(raw_body, x_hub_signature_256):
                 logger.error("❌ Webhook signature verification failed - rejecting request")
                 raise HTTPException(status_code=403, detail="Invalid signature")
-            logger.info("✅ Signature verification passed")
         else:
-            logger.info("ℹ️ Webhook signature verification DISABLED - accepting all requests")
+            logger.info("ℹ️ Webhook signature verification disabled")
 
         # Parse JSON body
         body = json.loads(raw_body.decode('utf-8'))
