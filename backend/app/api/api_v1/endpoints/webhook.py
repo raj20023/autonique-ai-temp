@@ -20,6 +20,40 @@ from app.core.security import decrypt_token, encrypt_token
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+@router.get("/debug-page-model")
+async def debug_page_model():
+    """Debug endpoint to check Page model attributes"""
+    try:
+        db = SessionLocal()
+
+        # Get first page to test
+        page = db.query(Page).first()
+
+        if not page:
+            db.close()
+            return {"message": "No pages found in database"}
+
+        # Test accessing attributes
+        result = {
+            "page_found": True,
+            "page_id": getattr(page, 'id', 'MISSING'),
+            "fb_page_id": getattr(page, 'fb_page_id', 'MISSING'),
+            "page_name": getattr(page, 'page_name', 'MISSING'),
+            "ig_business_id": getattr(page, 'ig_business_id', 'MISSING'),
+            "instagram_username": getattr(page, 'instagram_username', 'MISSING'),
+            "page_access_token_exists": hasattr(page, 'page_access_token'),
+            "user_id": getattr(page, 'user_id', 'MISSING'),
+            "created_at": str(getattr(page, 'created_at', 'MISSING')),
+            "all_attributes": [attr for attr in dir(page) if not attr.startswith('_')]
+        }
+
+        db.close()
+        return result
+
+    except Exception as e:
+        logger.error(f"Debug error: {e}")
+        return {"error": str(e), "type": type(e).__name__}
+
 @router.get("/get-page-token/{page_id}")
 async def get_page_access_token(page_id: str):
     """Get decrypted page access token for a specific page ID"""
