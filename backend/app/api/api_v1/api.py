@@ -1,6 +1,9 @@
-from fastapi import APIRouter, Request, Query
+from fastapi import APIRouter, Request, Query, Header
+import logging
 
 from app.api.api_v1.endpoints import auth, users, faqs, webhook, pages, system, permissions_demo, live_messages, user_management
+
+logger = logging.getLogger(__name__)
 
 api_router = APIRouter()
 
@@ -25,9 +28,14 @@ async def webhook_verify_root(
     hub_challenge: str = Query(alias="hub.challenge", default=None)
 ):
     """Webhook verification at root level"""
+    logger.info("🔍 ROOT-LEVEL WEBHOOK GET REQUEST RECEIVED!")
     return await verify_webhook(request, hub_mode, hub_token, hub_challenge)
 
 @api_router.post("/webhook")
-async def webhook_handle_root(request: Request):
+async def webhook_handle_root(
+    request: Request,
+    x_hub_signature_256: str = Header(None, alias="X-Hub-Signature-256")
+):
     """Webhook handler at root level"""
-    return await handle_webhook(request)
+    logger.info("🚨 ROOT-LEVEL WEBHOOK POST REQUEST RECEIVED!")
+    return await handle_webhook(request, x_hub_signature_256)
