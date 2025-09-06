@@ -210,6 +210,109 @@ async def resubscribe_seasonart1_webhook():
         logger.error(f"Error re-subscribing seasonart1 webhook: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/reset-seasonart1-permissions")
+async def reset_seasonart1_permissions():
+    """Reset permissions for seasonart1 by unsubscribing and resubscribing webhook"""
+    try:
+        db = SessionLocal()
+
+        # Find seasonart1 page
+        page = db.query(Page).filter(Page.fb_page_id == "709105118962659").first()
+        if not page:
+            db.close()
+            raise HTTPException(status_code=404, detail="seasonart1 page not found")
+
+        # Get user
+        user = db.query(User).filter(User.id == page.user_id).first()
+        if not user:
+            db.close()
+            raise HTTPException(status_code=404, detail="User not found")
+
+        # Decrypt tokens
+        try:
+            page_access_token = decrypt_token(page.page_access_token)
+            user_access_token = decrypt_token(user.access_token)
+        except Exception as e:
+            db.close()
+            raise HTTPException(status_code=500, detail=f"Failed to decrypt tokens: {e}")
+
+        import requests
+
+        page_id = "709105118962659"
+        app_id = settings.FACEBOOK_APP_ID
+
+        logger.info(f"Starting permission reset for seasonart1 (Page ID: {page_id})")
+
+        # Step 1: Unsubscribe webhook completely
+        unsubscribe_url = f"https://graph.facebook.com/v23.0/{page_id}/subscribed_apps/{app_id}"
+
+        logger.info("Step 1: Unsubscribing webhook...")
+        unsubscribe_response = requests.delete(
+            unsubscribe_url,
+            params={"access_token": page_access_token}
+        )
+
+        logger.info(f"Unsubscribe response: {unsubscribe_response.status_code} - {unsubscribe_response.text}")
+
+        # Step 2: Wait a moment
+        import time
+        time.sleep(2)
+
+        # Step 3: Re-subscribe with fresh permissions
+        subscribe_url = f"https://graph.facebook.com/v23.0/{page_id}/subscribed_apps"
+        payload = {
+            "subscribed_fields": "messages,messaging_postbacks,messaging_optins,messaging_referrals,message_reactions"
+        }
+
+        logger.info("Step 2: Re-subscribing webhook with fresh permissions...")
+        subscribe_response = requests.post(
+            subscribe_url,
+            data=payload,
+            params={"access_token": page_access_token}
+        )
+
+        logger.info(f"Subscribe response: {subscribe_response.status_code} - {subscribe_response.text}")
+
+        # Step 4: Verify subscription
+        verify_url = f"https://graph.facebook.com/v23.0/{page_id}/subscribed_apps"
+        verify_response = requests.get(verify_url, params={"access_token": page_access_token})
+
+        logger.info(f"Verify response: {verify_response.status_code} - {verify_response.text}")
+
+        result = {
+            "success": True,
+            "message": "Permission reset completed for seasonart1",
+            "steps": {
+                "unsubscribe": {
+                    "status_code": unsubscribe_response.status_code,
+                    "response": unsubscribe_response.text
+                },
+                "subscribe": {
+                    "status_code": subscribe_response.status_code,
+                    "response": subscribe_response.text
+                },
+                "verify": {
+                    "status_code": verify_response.status_code,
+                    "response": verify_response.json() if verify_response.status_code == 200 else verify_response.text
+                }
+            }
+        }
+
+        # Update database if successful
+        if subscribe_response.status_code == 200:
+            page.webhook_subscribed = True
+            db.commit()
+            logger.info("Database updated - webhook marked as subscribed")
+
+        db.close()
+        return result
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error resetting seasonart1 permissions: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/get-page-token/{page_id}")
 async def get_page_access_token(page_id: str):
     """Get decrypted page access token for a specific page ID"""
