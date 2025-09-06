@@ -11,6 +11,7 @@ from fastapi import FastAPI, Request, Depends
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
@@ -89,13 +90,30 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Custom middleware to bypass CORS for webhook endpoints
+class WebhookCORSMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Skip CORS for webhook endpoints
+        if request.url.path.startswith("/api/v1/webhook"):
+            response = await call_next(request)
+            # Add permissive headers for webhook endpoints
+            response.headers["Access-Control-Allow-Origin"] = "*"
+            response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+            response.headers["Access-Control-Allow-Headers"] = "*"
+            return response
+        else:
+            return await call_next(request)
+
 # Security middleware
 app.add_middleware(
     TrustedHostMiddleware,
     allowed_hosts=["*"]
 )
 
-# CORS middleware
+# Add custom webhook CORS middleware first
+app.add_middleware(WebhookCORSMiddleware)
+
+# CORS middleware for regular API endpoints
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
