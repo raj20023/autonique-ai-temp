@@ -105,7 +105,7 @@ async def subscribe_webhook_to_page(page_id: str):
         logger.error(f"Error subscribing webhook: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/resubscribe-seasonart1-webhook")
+@router.get("/resubscribe-seasonart1-webhook")
 async def resubscribe_seasonart1_webhook():
     """Re-subscribe webhook for seasonart1 with correct Instagram messaging permissions"""
     try:
