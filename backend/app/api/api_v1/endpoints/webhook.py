@@ -46,12 +46,12 @@ async def subscribe_webhook_to_page(page_id: str):
             db.close()
             raise HTTPException(status_code=500, detail=f"Failed to decrypt tokens: {e}")
 
-        # Subscribe webhook using page access token
+        # Subscribe webhook using page access token with correct Instagram messaging permissions
         import requests
 
         subscribe_url = f"https://graph.facebook.com/v23.0/{page_id}/subscribed_apps"
         payload = {
-            "subscribed_fields": "messages,messaging_postbacks,messaging_optins,message_deliveries,message_reads"
+            "subscribed_fields": "messages,messaging_postbacks,messaging_optins,messaging_referrals,message_reactions"
         }
 
         response = requests.post(
@@ -103,6 +103,111 @@ async def subscribe_webhook_to_page(page_id: str):
         raise
     except Exception as e:
         logger.error(f"Error subscribing webhook: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/resubscribe-seasonart1-webhook")
+async def resubscribe_seasonart1_webhook():
+    """Re-subscribe webhook for seasonart1 with correct Instagram messaging permissions"""
+    try:
+        db = SessionLocal()
+
+        # Find seasonart1 page
+        page = db.query(Page).filter(Page.fb_page_id == "709105118962659").first()
+        if not page:
+            db.close()
+            raise HTTPException(status_code=404, detail="seasonart1 page not found")
+
+        # Get user
+        user = db.query(User).filter(User.id == page.user_id).first()
+        if not user:
+            db.close()
+            raise HTTPException(status_code=404, detail="User not found")
+
+        # Decrypt tokens
+        try:
+            page_access_token = decrypt_token(page.page_access_token)
+            user_access_token = decrypt_token(user.access_token)
+        except Exception as e:
+            db.close()
+            raise HTTPException(status_code=500, detail=f"Failed to decrypt tokens: {e}")
+
+        # Re-subscribe webhook with correct Instagram messaging permissions
+        import requests
+
+        page_id = "709105118962659"
+        subscribe_url = f"https://graph.facebook.com/v23.0/{page_id}/subscribed_apps"
+
+        # Correct Instagram messaging permissions
+        payload = {
+            "subscribed_fields": "messages,messaging_postbacks,messaging_optins,messaging_referrals,message_reactions"
+        }
+
+        logger.info(f"Re-subscribing webhook for seasonart1 with fields: {payload['subscribed_fields']}")
+
+        # Try with page access token first
+        response = requests.post(
+            subscribe_url,
+            data=payload,
+            params={"access_token": page_access_token}
+        )
+
+        logger.info(f"Page token subscription response: {response.status_code} - {response.text}")
+
+        if response.status_code == 200:
+            # Update database
+            page.webhook_subscribed = True
+            db.commit()
+
+            result = {
+                "success": True,
+                "message": "seasonart1 webhook re-subscribed successfully with correct permissions",
+                "method": "page_token",
+                "subscribed_fields": payload["subscribed_fields"],
+                "response": response.json()
+            }
+        else:
+            # Try with user access token as fallback
+            logger.info("Page token failed, trying user token...")
+            response2 = requests.post(
+                subscribe_url,
+                data=payload,
+                params={"access_token": user_access_token}
+            )
+
+            logger.info(f"User token subscription response: {response2.status_code} - {response2.text}")
+
+            if response2.status_code == 200:
+                page.webhook_subscribed = True
+                db.commit()
+                result = {
+                    "success": True,
+                    "message": "seasonart1 webhook re-subscribed successfully with user token",
+                    "method": "user_token",
+                    "subscribed_fields": payload["subscribed_fields"],
+                    "response": response2.json()
+                }
+            else:
+                result = {
+                    "success": False,
+                    "message": "Failed to re-subscribe seasonart1 webhook",
+                    "subscribed_fields": payload["subscribed_fields"],
+                    "page_token_error": {
+                        "status_code": response.status_code,
+                        "response": response.text
+                    },
+                    "user_token_error": {
+                        "status_code": response2.status_code,
+                        "response": response2.text
+                    }
+                }
+
+        db.close()
+        return result
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error re-subscribing seasonart1 webhook: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/get-page-token/{page_id}")
