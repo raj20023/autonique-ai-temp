@@ -1,9 +1,9 @@
 import { ReactNode, ButtonHTMLAttributes } from 'react';
-import { motion } from 'framer-motion';
+import { motion, MotionProps } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { clsx } from 'clsx';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, keyof MotionProps> {
   children: ReactNode;
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -88,18 +88,22 @@ export default function Button({
     );
   }
 
+  const motionProps = {
+    whileHover: { scale: 1.02 },
+    whileTap: { scale: 0.98 },
+    transition: {
+      type: "spring" as const,
+      stiffness: 400,
+      damping: 17
+    }
+  };
+
   return (
     <motion.button
       className={baseClasses}
       disabled={disabled || loading}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      transition={{
-        type: "spring",
-        stiffness: 400,
-        damping: 17
-      }}
-      {...props}
+      {...motionProps}
+      {...(props as any)}
     >
       {buttonContent}
     </motion.button>
@@ -112,20 +116,24 @@ export function FloatingButton({
   className = '',
   ...props
 }: Omit<ButtonProps, 'variant' | 'size'>) {
+  const motionProps = {
+    whileHover: { scale: 1.1 },
+    whileTap: { scale: 0.9 },
+    transition: {
+      type: "spring" as const,
+      stiffness: 400,
+      damping: 17
+    }
+  };
+
   return (
     <motion.button
       className={clsx(
         'fixed bottom-6 right-6 h-14 w-14 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center z-50',
         className
       )}
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.9 }}
-      transition={{
-        type: "spring",
-        stiffness: 400,
-        damping: 17
-      }}
-      {...props}
+      {...motionProps}
+      {...(props as any)}
     >
       {children}
     </motion.button>
