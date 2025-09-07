@@ -1,20 +1,19 @@
 from fastapi import APIRouter, Request, HTTPException, Query, Header
 from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 import json
 import hmac
 import hashlib
 
-from app.core.database import get_db, SessionLocal
+from app.core.database import SessionLocal
 from app.core.config import settings
 from app.models.user import User
 from app.models.page import Page
 from app.models.message import Message
 from app.services.instagram_service import InstagramService
 from app.services.faq_service import FAQService
-from app.services.gemini_service import GeminiService
 from app.core.security import decrypt_token, encrypt_token
 
 router = APIRouter()
@@ -105,411 +104,15 @@ async def subscribe_webhook_to_page(page_id: str):
         logger.error(f"Error subscribing webhook: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/resubscribe-seasonart1-webhook")
-async def resubscribe_seasonart1_webhook():
-    """Re-subscribe webhook for seasonart1 with correct Instagram messaging permissions"""
-    try:
-        db = SessionLocal()
 
-        # Find seasonart1 page
-        page = db.query(Page).filter(Page.fb_page_id == "709105118962659").first()
-        if not page:
-            db.close()
-            raise HTTPException(status_code=404, detail="seasonart1 page not found")
 
-        # Get user
-        user = db.query(User).filter(User.id == page.user_id).first()
-        if not user:
-            db.close()
-            raise HTTPException(status_code=404, detail="User not found")
 
-        # Decrypt tokens
-        try:
-            page_access_token = decrypt_token(page.page_access_token)
-            user_access_token = decrypt_token(user.access_token)
-        except Exception as e:
-            db.close()
-            raise HTTPException(status_code=500, detail=f"Failed to decrypt tokens: {e}")
 
-        # Re-subscribe webhook with correct Instagram messaging permissions
-        import requests
 
-        page_id = "709105118962659"
-        subscribe_url = f"https://graph.facebook.com/v23.0/{page_id}/subscribed_apps"
 
-        # Correct Instagram messaging permissions
-        payload = {
-            "subscribed_fields": "messages,messaging_postbacks,messaging_optins,messaging_referrals,message_reactions"
-        }
 
-        logger.info(f"Re-subscribing webhook for seasonart1 with fields: {payload['subscribed_fields']}")
 
-        # Try with page access token first
-        response = requests.post(
-            subscribe_url,
-            data=payload,
-            params={"access_token": page_access_token}
-        )
 
-        logger.info(f"Page token subscription response: {response.status_code} - {response.text}")
-
-        if response.status_code == 200:
-            # Update database
-            page.webhook_subscribed = True
-            db.commit()
-
-            result = {
-                "success": True,
-                "message": "seasonart1 webhook re-subscribed successfully with correct permissions",
-                "method": "page_token",
-                "subscribed_fields": payload["subscribed_fields"],
-                "response": response.json()
-            }
-        else:
-            # Try with user access token as fallback
-            logger.info("Page token failed, trying user token...")
-            response2 = requests.post(
-                subscribe_url,
-                data=payload,
-                params={"access_token": user_access_token}
-            )
-
-            logger.info(f"User token subscription response: {response2.status_code} - {response2.text}")
-
-            if response2.status_code == 200:
-                page.webhook_subscribed = True
-                db.commit()
-                result = {
-                    "success": True,
-                    "message": "seasonart1 webhook re-subscribed successfully with user token",
-                    "method": "user_token",
-                    "subscribed_fields": payload["subscribed_fields"],
-                    "response": response2.json()
-                }
-            else:
-                result = {
-                    "success": False,
-                    "message": "Failed to re-subscribe seasonart1 webhook",
-                    "subscribed_fields": payload["subscribed_fields"],
-                    "page_token_error": {
-                        "status_code": response.status_code,
-                        "response": response.text
-                    },
-                    "user_token_error": {
-                        "status_code": response2.status_code,
-                        "response": response2.text
-                    }
-                }
-
-        db.close()
-        return result
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error re-subscribing seasonart1 webhook: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@router.get("/reset-seasonart1-permissions")
-async def reset_seasonart1_permissions():
-    """Reset permissions for seasonart1 by unsubscribing and resubscribing webhook"""
-    try:
-        db = SessionLocal()
-
-        # Find seasonart1 page
-        page = db.query(Page).filter(Page.fb_page_id == "709105118962659").first()
-        if not page:
-            db.close()
-            raise HTTPException(status_code=404, detail="seasonart1 page not found")
-
-        # Get user
-        user = db.query(User).filter(User.id == page.user_id).first()
-        if not user:
-            db.close()
-            raise HTTPException(status_code=404, detail="User not found")
-
-        # Decrypt tokens
-        try:
-            page_access_token = decrypt_token(page.page_access_token)
-            user_access_token = decrypt_token(user.access_token)
-        except Exception as e:
-            db.close()
-            raise HTTPException(status_code=500, detail=f"Failed to decrypt tokens: {e}")
-
-        import requests
-
-        page_id = "709105118962659"
-        app_id = settings.FACEBOOK_APP_ID
-
-        logger.info(f"Starting permission reset for seasonart1 (Page ID: {page_id})")
-
-        # Step 1: Unsubscribe webhook completely
-        unsubscribe_url = f"https://graph.facebook.com/v23.0/{page_id}/subscribed_apps/{app_id}"
-
-        logger.info("Step 1: Unsubscribing webhook...")
-        unsubscribe_response = requests.delete(
-            unsubscribe_url,
-            params={"access_token": page_access_token}
-        )
-
-        logger.info(f"Unsubscribe response: {unsubscribe_response.status_code} - {unsubscribe_response.text}")
-
-        # Step 2: Wait a moment
-        import time
-        time.sleep(2)
-
-        # Step 3: Re-subscribe with fresh permissions
-        subscribe_url = f"https://graph.facebook.com/v23.0/{page_id}/subscribed_apps"
-        payload = {
-            "subscribed_fields": "messages,messaging_postbacks,messaging_optins,messaging_referrals,message_reactions"
-        }
-
-        logger.info("Step 2: Re-subscribing webhook with fresh permissions...")
-        subscribe_response = requests.post(
-            subscribe_url,
-            data=payload,
-            params={"access_token": page_access_token}
-        )
-
-        logger.info(f"Subscribe response: {subscribe_response.status_code} - {subscribe_response.text}")
-
-        # Step 4: Verify subscription
-        verify_url = f"https://graph.facebook.com/v23.0/{page_id}/subscribed_apps"
-        verify_response = requests.get(verify_url, params={"access_token": page_access_token})
-
-        logger.info(f"Verify response: {verify_response.status_code} - {verify_response.text}")
-
-        result = {
-            "success": True,
-            "message": "Permission reset completed for seasonart1",
-            "steps": {
-                "unsubscribe": {
-                    "status_code": unsubscribe_response.status_code,
-                    "response": unsubscribe_response.text
-                },
-                "subscribe": {
-                    "status_code": subscribe_response.status_code,
-                    "response": subscribe_response.text
-                },
-                "verify": {
-                    "status_code": verify_response.status_code,
-                    "response": verify_response.json() if verify_response.status_code == 200 else verify_response.text
-                }
-            }
-        }
-
-        # Update database if successful
-        if subscribe_response.status_code == 200:
-            page.webhook_subscribed = True
-            db.commit()
-            logger.info("Database updated - webhook marked as subscribed")
-
-        db.close()
-        return result
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error resetting seasonart1 permissions: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@router.get("/get-page-token/{page_id}")
-async def get_page_access_token(page_id: str):
-    """Get decrypted page access token for a specific page ID"""
-    try:
-        db = SessionLocal()
-
-        # Find the page by fb_page_id
-        page = db.query(Page).filter(Page.fb_page_id == page_id).first()
-
-        if not page:
-            db.close()
-            raise HTTPException(status_code=404, detail=f"Page with ID {page_id} not found")
-
-        # Get user info
-        user = db.query(User).filter(User.id == page.user_id).first()
-
-        # Decrypt the access token
-        try:
-            page_access_token = decrypt_token(page.page_access_token)
-
-            # Verify token works by calling Facebook API
-            import requests
-            verify_url = f"https://graph.facebook.com/v23.0/{page_id}?fields=name,id&access_token={page_access_token}"
-            response = requests.get(verify_url)
-
-            token_valid = response.status_code == 200
-            page_info = response.json() if token_valid else None
-
-            result = {
-                "page_id": page.fb_page_id,
-                "page_name": page.page_name,
-                "instagram_business_account_id": page.ig_business_id,
-                "instagram_username": page.instagram_username,
-                "page_access_token": page_access_token,
-                "user_email": user.email if user else None,
-                "token_valid": token_valid,
-                "facebook_page_info": page_info
-            }
-
-            db.close()
-            return result
-
-        except Exception as e:
-            db.close()
-            raise HTTPException(status_code=500, detail=f"Failed to decrypt token: {str(e)}")
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error getting page access token: {e}")
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
-
-@router.get("/get-seasonart1-token")
-async def get_seasonart1_token():
-    """Get access token specifically for seasonart1 Instagram account"""
-    try:
-        db = SessionLocal()
-
-        # Try to find seasonart1 by fb_page_id first
-        page = db.query(Page).filter(Page.fb_page_id == "709105118962659").first()
-
-        # If not found by fb_page_id, try by Instagram username
-        if not page:
-            page = db.query(Page).filter(Page.instagram_username.ilike('%seasonart1%')).first()
-
-        if not page:
-            db.close()
-            # List all available pages for debugging
-            all_pages = db.query(Page).all()
-            available_pages = [
-                {
-                    "page_id": p.fb_page_id,
-                    "name": p.page_name,
-                    "instagram_username": p.instagram_username
-                } for p in all_pages
-            ]
-
-            raise HTTPException(
-                status_code=404,
-                detail={
-                    "message": "seasonart1 page not found",
-                    "available_pages": available_pages
-                }
-            )
-
-        # Get user info
-        user = db.query(User).filter(User.id == page.user_id).first()
-
-        # Decrypt the access token
-        try:
-            page_access_token = decrypt_token(page.page_access_token)
-
-            # Verify token and get Instagram account info
-            import requests
-
-            # Test 1: Verify page access
-            page_url = f"https://graph.facebook.com/v23.0/{page.fb_page_id}?fields=name,id,instagram_business_account&access_token={page_access_token}"
-            page_response = requests.get(page_url)
-
-            # Test 2: Get Instagram account details
-            ig_url = f"https://graph.facebook.com/v23.0/{page.ig_business_id}?fields=id,username,name,followers_count&access_token={page_access_token}"
-            ig_response = requests.get(ig_url)
-
-            # Test 3: Check webhook subscription - PROPERLY
-            webhook_url = f"https://graph.facebook.com/v23.0/{page.fb_page_id}/subscribed_apps?access_token={page_access_token}"
-            webhook_response = requests.get(webhook_url)
-
-            # FIXED: Actually check if our app is subscribed
-            webhook_status = {
-                "status_code": webhook_response.status_code,
-                "our_app_subscribed": False,
-                "subscribed_apps": [],
-                "error": None
-            }
-
-            if webhook_response.status_code == 200:
-                try:
-                    webhook_data = webhook_response.json()
-                    subscribed_apps = webhook_data.get('data', [])
-                    webhook_status["subscribed_apps"] = [{"id": app.get("id"), "name": app.get("name")} for app in subscribed_apps]
-
-                    # Check if OUR app is actually subscribed
-                    our_app_id = settings.FACEBOOK_APP_ID
-                    webhook_status["our_app_subscribed"] = any(app.get("id") == our_app_id for app in subscribed_apps)
-                    webhook_status["our_app_id"] = our_app_id
-
-                    if not webhook_status["our_app_subscribed"]:
-                        webhook_status["error"] = f"Our app ({our_app_id}) is NOT subscribed to this page"
-
-                except Exception as e:
-                    webhook_status["error"] = f"Failed to parse webhook response: {e}"
-            else:
-                webhook_status["error"] = f"Failed to check webhook subscription: {webhook_response.text}"
-
-            result = {
-                "success": True,
-                "page_id": page.fb_page_id,
-                "page_name": page.page_name,
-                "instagram_business_account_id": page.ig_business_id,
-                "instagram_username": page.instagram_username,
-                "page_access_token": page_access_token,
-                "user_email": user.email if user else None,
-                "verification": {
-                    "page_access": {
-                        "status_code": page_response.status_code,
-                        "data": page_response.json() if page_response.status_code == 200 else None
-                    },
-                    "instagram_access": {
-                        "status_code": ig_response.status_code,
-                        "data": ig_response.json() if ig_response.status_code == 200 else None
-                    },
-                    "webhook_subscription": webhook_status
-                }
-            }
-
-            db.close()
-            return result
-
-        except Exception as e:
-            db.close()
-            raise HTTPException(status_code=500, detail=f"Failed to decrypt token: {str(e)}")
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error getting seasonart1 token: {e}")
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
-
-@router.get("/list-all-pages")
-async def list_all_pages():
-    """List all connected pages with their basic info (without access tokens)"""
-    try:
-        db = SessionLocal()
-
-        pages = db.query(Page).all()
-        users = {user.id: user.email for user in db.query(User).all()}
-
-        result = []
-        for page in pages:
-            result.append({
-                "page_id": page.fb_page_id,
-                "page_name": page.page_name,
-                "instagram_business_account_id": page.ig_business_id,
-                "instagram_username": page.instagram_username,
-                "user_email": users.get(page.user_id, "Unknown"),
-                "created_at": page.created_at.isoformat() if page.created_at else None
-            })
-
-        db.close()
-        return {
-            "total_pages": len(result),
-            "pages": result
-        }
-
-    except Exception as e:
-        logger.error(f"Error listing pages: {e}")
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 def verify_webhook_signature(payload: bytes, signature: str) -> bool:
     """Verify the webhook signature from Facebook"""
@@ -558,18 +161,7 @@ async def verify_webhook(
     hub_challenge: str = Query(alias="hub.challenge", default=None)
 ):
     """Verify webhook subscription with Facebook"""
-    # 🔍 WEBHOOK VERIFICATION REQUEST RECEIVED
-    logger.info("🔍 WEBHOOK GET VERIFICATION REQUEST RECEIVED!")
-    logger.info(f"📍 Request URL: {request.url}")
-    logger.info(f"📋 Request method: {request.method}")
-    logger.info(f"🔗 Request headers: {dict(request.headers)}")
-    logger.info(f"📡 Remote IP: {request.client.host if request.client else 'Unknown'}")
-    logger.info(f"🌐 User-Agent: {request.headers.get('user-agent', 'Not provided')}")
-    logger.info(f"🔧 Hub mode: {hub_mode}")
-    logger.info(f"🔑 Hub token: {hub_token}")
-    logger.info(f"🎯 Hub challenge: {hub_challenge}")
-    logger.info(f"✅ Expected token: {settings.WEBHOOK_VERIFY_TOKEN}")
-    logger.info(f"🔍 Token match: {hub_token == settings.WEBHOOK_VERIFY_TOKEN}")
+    logger.info(f"Webhook verification request - Mode: {hub_mode}, Token match: {hub_token == settings.WEBHOOK_VERIFY_TOKEN}")
 
     if hub_mode == "subscribe" and hub_token == settings.WEBHOOK_VERIFY_TOKEN:
         logger.info("Webhook verified successfully")
@@ -593,15 +185,7 @@ async def handle_webhook(
 ):
     """Handle incoming Instagram messages with signature verification"""
     try:
-        # 🚨 WEBHOOK RECEIVED - Log immediately when function is called
-        logger.info("🚨 WEBHOOK POST REQUEST RECEIVED!")
-        logger.info(f"📍 Request URL: {request.url}")
-        logger.info(f"📋 Request method: {request.method}")
-        logger.info(f"🔗 Request headers: {dict(request.headers)}")
-        logger.info(f"🔐 X-Hub-Signature-256: {x_hub_signature_256}")
-        logger.info(f"📊 Content-Type: {request.headers.get('content-type', 'Not provided')}")
-        logger.info(f"🌐 User-Agent: {request.headers.get('user-agent', 'Not provided')}")
-        logger.info(f"📡 Remote IP: {request.client.host if request.client else 'Unknown'}")
+        logger.info("Webhook POST request received")
 
         # Get raw body for signature verification
         raw_body = await request.body()
@@ -649,7 +233,7 @@ async def verify_webhook_no_slash(
     hub_challenge: str = Query(alias="hub.challenge", default=None)
 ):
     """Verify webhook subscription with Facebook (no trailing slash)"""
-    logger.info("🔍 WEBHOOK GET REQUEST (NO SLASH) - Redirecting to main handler")
+
     return await verify_webhook(request, hub_mode, hub_token, hub_challenge)
 
 @router.post("")
@@ -658,7 +242,7 @@ async def handle_webhook_no_slash(
     x_hub_signature_256: str = Header(None, alias="X-Hub-Signature-256")
 ):
     """Handle incoming Instagram messages (no trailing slash)"""
-    logger.info("🚨 WEBHOOK POST REQUEST (NO SLASH) - Redirecting to main handler")
+
     return await handle_webhook(request, x_hub_signature_256)
 
 async def process_webhook_entry(entry: dict):
@@ -760,7 +344,7 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
         # Enhanced safety check: See if this message text matches any recent response we sent
         # This catches cases where the bot message detection above might miss something
         from datetime import timedelta
-        recent_cutoff = datetime.utcnow() - timedelta(minutes=10)  # Extended to 10 minutes for better coverage
+        recent_cutoff = datetime.now(timezone.utc) - timedelta(minutes=10)  # Extended to 10 minutes for better coverage
 
         # FIXED: Check for exact match with recent responses FROM THE SAME INSTAGRAM ACCOUNT
         # This prevents cross-account message filtering when user has multiple IG accounts
@@ -801,7 +385,7 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
             ig_message_id=message_id,
             message_text=message_text,
             is_incoming=True,  # Explicitly mark as incoming message from customer
-            created_at=datetime.fromtimestamp(timestamp / 1000) if timestamp else datetime.utcnow()
+            created_at=datetime.fromtimestamp(timestamp / 1000, tz=timezone.utc) if timestamp else datetime.now(timezone.utc)
         )
         
         # Check user access to auto-reply features
@@ -921,7 +505,7 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
                     message_record.similarity_score = faq_match.similarity_score
                 message_record.response_text = response_text
                 message_record.auto_replied = True
-                message_record.reply_sent_at = datetime.utcnow()
+                message_record.reply_sent_at = datetime.now(timezone.utc)
 
                 logger.info(f"Smart auto-reply sent to {sender_id} for message {message_id}")
             else:

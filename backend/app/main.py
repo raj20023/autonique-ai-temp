@@ -118,9 +118,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://autonique.in",
-        "https://www.autonique.in",
-        "http://localhost:3000",
-        "http://localhost:3001"
+        "https://www.autonique.in"
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],

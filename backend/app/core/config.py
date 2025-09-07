@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     
     # Webhook
     WEBHOOK_VERIFY_TOKEN: str = "autonique_webhook_2024_secure_token_xyz789"
-    WEBHOOK_VERIFY_SIGNATURE: bool = False  # Disabled to prevent blocking webhook requests
+    WEBHOOK_VERIFY_SIGNATURE: bool = os.getenv("WEBHOOK_VERIFY_SIGNATURE", "true").lower() == "true"
     
     # Simple caching (no Redis)
     ENABLE_CACHING: bool = True
