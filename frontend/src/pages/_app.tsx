@@ -2,6 +2,7 @@ import type { AppProps } from 'next/app';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Toaster } from 'react-hot-toast';
 import { useState } from 'react';
+import Head from 'next/head';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 
@@ -21,6 +22,14 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <ErrorBoundary>
+      <Head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </Head>
       <ThemeProvider>
         <QueryClientProvider client={queryClient}>
           <Component {...pageProps} />
@@ -31,10 +40,12 @@ export default function App({ Component, pageProps }: AppProps) {
               style: {
                 background: '#1f2937',
                 color: '#fff',
-                borderRadius: '12px',
+                borderRadius: '16px',
                 border: '1px solid #374151',
                 fontSize: '14px',
                 fontWeight: '500',
+                fontFamily: 'Inter, sans-serif',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
               },
               success: {
                 duration: 3000,
@@ -43,7 +54,7 @@ export default function App({ Component, pageProps }: AppProps) {
                   secondary: '#fff',
                 },
                 style: {
-                  background: '#065f46',
+                  background: 'linear-gradient(135deg, #065f46, #047857)',
                   color: '#fff',
                   border: '1px solid #10B981',
                 },
@@ -55,7 +66,7 @@ export default function App({ Component, pageProps }: AppProps) {
                   secondary: '#fff',
                 },
                 style: {
-                  background: '#7f1d1d',
+                  background: 'linear-gradient(135deg, #7f1d1d, #991b1b)',
                   color: '#fff',
                   border: '1px solid #EF4444',
                 },

@@ -87,18 +87,26 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
               onClick={() => setSidebarOpen(false)}
             />
             <motion.div
-              className="fixed inset-y-0 left-0 flex w-80 flex-col bg-white shadow-2xl border-r border-neutral-200"
-              initial={{ x: -320 }}
+              className="fixed inset-y-0 left-0 flex w-72 flex-col bg-white shadow-2xl border-r border-neutral-100"
+              initial={{ x: -288 }}
               animate={{ x: 0 }}
-              exit={{ x: -320 }}
+              exit={{ x: -288 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
             >
-              <div className="flex h-20 items-center justify-between px-6 border-b border-neutral-200">
+              <div className="flex h-16 items-center justify-between px-6 border-b border-neutral-100">
                 <motion.div
-                  className="flex items-center space-x-3"
+                  className="flex items-center"
                   whileHover={{ scale: 1.02 }}
                 >
-                  <Logo variant="full" size="lg" theme="light" animated />
+                  <img
+                    src="/logos/full_logo_light_theam.png"
+                    alt="AutoniqueAI"
+                    className="h-8 w-auto"
+                    onError={(e) => {
+                      e.currentTarget.src = "/logos/logo_icon.png";
+                      e.currentTarget.className = "h-8 w-8";
+                    }}
+                  />
                 </motion.div>
                 <motion.button
                   onClick={() => setSidebarOpen(false)}
@@ -106,7 +114,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
-                  <X className="h-6 w-6" />
+                  <X className="h-5 w-5" />
                 </motion.button>
               </div>
               <nav className="flex-1 px-6 py-6">
@@ -122,10 +130,10 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                       >
                         <Link
                           href={item.href}
-                          className={`group flex items-center space-x-4 px-4 py-4 rounded-2xl transition-all duration-200 ${
+                          className={`group flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                             isActive
-                              ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg'
-                              : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'
+                              ? 'bg-orange-500 text-white shadow-lg'
+                              : 'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900'
                           }`}
                           onClick={() => setSidebarOpen(false)}
                         >
@@ -133,22 +141,14 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                             whileHover={{ scale: 1.1 }}
                             transition={{ duration: 0.2 }}
                           >
-                            <item.icon className="h-6 w-6" />
+                            <item.icon className="h-5 w-5" />
                           </motion.div>
                           <div className="flex-1">
-                            <span className="font-semibold text-base">{item.name}</span>
-                            <p className={`text-sm ${isActive ? 'text-white/80' : 'text-neutral-500'}`}>
+                            <span className="font-semibold text-sm">{item.name}</span>
+                            <p className={`text-xs ${isActive ? 'text-white/80' : 'text-neutral-500'}`}>
                               {item.description}
                             </p>
                           </div>
-                          {isActive && (
-                            <motion.div
-                              className="w-2 h-2 bg-white rounded-full"
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ delay: 0.2 }}
-                            />
-                          )}
                         </Link>
                       </motion.li>
                     );
@@ -161,24 +161,32 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
       </AnimatePresence>
 
       {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-80 lg:flex-col">
+      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col">
         <motion.div
-          className="flex flex-col flex-grow bg-white shadow-2xl border-r border-neutral-200"
-          initial={{ x: -320 }}
+          className="flex flex-col flex-grow bg-white shadow-xl border-r border-neutral-100"
+          initial={{ x: -288 }}
           animate={{ x: 0 }}
           transition={{ type: "spring", damping: 25, stiffness: 200 }}
         >
-          <div className="flex h-20 items-center px-8 border-b border-neutral-200">
+          <div className="flex h-20 items-center px-6 border-b border-neutral-100">
             <motion.div
-              className="flex items-center space-x-4"
+              className="flex items-center"
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.2 }}
             >
-              <Logo variant="full" size="xl" theme="light" animated />
+              <img
+                src="/logos/full_logo_light_theam.png"
+                alt="AutoniqueAI"
+                className="h-8 w-auto"
+                onError={(e) => {
+                  e.currentTarget.src = "/logos/logo_icon.png";
+                  e.currentTarget.className = "h-8 w-8";
+                }}
+              />
             </motion.div>
           </div>
-          <nav className="flex-1 px-8 py-8">
-            <ul className="space-y-3">
+          <nav className="flex-1 px-6 py-8">
+            <ul className="space-y-2">
               {navigation.map((item, index) => {
                 const isActive = router.pathname === item.href;
                 return (
@@ -190,32 +198,24 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                   >
                     <Link
                       href={item.href}
-                      className={`group flex items-center space-x-4 px-6 py-5 rounded-2xl transition-all duration-200 ${
+                      className={`group flex items-center space-x-3 px-4 py-4 rounded-xl transition-all duration-200 ${
                         isActive
-                          ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg'
-                          : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'
+                          ? 'bg-orange-500 text-white shadow-lg'
+                          : 'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900'
                       }`}
                     >
                       <motion.div
-                        whileHover={{ scale: 1.1, rotate: isActive ? 0 : 5 }}
+                        whileHover={{ scale: 1.1 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <item.icon className="h-6 w-6" />
+                        <item.icon className="h-5 w-5" />
                       </motion.div>
                       <div className="flex-1">
-                        <span className="font-semibold text-lg">{item.name}</span>
-                        <p className={`text-sm ${isActive ? 'text-white/80' : 'text-neutral-500'}`}>
+                        <span className="font-semibold text-base">{item.name}</span>
+                        <p className={`text-xs ${isActive ? 'text-white/80' : 'text-neutral-500'}`}>
                           {item.description}
                         </p>
                       </div>
-                      {isActive && (
-                        <motion.div
-                          className="w-2 h-2 bg-white rounded-full"
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{ delay: 0.2 }}
-                        />
-                      )}
                     </Link>
                   </motion.li>
                 );
@@ -225,17 +225,17 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
 
           {/* User section */}
           <motion.div
-            className="border-t border-neutral-200 p-8"
+            className="border-t border-neutral-100 p-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
           >
             <motion.div
-              className="flex items-center space-x-4 mb-6 p-4 bg-neutral-50 rounded-2xl"
+              className="flex items-center space-x-3 mb-4 p-3 bg-neutral-50 rounded-xl"
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.2 }}
             >
-              <div className="w-14 h-14 rounded-full overflow-hidden bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
+              <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
                 {instagramProfile?.profile_picture_url ? (
                   <img
                     src={instagramProfile.profile_picture_url}
@@ -243,94 +243,61 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <Instagram className="h-7 w-7 text-white" />
+                  <Instagram className="h-5 w-5 text-white" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-lg font-bold text-neutral-900 truncate">
+                <p className="text-sm font-semibold text-neutral-900 truncate">
                   {instagramProfile ? `@${instagramProfile.instagram_username}` : (user?.name || 'User')}
                 </p>
-                <p className="text-sm text-neutral-600 truncate">
+                <p className="text-xs text-neutral-600 truncate">
                   {instagramProfile ? instagramProfile.instagram_display_name : (user?.email || 'No email')}
                 </p>
               </div>
             </motion.div>
 
-            <Button
+            <motion.button
               onClick={handleLogout}
-              variant="ghost"
-              size="md"
-              icon={<LogOut className="h-5 w-5" />}
-              fullWidth
-              className="justify-start text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100"
+              className="flex items-center space-x-2 w-full px-3 py-2 text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-all duration-200 text-sm"
+              whileHover={{ x: 5 }}
+              transition={{ duration: 0.2 }}
             >
-              Sign out
-            </Button>
+              <LogOut className="h-4 w-4" />
+              <span>Sign out</span>
+            </motion.button>
           </motion.div>
         </motion.div>
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-80">
+      <div className="lg:pl-72">
         {/* Top bar */}
         <motion.div
-          className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-neutral-200/50 shadow-sm"
+          className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-neutral-100 shadow-sm"
           initial={{ y: -80 }}
           animate={{ y: 0 }}
           transition={{ type: "spring", damping: 25, stiffness: 200 }}
         >
-          <div className="flex h-20 items-center justify-between px-6 sm:px-8 lg:px-10">
-            <div className="flex items-center space-x-6">
+          <div className="flex h-16 items-center justify-between px-6 lg:px-8">
+            <div className="flex items-center space-x-4">
               <motion.button
                 onClick={() => setSidebarOpen(true)}
                 className="text-neutral-700 hover:text-neutral-900 lg:hidden p-2 rounded-lg hover:bg-neutral-100 transition-colors"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
-                <Menu className="h-6 w-6" />
+                <Menu className="h-5 w-5" />
               </motion.button>
               {title && (
-                <AnimatedContainer animation="slideRight">
-                  <h1 className="text-2xl font-bold text-neutral-900">{title}</h1>
-                </AnimatedContainer>
+                <h1 className="text-xl font-bold text-neutral-900">{title}</h1>
               )}
             </div>
 
-            <div className="flex items-center space-x-4">
-              {/* Search */}
-              <motion.div
-                className="hidden md:flex items-center space-x-2 bg-neutral-100 rounded-xl px-4 py-2"
-                whileHover={{ scale: 1.02 }}
-              >
-                <Search className="h-4 w-4 text-neutral-500" />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="bg-transparent border-none outline-none text-sm text-neutral-700 placeholder-neutral-500"
-                />
-              </motion.div>
-
-              {/* Notifications */}
-              <motion.button
-                className="relative p-2 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <Bell className="h-5 w-5" />
-                <motion.div
-                  className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full"
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-              </motion.button>
-
-              {/* User Profile */}
+            <div className="flex items-center space-x-3">
+              {/* User Profile - Desktop */}
               <div className="hidden sm:flex items-center space-x-3">
-                <motion.div
-                  className="flex items-center space-x-3 bg-neutral-50 rounded-xl px-4 py-2"
-                  whileHover={{ scale: 1.02 }}
-                >
-                  <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
+                <div className="flex items-center space-x-2 bg-neutral-50 rounded-lg px-3 py-2">
+                  <div className="w-7 h-7 rounded-full overflow-hidden bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center">
                     {instagramProfile?.profile_picture_url ? (
                       <img
                         src={instagramProfile.profile_picture_url}
@@ -342,17 +309,11 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                     )}
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-sm font-semibold text-neutral-900">
+                    <span className="text-sm font-medium text-neutral-900">
                       {instagramProfile ? `@${instagramProfile.instagram_username}` : (user?.name || 'User')}
                     </span>
-                    {instagramProfile && (
-                      <span className="text-xs text-neutral-600">
-                        {instagramProfile.instagram_display_name}
-                      </span>
-                    )}
                   </div>
-                  <ChevronDown className="h-4 w-4 text-neutral-500" />
-                </motion.div>
+                </div>
               </div>
 
               <motion.button
@@ -361,7 +322,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
-                <LogOut className="h-5 w-5" />
+                <LogOut className="h-4 w-4" />
               </motion.button>
             </div>
           </div>

@@ -86,181 +86,235 @@ export default function HomePage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-orange-50 to-orange-100">
+      <div className="min-h-screen bg-gradient-to-br from-white via-orange-50/30 to-orange-100/50">
         {/* Header */}
-        <AnimatedContainer animation="slideDown">
-          <header className="relative z-10 bg-white/80 backdrop-blur-xl border-b border-neutral-200/50 shadow-sm">
-            <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-              <div className="flex justify-between items-center">
-                <motion.div
-                  className="flex items-center space-x-4"
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ duration: 0.2 }}
+        <motion.header
+          className="relative z-50 bg-white/95 backdrop-blur-2xl border-b border-neutral-200/20"
+          initial={{ y: -100 }}
+          animate={{ y: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        >
+          <nav className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
+            <div className="flex justify-between items-center">
+              <motion.div
+                className="flex items-center"
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.2 }}
+              >
+                <img
+                  src="/logos/full_logo_light_theam.png"
+                  alt="AutoniqueAI"
+                  className="h-10 w-auto"
+                  onError={(e) => {
+                    e.currentTarget.src = "/logos/logo_icon.png";
+                    e.currentTarget.className = "h-10 w-10";
+                  }}
+                />
+              </motion.div>
+              <div className="hidden lg:flex items-center space-x-12">
+                <Link href="#features" className="text-neutral-700 hover:text-orange-600 transition-all duration-200 font-medium text-sm tracking-wide">
+                  Features
+                </Link>
+                <Link href="#benefits" className="text-neutral-700 hover:text-orange-600 transition-all duration-200 font-medium text-sm tracking-wide">
+                  Benefits
+                </Link>
+                <Link href="#pricing" className="text-neutral-700 hover:text-orange-600 transition-all duration-200 font-medium text-sm tracking-wide">
+                  Pricing
+                </Link>
+                <motion.button
+                  onClick={handleGetStarted}
+                  className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 rounded-2xl font-semibold text-sm transition-all duration-200 shadow-lg hover:shadow-xl flex items-center space-x-2"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <Logo
-                    variant="full"
-                    size="lg"
-                    theme="light"
-                    animated
-                    className="drop-shadow-sm"
-                  />
-                </motion.div>
-                <div className="hidden md:flex items-center space-x-8">
-                  <Link href="#features" className="text-neutral-700 hover:text-orange-600 transition-colors font-medium">
-                    Features
-                  </Link>
-                  <Link href="#benefits" className="text-neutral-700 hover:text-orange-600 transition-colors font-medium">
-                    Benefits
-                  </Link>
-                  <Link href="#pricing" className="text-neutral-700 hover:text-orange-600 transition-colors font-medium">
-                    Pricing
-                  </Link>
-                  <Button
-                    onClick={handleGetStarted}
-                    variant="primary"
-                    size="md"
-                    icon={<ArrowRight className="h-4 w-4" />}
-                    iconPosition="right"
-                  >
-                    Get Started
-                  </Button>
-                </div>
+                  <span>Get Started</span>
+                  <ArrowRight className="h-4 w-4" />
+                </motion.button>
               </div>
-            </nav>
-          </header>
-        </AnimatedContainer>
+            </div>
+          </nav>
+        </motion.header>
 
         {/* Hero Section */}
-        <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
-          <div className="text-center">
-            {/* Floating Logo Animation */}
-            <AnimatedContainer animation="bounceIn" delay={0.2}>
-              <div className="mb-12">
+        <section className="relative overflow-hidden">
+          {/* Background Elements */}
+          <div className="absolute inset-0">
+            <motion.div
+              className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-orange-400/20 to-orange-600/20 rounded-full blur-3xl"
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.3, 0.6, 0.3],
+                x: [0, 50, 0],
+                y: [0, -30, 0]
+              }}
+              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.div
+              className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-orange-300/20 to-orange-500/20 rounded-full blur-3xl"
+              animate={{
+                scale: [1, 1.3, 1],
+                opacity: [0.2, 0.5, 0.2],
+                x: [0, -30, 0],
+                y: [0, 20, 0]
+              }}
+              transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            />
+          </div>
+
+          <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-24 lg:py-32">
+            <div className="text-center">
+              {/* Logo Hero */}
+              <motion.div
+                className="mb-16"
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+              >
                 <motion.div
-                  className="inline-block bg-white/60 backdrop-blur-xl rounded-4xl p-8 shadow-2xl border border-white/20"
+                  className="inline-block relative"
                   animate={{
-                    y: [0, -10, 0],
-                    rotate: [0, 1, -1, 0]
+                    y: [0, -8, 0],
                   }}
                   transition={{
-                    duration: 6,
+                    duration: 4,
                     repeat: Infinity,
                     ease: "easeInOut"
                   }}
                 >
-                  <Logo
-                    variant="icon"
-                    size="2xl"
-                    animated
-                    className="drop-shadow-xl"
-                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-orange-600/20 rounded-3xl blur-2xl scale-110"></div>
+                  <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50">
+                    <img
+                      src="/logos/logo_icon.png"
+                      alt="AutoniqueAI"
+                      className="h-20 w-20 mx-auto"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  </div>
                 </motion.div>
-              </div>
-            </AnimatedContainer>
+              </motion.div>
 
-            <AnimatedContainer animation="fadeIn" delay={0.4}>
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-neutral-900 mb-8 leading-tight">
-                Automate Your{' '}
-                <span className="bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 bg-clip-text text-transparent">
-                  Instagram DMs
-                </span>
-                <motion.span
-                  className="inline-block ml-4"
-                  animate={{ rotate: [0, 10, -10, 0] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <Sparkles className="h-12 w-12 md:h-16 md:w-16 text-orange-500" />
-                </motion.span>
-              </h1>
-            </AnimatedContainer>
+              {/* Main Headline */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                className="mb-8"
+              >
+                <h1 className="text-6xl md:text-7xl lg:text-8xl font-black text-neutral-900 mb-6 leading-[0.9] tracking-tight">
+                  Automate Your{' '}
+                  <span className="relative">
+                    <span className="bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 bg-clip-text text-transparent">
+                      Instagram DMs
+                    </span>
+                    <motion.div
+                      className="absolute -inset-2 bg-gradient-to-r from-orange-500/20 to-orange-600/20 rounded-2xl blur-xl"
+                      animate={{ opacity: [0.5, 0.8, 0.5] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  </span>
+                </h1>
+              </motion.div>
 
-            <AnimatedContainer animation="slideUp" delay={0.6}>
-              <p className="text-xl md:text-2xl text-neutral-600 mb-12 max-w-4xl mx-auto leading-relaxed">
-                Transform your Instagram customer service with AI-powered automation.
-                <span className="font-semibold text-neutral-900"> Save 10+ hours weekly</span> while providing
-                <span className="font-semibold text-orange-600"> instant, intelligent responses</span> to every customer inquiry.
-              </p>
-            </AnimatedContainer>
+              {/* Subtitle */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+                className="mb-12"
+              >
+                <p className="text-xl md:text-2xl text-neutral-600 max-w-4xl mx-auto leading-relaxed font-medium">
+                  Transform your Instagram customer service with{' '}
+                  <span className="text-orange-600 font-semibold">AI-powered automation</span>.
+                  Save 10+ hours weekly while providing instant, intelligent responses.
+                </p>
+              </motion.div>
 
-            <AnimatedContainer animation="scaleIn" delay={0.8}>
-              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
-                <Button
+              {/* CTA Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.7 }}
+                className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
+              >
+                <motion.button
                   onClick={handleGetStarted}
-                  variant="primary"
-                  size="xl"
-                  icon={<Instagram className="h-7 w-7" />}
-                  className="shadow-2xl hover:shadow-3xl"
+                  className="group relative bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 shadow-2xl hover:shadow-orange-500/25 flex items-center space-x-3"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  Start Free Trial
-                  <ArrowRight className="h-6 w-6 ml-2" />
-                </Button>
+                  <Instagram className="h-6 w-6" />
+                  <span>Start Free Trial</span>
+                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-500 rounded-2xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity -z-10"></div>
+                </motion.button>
 
                 <motion.div
-                  className="flex items-center space-x-3 text-neutral-600 bg-white/80 backdrop-blur-sm px-6 py-3 rounded-2xl border border-neutral-200"
-                  whileHover={{ scale: 1.05 }}
+                  className="flex items-center space-x-3 text-neutral-600 bg-white/90 backdrop-blur-xl px-6 py-4 rounded-2xl border border-neutral-200/50 shadow-lg"
+                  whileHover={{ scale: 1.02, y: -1 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <CheckCircle className="h-5 w-5 text-success-500" />
+                  <CheckCircle className="h-5 w-5 text-green-500" />
                   <span className="font-medium">14-day free trial • No credit card required</span>
                 </motion.div>
-              </div>
-            </AnimatedContainer>
+              </motion.div>
 
-            {/* Social Proof */}
-            <AnimatedContainer animation="fadeIn" delay={1.0}>
-              <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-8 text-neutral-500">
-                <div className="flex items-center space-x-2">
-                  <div className="flex -space-x-2">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="w-8 h-8 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-bold">
-                        {i}
-                      </div>
+              {/* Social Proof */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.9 }}
+                className="flex flex-col lg:flex-row items-center justify-center space-y-6 lg:space-y-0 lg:space-x-12 text-neutral-600"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="flex -space-x-3">
+                    {[
+                      'bg-gradient-to-r from-blue-500 to-blue-600',
+                      'bg-gradient-to-r from-green-500 to-green-600',
+                      'bg-gradient-to-r from-purple-500 to-purple-600',
+                      'bg-gradient-to-r from-pink-500 to-pink-600'
+                    ].map((bg, i) => (
+                      <motion.div
+                        key={i}
+                        className={`w-10 h-10 ${bg} rounded-full border-3 border-white flex items-center justify-center text-white text-sm font-bold shadow-lg`}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 1.1 + i * 0.1, type: "spring", stiffness: 200 }}
+                      >
+                        {String.fromCharCode(65 + i)}
+                      </motion.div>
                     ))}
                   </div>
-                  <span className="text-sm font-medium">1000+ businesses trust us</span>
+                  <div>
+                    <p className="font-semibold text-neutral-900">1000+ businesses</p>
+                    <p className="text-sm text-neutral-600">trust AutoniqueAI</p>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-1">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 1.2 + i * 0.1, duration: 0.3 }}
-                    >
-                      ⭐
-                    </motion.div>
-                  ))}
-                  <span className="text-sm font-medium ml-2">4.9/5 rating</span>
+
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-1">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, scale: 0, rotate: -180 }}
+                        animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                        transition={{ delay: 1.3 + i * 0.1, type: "spring", stiffness: 200 }}
+                        className="text-yellow-400 text-xl"
+                      >
+                        ⭐
+                      </motion.div>
+                    ))}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-neutral-900">4.9/5 rating</p>
+                    <p className="text-sm text-neutral-600">from 500+ reviews</p>
+                  </div>
                 </div>
-              </div>
-            </AnimatedContainer>
+              </motion.div>
+            </div>
           </div>
 
-          {/* Floating Elements */}
-          <motion.div
-            className="absolute top-20 left-10 w-20 h-20 bg-orange-400/20 rounded-full blur-xl"
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.6, 0.3]
-            }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.div
-            className="absolute bottom-20 right-10 w-32 h-32 bg-orange-300/20 rounded-full blur-xl"
-            animate={{
-              scale: [1, 1.3, 1],
-              opacity: [0.2, 0.5, 0.2]
-            }}
-            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          />
-          <motion.div
-            className="absolute top-1/2 right-20 w-16 h-16 bg-orange-500/20 rounded-full blur-xl"
-            animate={{
-              scale: [1, 1.1, 1],
-              opacity: [0.4, 0.7, 0.4]
-            }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          />
         </section>
 
         {/* Features Section */}

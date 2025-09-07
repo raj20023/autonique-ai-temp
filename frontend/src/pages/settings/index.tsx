@@ -1,12 +1,28 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'react-hot-toast';
+import { motion } from 'framer-motion';
+import {
+  User,
+  Instagram,
+  Bell,
+  Shield,
+  LogOut,
+  Trash2,
+  RefreshCw,
+  Download,
+  Check,
+  AlertTriangle
+} from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { isAuthenticated } from '@/utils/auth';
 import { userApi, pagesApi } from '@/utils/api';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import styles from '@/styles/settings.module.css';
 import { buildFacebookOAuthUrl, getRedirectUri } from '@/config/facebook';
+import DashboardLayout from '@/components/layout/DashboardLayout';
+import Button from '@/components/ui/Button';
+import Card, { CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
+import AnimatedContainer from '@/components/ui/AnimatedContainer';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -100,283 +116,426 @@ export default function SettingsPage() {
   }
 
   const tabs = [
-    { id: 'account', name: 'Account', icon: '👤' },
-    { id: 'instagram', name: 'Instagram', icon: '📱' },
-    { id: 'notifications', name: 'Notifications', icon: '🔔' },
-    { id: 'privacy', name: 'Privacy', icon: '🔒' }
+    { id: 'account', name: 'Account', icon: User, description: 'Manage your account information' },
+    { id: 'instagram', name: 'Instagram', icon: Instagram, description: 'Connected Instagram accounts' },
+    { id: 'notifications', name: 'Notifications', icon: Bell, description: 'Notification preferences' },
+    { id: 'privacy', name: 'Privacy', icon: Shield, description: 'Privacy and security settings' }
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <button
-                onClick={() => router.push('/dashboard')}
-                className="mr-4 text-gray-600 hover:text-gray-900"
-              >
-                ← Back to Dashboard
-              </button>
-              <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+    <DashboardLayout title="Settings">
+      <div className="max-w-6xl mx-auto">
+        <AnimatedContainer animation="fadeIn">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-neutral-900 mb-2">Settings</h1>
+            <p className="text-neutral-600">Manage your account and preferences</p>
+          </div>
+
+          <div className="grid lg:grid-cols-4 gap-8">
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+              <Card className="p-0 overflow-hidden">
+                <nav className="space-y-1">
+                  {tabs.map((tab, index) => {
+                    const Icon = tab.icon;
+                    return (
+                      <motion.button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`w-full flex items-center px-6 py-4 text-left transition-all duration-200 ${
+                          activeTab === tab.id
+                            ? 'bg-orange-500 text-white shadow-lg'
+                            : 'text-neutral-700 hover:bg-neutral-50'
+                        }`}
+                        whileHover={{ x: activeTab === tab.id ? 0 : 5 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <Icon className="h-5 w-5 mr-3" />
+                        <div className="flex-1">
+                          <div className="font-medium">{tab.name}</div>
+                          <div className={`text-xs ${activeTab === tab.id ? 'text-white/80' : 'text-neutral-500'}`}>
+                            {tab.description}
+                          </div>
+                        </div>
+                      </motion.button>
+                    );
+                  })}
+                </nav>
+              </Card>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar */}
-          <div className="lg:w-1/4">
-            <nav className="bg-white rounded-lg shadow p-4">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center px-4 py-3 text-left rounded-lg mb-2 transition-colors ${
-                    activeTab === tab.id
-                      ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  <span className="mr-3">{tab.icon}</span>
-                  {tab.name}
-                </button>
-              ))}
-            </nav>
-          </div>
-
-          {/* Main Content */}
-          <div className="lg:w-3/4">
-            <div className="bg-white rounded-lg shadow">
+            {/* Main Content */}
+            <div className="lg:col-span-3 space-y-6">
               {/* Account Tab */}
               {activeTab === 'account' && (
-                <div className="p-6">
-                  <h2 className="text-xl font-semibold mb-6">Account Information</h2>
-                  
-                  <form onSubmit={handleAccountUpdate} className="space-y-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Full Name
-                      </label>
-                      <input
-                        type="text"
-                        value={accountForm.name}
-                        onChange={(e) => setAccountForm({ ...accountForm, name: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                      />
-                    </div>
+                <AnimatedContainer animation="slideUp" className="space-y-6">
+                  {/* Account Information */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <User className="h-5 w-5 text-orange-500" />
+                        <span>Account Information</span>
+                      </CardTitle>
+                      <CardDescription>
+                        Update your personal information and account details
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <form onSubmit={handleAccountUpdate} className="space-y-6">
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              Full Name
+                            </label>
+                            <input
+                              type="text"
+                              value={accountForm.name}
+                              onChange={(e) => setAccountForm({ ...accountForm, name: e.target.value })}
+                              className="w-full px-4 py-3 border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                              required
+                            />
+                          </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email Address
-                      </label>
-                      <input
-                        type="email"
-                        value={accountForm.email}
-                        onChange={(e) => setAccountForm({ ...accountForm, email: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
+                          <div>
+                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                              Email Address
+                            </label>
+                            <input
+                              type="email"
+                              value={accountForm.email}
+                              onChange={(e) => setAccountForm({ ...accountForm, email: e.target.value })}
+                              className="w-full px-4 py-3 border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                            />
+                          </div>
+                        </div>
 
-                    <div className="flex gap-4">
-                      <button
-                        type="submit"
-                        disabled={isUpdatingUser}
-                        className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
-                      >
-                        {isUpdatingUser ? 'Updating...' : 'Update Account'}
-                      </button>
-                    </div>
-                  </form>
+                        <Button
+                          type="submit"
+                          loading={isUpdatingUser}
+                          variant="primary"
+                          icon={<Check className="h-4 w-4" />}
+                        >
+                          {isUpdatingUser ? 'Updating...' : 'Update Account'}
+                        </Button>
+                      </form>
+                    </CardContent>
+                  </Card>
 
-                  <hr className="my-8" />
+                  {/* Account Actions */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-neutral-900">Account Actions</CardTitle>
+                      <CardDescription>
+                        Manage your account settings and data
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        <Button
+                          onClick={handleLogout}
+                          variant="secondary"
+                          icon={<LogOut className="h-4 w-4" />}
+                        >
+                          Sign Out
+                        </Button>
 
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium text-gray-900">Account Actions</h3>
-                    
-                    <button
-                      onClick={handleLogout}
-                      className="bg-gray-600 text-white px-6 py-2 rounded-md hover:bg-gray-700"
-                    >
-                      Logout
-                    </button>
+                        <Button
+                          onClick={handleDeleteAccount}
+                          loading={isDeletingUser}
+                          variant={showDeleteConfirm ? "danger" : "outline"}
+                          icon={<Trash2 className="h-4 w-4" />}
+                        >
+                          {isDeletingUser
+                            ? 'Deleting...'
+                            : showDeleteConfirm
+                            ? 'Click again to confirm'
+                            : 'Delete Account'
+                          }
+                        </Button>
+                      </div>
 
-                    <div>
-                      <button
-                        onClick={handleDeleteAccount}
-                        disabled={isDeletingUser}
-                        className={`px-6 py-2 rounded-md ${
-                          showDeleteConfirm
-                            ? 'bg-red-600 text-white hover:bg-red-700'
-                            : 'bg-red-100 text-red-700 hover:bg-red-200'
-                        } disabled:opacity-50`}
-                      >
-                        {isDeletingUser
-                          ? 'Deleting...'
-                          : showDeleteConfirm
-                          ? 'Click again to confirm deletion'
-                          : 'Delete Account'
-                        }
-                      </button>
                       {showDeleteConfirm && (
-                        <p className="text-sm text-red-600 mt-2">
-                          ⚠️ This action cannot be undone. All your data will be permanently deleted.
-                        </p>
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          className="bg-red-50 border border-red-200 rounded-xl p-4"
+                        >
+                          <div className="flex items-start space-x-3">
+                            <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5" />
+                            <div>
+                              <p className="text-sm font-medium text-red-800">
+                                This action cannot be undone
+                              </p>
+                              <p className="text-sm text-red-700 mt-1">
+                                All your data will be permanently deleted including your Instagram connections and FAQ settings.
+                              </p>
+                            </div>
+                          </div>
+                        </motion.div>
                       )}
-                    </div>
-                  </div>
-                </div>
+                    </CardContent>
+                  </Card>
+                </AnimatedContainer>
               )}
 
               {/* Instagram Tab */}
               {activeTab === 'instagram' && (
-                <div className="p-6">
-                  <h2 className="text-xl font-semibold mb-6">Instagram Accounts</h2>
-                  
-                  {pagesLoading ? (
-                    <div className="text-center py-8">Loading Instagram accounts...</div>
-                  ) : pages && pages.length > 0 ? (
-                    <div className="space-y-4">
-                      {pages.map((page: any) => (
-                        <div key={page.id} className="border rounded-lg p-4">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h3 className="font-medium">{page.page_name}</h3>
-                              <p className="text-sm text-gray-600">
-                                @{page.instagram_username || 'Not connected'}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                Status: {page.webhook_subscribed ? '✅ Active' : '⚠️ Setup Required'}
-                              </p>
-                            </div>
-                            <div className="flex gap-2">
-                              {!page.webhook_subscribed && (
-                                <button className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
-                                  Setup Webhook
-                                </button>
-                              )}
-                            </div>
-                          </div>
+                <AnimatedContainer animation="slideUp" className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <Instagram className="h-5 w-5 text-orange-500" />
+                        <span>Connected Instagram Accounts</span>
+                      </CardTitle>
+                      <CardDescription>
+                        Manage your connected Instagram Business accounts
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      {pagesLoading ? (
+                        <div className="text-center py-12">
+                          <motion.div
+                            className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          />
+                          <p className="text-neutral-600">Loading Instagram accounts...</p>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <p className="text-gray-600 mb-4">No Instagram accounts connected</p>
-                      <button
+                      ) : pages && pages.length > 0 ? (
+                        <div className="space-y-4">
+                          {pages.map((page: any, index: number) => (
+                            <motion.div
+                              key={page.id}
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: index * 0.1 }}
+                              className="border border-neutral-200 rounded-xl p-6 hover:shadow-lg transition-all duration-200"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-4">
+                                  <div className="w-14 h-14 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center">
+                                    <Instagram className="h-7 w-7 text-white" />
+                                  </div>
+                                  <div>
+                                    <h3 className="font-semibold text-lg text-neutral-900">{page.page_name}</h3>
+                                    <p className="text-neutral-600">@{page.instagram_username || 'Not connected'}</p>
+                                    <div className="flex items-center space-x-2 mt-1">
+                                      {page.webhook_subscribed ? (
+                                        <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full flex items-center space-x-1">
+                                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                          <span>Active</span>
+                                        </span>
+                                      ) : (
+                                        <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full flex items-center space-x-1">
+                                          <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                                          <span>Setup Required</span>
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex items-center space-x-3">
+                                  {!page.webhook_subscribed && (
+                                    <Button
+                                      variant="primary"
+                                      size="sm"
+                                    >
+                                      Setup Webhook
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-12">
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: "spring", stiffness: 200 }}
+                            className="w-20 h-20 bg-gradient-to-r from-orange-100 to-orange-200 rounded-full flex items-center justify-center mx-auto mb-6"
+                          >
+                            <Instagram className="h-10 w-10 text-orange-600" />
+                          </motion.div>
+                          <h3 className="text-xl font-semibold text-neutral-900 mb-2">No Instagram accounts connected</h3>
+                          <p className="text-neutral-600 mb-8 max-w-md mx-auto">
+                            Connect your Instagram Business account to start automating your DMs and providing instant customer support.
+                          </p>
+                          <Button
+                            onClick={reconnectInstagram}
+                            variant="primary"
+                            size="lg"
+                            icon={<Instagram className="h-5 w-5" />}
+                          >
+                            Connect Instagram Business Account
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Reconnect Section */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <RefreshCw className="h-5 w-5 text-orange-500" />
+                        <span>Reconnect Instagram</span>
+                      </CardTitle>
+                      <CardDescription>
+                        If you're experiencing issues with your Instagram connection, you can reconnect your account.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Button
                         onClick={reconnectInstagram}
-                        className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
+                        variant="outline"
+                        icon={<RefreshCw className="h-4 w-4" />}
                       >
-                        Connect Instagram Account
-                      </button>
-                    </div>
-                  )}
-
-                  <hr className="my-6" />
-
-                  <div>
-                    <h3 className="text-lg font-medium mb-4">Reconnect Instagram</h3>
-                    <p className="text-gray-600 mb-4">
-                      If you're experiencing issues with your Instagram connection, you can reconnect your account.
-                    </p>
-                    <button
-                      onClick={reconnectInstagram}
-                      className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700"
-                    >
-                      Reconnect Instagram
-                    </button>
-                  </div>
-                </div>
+                        Reconnect Instagram
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </AnimatedContainer>
               )}
 
               {/* Notifications Tab */}
               {activeTab === 'notifications' && (
-                <div className="p-6">
-                  <h2 className="text-xl font-semibold mb-6">Notification Preferences</h2>
-                  
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium">Email Notifications</h3>
-                        <p className="text-sm text-gray-600">Receive email updates about your account</p>
+                <AnimatedContainer animation="slideUp">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <Bell className="h-5 w-5 text-orange-500" />
+                        <span>Notification Preferences</span>
+                      </CardTitle>
+                      <CardDescription>
+                        Manage how you receive notifications from AutoniqueAI
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-xl">
+                        <div>
+                          <h3 className="font-semibold text-neutral-900">Email Notifications</h3>
+                          <p className="text-sm text-neutral-600">Receive email updates about your account activity</p>
+                        </div>
+                        <motion.label
+                          className="relative inline-flex items-center cursor-pointer"
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <input type="checkbox" className="sr-only peer" defaultChecked />
+                          <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                        </motion.label>
                       </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" defaultChecked />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                      </label>
-                    </div>
 
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium">Message Alerts</h3>
-                        <p className="text-sm text-gray-600">Get notified when auto-replies are sent</p>
+                      <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-xl">
+                        <div>
+                          <h3 className="font-semibold text-neutral-900">Message Alerts</h3>
+                          <p className="text-sm text-neutral-600">Get notified when auto-replies are sent</p>
+                        </div>
+                        <motion.label
+                          className="relative inline-flex items-center cursor-pointer"
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <input type="checkbox" className="sr-only peer" defaultChecked />
+                          <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                        </motion.label>
                       </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" defaultChecked />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                      </label>
-                    </div>
 
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium">System Updates</h3>
-                        <p className="text-sm text-gray-600">Important updates about the service</p>
+                      <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-xl">
+                        <div>
+                          <h3 className="font-semibold text-neutral-900">System Updates</h3>
+                          <p className="text-sm text-neutral-600">Important updates about the service</p>
+                        </div>
+                        <motion.label
+                          className="relative inline-flex items-center cursor-pointer"
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <input type="checkbox" className="sr-only peer" defaultChecked />
+                          <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                        </motion.label>
                       </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" defaultChecked />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                      </label>
-                    </div>
-                  </div>
-                </div>
+                    </CardContent>
+                  </Card>
+                </AnimatedContainer>
               )}
 
               {/* Privacy Tab */}
               {activeTab === 'privacy' && (
-                <div className="p-6">
-                  <h2 className="text-xl font-semibold mb-6">Privacy & Security</h2>
-                  
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="font-medium mb-2">Data Usage</h3>
-                      <p className="text-gray-600 mb-4">
-                        We only use your Instagram data to provide auto-reply services. Your messages and customer data are never shared with third parties.
-                      </p>
-                    </div>
+                <AnimatedContainer animation="slideUp" className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <Shield className="h-5 w-5 text-orange-500" />
+                        <span>Privacy & Security</span>
+                      </CardTitle>
+                      <CardDescription>
+                        Your data privacy and security information
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="space-y-4">
+                        <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
+                          <h3 className="font-semibold text-blue-900 mb-2">🔒 Data Usage</h3>
+                          <p className="text-blue-800 text-sm">
+                            We only use your Instagram data to provide auto-reply services. Your messages and customer data are never shared with third parties.
+                          </p>
+                        </div>
 
-                    <div>
-                      <h3 className="font-medium mb-2">Data Retention</h3>
-                      <p className="text-gray-600 mb-4">
-                        Message data is stored for 30 days to improve response quality. You can request data deletion at any time.
-                      </p>
-                    </div>
+                        <div className="p-4 bg-green-50 rounded-xl border border-green-200">
+                          <h3 className="font-semibold text-green-900 mb-2">⏰ Data Retention</h3>
+                          <p className="text-green-800 text-sm">
+                            Message data is stored for 30 days to improve response quality. You can request data deletion at any time.
+                          </p>
+                        </div>
 
-                    <div>
-                      <h3 className="font-medium mb-2">Account Security</h3>
-                      <p className="text-gray-600 mb-4">
-                        Your account is secured through Facebook OAuth. We recommend keeping your Facebook account secure with two-factor authentication.
-                      </p>
-                    </div>
+                        <div className="p-4 bg-purple-50 rounded-xl border border-purple-200">
+                          <h3 className="font-semibold text-purple-900 mb-2">🛡️ Account Security</h3>
+                          <p className="text-purple-800 text-sm">
+                            Your account is secured through Facebook OAuth. We recommend keeping your Facebook account secure with two-factor authentication.
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                      <h4 className="font-medium text-yellow-800 mb-2">⚠️ Data Export</h4>
-                      <p className="text-yellow-700 mb-3">
-                        You can request an export of all your data at any time.
-                      </p>
-                      <button className="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700">
-                        Request Data Export
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <Download className="h-5 w-5 text-orange-500" />
+                        <span>Data Export</span>
+                      </CardTitle>
+                      <CardDescription>
+                        Request an export of all your data
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="bg-orange-50 border border-orange-200 rounded-xl p-6">
+                        <div className="flex items-start space-x-3">
+                          <Download className="h-6 w-6 text-orange-600 mt-1" />
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-orange-900 mb-2">Export Your Data</h4>
+                            <p className="text-orange-800 text-sm mb-4">
+                              You can request an export of all your data at any time. This includes your account information, connected Instagram accounts, and FAQ settings.
+                            </p>
+                            <Button
+                              variant="outline"
+                              icon={<Download className="h-4 w-4" />}
+                              className="border-orange-300 text-orange-700 hover:bg-orange-100"
+                            >
+                              Request Data Export
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </AnimatedContainer>
               )}
             </div>
           </div>
-        </div>
+        </AnimatedContainer>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
