@@ -313,10 +313,15 @@ export default function HomePage() {
               </AnimatedContainer>
 
               {/* AI-Enhanced CTA Buttons */}
-              <StaggerContainer
-                stagger={0.2}
-                className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.8 }}
               >
+                <StaggerContainer
+                  stagger={0.2}
+                  className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
+                >
                 <StaggerItem>
                   <Button
                     variant="ai"
