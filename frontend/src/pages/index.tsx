@@ -90,7 +90,7 @@ export default function HomePage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-neutral-25 via-neural-50/30 to-cyber-50/20">
+      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-neutral-50 via-blue-50/30 to-cyan-50/20">
         {/* Particle Background */}
         <ParticleSystem
           {...ParticlePresets.neural}
@@ -158,7 +158,8 @@ export default function HomePage() {
           <div className="absolute inset-0">
             {/* Neural Network Nodes */}
             <motion.div
-              className="absolute top-20 left-10 w-4 h-4 bg-neural-400 rounded-full shadow-neural"
+              className="absolute top-20 left-10 w-4 h-4 rounded-full shadow-lg"
+              style={{ backgroundColor: '#4facfe' }}
               animate={{
                 scale: [1, 1.5, 1],
                 opacity: [0.6, 1, 0.6],
@@ -166,7 +167,8 @@ export default function HomePage() {
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             />
             <motion.div
-              className="absolute top-32 left-32 w-3 h-3 bg-cyber-400 rounded-full shadow-ai"
+              className="absolute top-32 left-32 w-3 h-3 rounded-full shadow-lg"
+              style={{ backgroundColor: '#38bdf8' }}
               animate={{
                 scale: [1, 1.3, 1],
                 opacity: [0.5, 0.9, 0.5],
@@ -174,7 +176,8 @@ export default function HomePage() {
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
             />
             <motion.div
-              className="absolute top-40 right-20 w-5 h-5 bg-quantum-400 rounded-full shadow-neural"
+              className="absolute top-40 right-20 w-5 h-5 rounded-full shadow-lg"
+              style={{ backgroundColor: '#d946ef' }}
               animate={{
                 scale: [1, 1.4, 1],
                 opacity: [0.7, 1, 0.7],
@@ -191,7 +194,7 @@ export default function HomePage() {
               }}
               transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
             >
-              <Brain className="w-8 h-8 text-neural-500" />
+              <Brain className="w-8 h-8" style={{ color: '#4facfe' }} />
             </motion.div>
 
             <motion.div
@@ -202,7 +205,7 @@ export default function HomePage() {
               }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
             >
-              <Cpu className="w-6 h-6 text-cyber-500" />
+              <Cpu className="w-6 h-6" style={{ color: '#38bdf8' }} />
             </motion.div>
           </div>
 
@@ -236,7 +239,7 @@ export default function HomePage() {
                       }}
                     />
                     {/* AI Pulse Ring */}
-                    <div className="absolute inset-0 rounded-3xl border-2 border-neural-400/50 animate-neuralPulse"></div>
+                    <div className="absolute inset-0 rounded-3xl border-2 border-blue-400/50 animate-pulse"></div>
                   </div>
                 </motion.div>
               </AnimatedContainer>
@@ -261,7 +264,7 @@ export default function HomePage() {
                   </span>
                   <br />
                   <span className="relative inline-block">
-                    <span className="bg-gradient-to-r from-neural-500 via-cyber-500 to-quantum-500 bg-clip-text text-transparent">
+                    <span className="bg-gradient-to-r from-blue-500 via-cyan-500 to-purple-500 bg-clip-text text-transparent">
                       Instagram
                     </span>
                     <motion.div
@@ -276,7 +279,7 @@ export default function HomePage() {
                   <span className="relative inline-block">
                     Automation
                     <motion.div
-                      className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-neural-400 to-cyber-400 rounded-full"
+                      className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full"
                       initial={{ scaleX: 0 }}
                       animate={{ scaleX: 1 }}
                       transition={{ duration: 1.5, delay: 1 }}
@@ -294,11 +297,11 @@ export default function HomePage() {
                 <p className="text-body text-xl md:text-2xl text-neutral-600 max-w-4xl mx-auto leading-relaxed font-medium">
                   Transform your Instagram customer service with{' '}
                   <span className="relative">
-                    <span className="bg-gradient-to-r from-neural-600 via-cyber-600 to-quantum-600 bg-clip-text text-transparent font-semibold">
+                    <span className="bg-gradient-to-r from-blue-600 via-cyan-600 to-purple-600 bg-clip-text text-transparent font-semibold">
                       Neural AI Technology
                     </span>
                     <motion.div
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-neural-400 to-cyber-400"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-400 to-cyan-400"
                       initial={{ scaleX: 0 }}
                       animate={{ scaleX: 1 }}
                       transition={{ duration: 1, delay: 1.2 }}

@@ -78,7 +78,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-neutral-25 via-neural-50/20 to-cyber-50/10">
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-neutral-50 via-blue-50/20 to-cyan-50/10">
       {/* AI Dashboard Particle Background */}
       <ParticleSystem
         {...ParticlePresets.aiGlow}
@@ -97,7 +97,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
           }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         >
-          <Brain className="w-6 h-6 text-neural-500" />
+          <Brain className="w-6 h-6" style={{ color: '#4facfe' }} />
         </motion.div>
 
         <motion.div
@@ -108,7 +108,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
           }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}
         >
-          <Cpu className="w-5 h-5 text-cyber-500" />
+          <Cpu className="w-5 h-5" style={{ color: '#38bdf8' }} />
         </motion.div>
       </div>
       {/* Mobile sidebar */}
@@ -205,7 +205,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
           transition={{ type: "spring", damping: 25, stiffness: 200 }}
         >
           {/* AI Sidebar Accent */}
-          <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-neural-400 via-cyber-400 to-quantum-400"></div>
+          <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-400 via-cyan-400 to-purple-400"></div>
 
           <div className="flex h-20 items-center px-6 border-b border-white/10">
             <motion.div
@@ -330,7 +330,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
               {title && (
                 <h1 className="text-display text-xl font-bold text-neutral-900 relative">
                   {title}
-                  <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-neural-400 to-cyber-400 rounded-full"></div>
+                  <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full"></div>
                 </h1>
               )}
             </div>
