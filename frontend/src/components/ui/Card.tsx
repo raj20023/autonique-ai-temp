@@ -19,9 +19,9 @@ const variants = {
   elevated: 'bg-white shadow-lg border border-neutral-100',
   outlined: 'bg-white border-2 border-neutral-300',
   glass: 'glass shadow-glass border border-white/20',
-  neural: 'glass shadow-neural border border-neural-200/30 relative overflow-hidden',
-  cyber: 'glass shadow-ai border border-cyber-200/30 relative overflow-hidden',
-  quantum: 'glass shadow-morphic border border-quantum-200/30 relative overflow-hidden',
+  neural: 'glass shadow-neural border border-blue-200/30 relative overflow-hidden',
+  cyber: 'glass shadow-ai border border-cyan-200/30 relative overflow-hidden',
+  quantum: 'glass shadow-morphic border border-purple-200/30 relative overflow-hidden',
   floating: 'glass shadow-levitate border border-white/10 relative'
 };
 
@@ -38,9 +38,9 @@ const hoverEffects = {
   elevated: 'hover:shadow-xl hover:-translate-y-1',
   outlined: 'hover:border-orange-300 hover:shadow-sm',
   glass: 'hover:bg-white/90 hover:shadow-2xl',
-  neural: 'hover:shadow-neural hover:border-neural-300/50 hover:-translate-y-2 hover:scale-[1.02]',
-  cyber: 'hover:shadow-ai hover:border-cyber-300/50 hover:-translate-y-2 hover:scale-[1.02]',
-  quantum: 'hover:shadow-morphic hover:border-quantum-300/50 hover:-translate-y-2 hover:scale-[1.02]',
+  neural: 'hover:shadow-neural hover:border-blue-300/50 hover:-translate-y-2 hover:scale-[1.02]',
+  cyber: 'hover:shadow-ai hover:border-cyan-300/50 hover:-translate-y-2 hover:scale-[1.02]',
+  quantum: 'hover:shadow-morphic hover:border-purple-300/50 hover:-translate-y-2 hover:scale-[1.02]',
   floating: 'hover:shadow-levitate hover:-translate-y-4 hover:scale-[1.01]'
 };
 
@@ -75,7 +75,7 @@ export default function Card({
   }
 
   const getAnimationProps = () => {
-    const baseProps = {
+    const baseProps: any = {
       initial: { opacity: 0, y: 20 },
       whileInView: { opacity: 1, y: 0 },
       viewport: { once: true, amount: 0.3 },
@@ -88,7 +88,7 @@ export default function Card({
       baseProps.transition = {
         duration: 0.8,
         ease: [0.34, 1.56, 0.64, 1],
-        type: "spring",
+        type: "spring" as const,
         stiffness: 100,
         damping: 20
       };
@@ -100,7 +100,7 @@ export default function Card({
       baseProps.transition = {
         duration: 1.0,
         ease: [0.175, 0.885, 0.32, 1.275],
-        type: "spring",
+        type: "spring" as const,
         stiffness: 120,
         damping: 25
       };
@@ -124,18 +124,22 @@ export default function Card({
       {/* AI Accent Lines for Neural Variants */}
       {(variant === 'neural' || variant === 'cyber' || variant === 'quantum') && (
         <>
-          <div className={clsx(
-            "absolute top-0 left-0 w-full h-0.5 rounded-t-2xl",
-            variant === 'neural' && "bg-gradient-to-r from-neural-400 to-neural-600",
-            variant === 'cyber' && "bg-gradient-to-r from-cyber-400 to-cyber-600",
-            variant === 'quantum' && "bg-gradient-to-r from-quantum-400 to-quantum-600"
-          )} />
-          <div className={clsx(
-            "absolute top-0 left-0 w-0.5 h-full rounded-l-2xl",
-            variant === 'neural' && "bg-gradient-to-b from-neural-400 to-neural-600",
-            variant === 'cyber' && "bg-gradient-to-b from-cyber-400 to-cyber-600",
-            variant === 'quantum' && "bg-gradient-to-b from-quantum-400 to-quantum-600"
-          )} />
+          <div
+            className="absolute top-0 left-0 w-full h-0.5 rounded-t-2xl bg-gradient-to-r"
+            style={{
+              background: variant === 'neural' ? 'linear-gradient(to right, #4facfe, #2563eb)' :
+                         variant === 'cyber' ? 'linear-gradient(to right, #38bdf8, #0284c7)' :
+                         variant === 'quantum' ? 'linear-gradient(to right, #d946ef, #a21caf)' : 'transparent'
+            }}
+          />
+          <div
+            className="absolute top-0 left-0 w-0.5 h-full rounded-l-2xl bg-gradient-to-b"
+            style={{
+              background: variant === 'neural' ? 'linear-gradient(to bottom, #4facfe, #2563eb)' :
+                         variant === 'cyber' ? 'linear-gradient(to bottom, #38bdf8, #0284c7)' :
+                         variant === 'quantum' ? 'linear-gradient(to bottom, #d946ef, #a21caf)' : 'transparent'
+            }}
+          />
         </>
       )}
 

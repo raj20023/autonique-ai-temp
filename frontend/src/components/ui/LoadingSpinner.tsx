@@ -104,19 +104,28 @@ export default function LoadingSpinner({
         <div className="relative">
           {/* Outer Neural Ring */}
           <motion.div
-            className={clsx('border-2 border-transparent border-t-neural-500 border-r-neural-300 rounded-full', sizes[size])}
+            className={clsx('border-2 border-transparent rounded-full', sizes[size])}
+            style={{
+              borderTopColor: '#4facfe',
+              borderRightColor: '#7db3ff'
+            }}
             animate={{ rotate: 360 }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
           />
           {/* Inner Neural Ring */}
           <motion.div
-            className={clsx('absolute inset-2 border-2 border-transparent border-b-neural-400 border-l-neural-200 rounded-full')}
+            className="absolute inset-2 border-2 border-transparent rounded-full"
+            style={{
+              borderBottomColor: '#2563eb',
+              borderLeftColor: '#b8d4ff'
+            }}
             animate={{ rotate: -360 }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
           />
           {/* Neural Core */}
           <motion.div
-            className="absolute inset-1/2 w-2 h-2 bg-neural-500 rounded-full transform -translate-x-1/2 -translate-y-1/2"
+            className="absolute inset-1/2 w-2 h-2 rounded-full transform -translate-x-1/2 -translate-y-1/2"
+            style={{ backgroundColor: '#4facfe' }}
             animate={{
               scale: [1, 1.3, 1],
               opacity: [0.7, 1, 0.7]
@@ -126,7 +135,8 @@ export default function LoadingSpinner({
         </div>
         {text && (
           <motion.p
-            className={clsx('text-neural-600 font-medium', textSizes[size])}
+            className={clsx('font-medium', textSizes[size])}
+            style={{ color: '#1d4ed8' }}
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
@@ -143,20 +153,22 @@ export default function LoadingSpinner({
         <div className="relative">
           {/* Cyber Grid */}
           <motion.div
-            className={clsx('border border-cyber-400 rounded-lg', sizes[size])}
+            className={clsx('border rounded-lg', sizes[size])}
+            style={{ borderColor: '#38bdf8' }}
             animate={{
               rotateY: [0, 180, 360],
               scale: [1, 1.1, 1]
             }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           >
-            <div className="absolute inset-1 border border-cyber-300 rounded-sm" />
-            <div className="absolute inset-2 bg-cyber-500 rounded-xs opacity-50" />
+            <div className="absolute inset-1 border rounded-sm" style={{ borderColor: '#7dd3fc' }} />
+            <div className="absolute inset-2 rounded-xs opacity-50" style={{ backgroundColor: '#0ea5e9' }} />
           </motion.div>
         </div>
         {text && (
           <motion.p
-            className={clsx('text-cyber-600 font-medium font-mono', textSizes[size])}
+            className={clsx('font-medium font-mono', textSizes[size])}
+            style={{ color: '#0284c7' }}
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
@@ -175,11 +187,12 @@ export default function LoadingSpinner({
           {[0, 1, 2].map((i) => (
             <motion.div
               key={i}
-              className="absolute w-2 h-2 bg-quantum-500 rounded-full"
+              className="absolute w-2 h-2 rounded-full"
               style={{
                 top: '50%',
                 left: '50%',
-                transformOrigin: '0 0'
+                transformOrigin: '0 0',
+                backgroundColor: '#c026d3'
               }}
               animate={{
                 rotate: [0, 360],
@@ -197,7 +210,8 @@ export default function LoadingSpinner({
         </div>
         {text && (
           <motion.p
-            className={clsx('text-quantum-600 font-medium', textSizes[size])}
+            className={clsx('font-medium', textSizes[size])}
+            style={{ color: '#a21caf' }}
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
@@ -215,7 +229,8 @@ export default function LoadingSpinner({
           {[0, 1, 2, 3, 4].map((i) => (
             <motion.div
               key={i}
-              className="w-1 bg-matrix-500 rounded-full"
+              className="w-1 rounded-full"
+              style={{ backgroundColor: '#16a34a' }}
               animate={{
                 height: [4, 16, 4],
                 opacity: [0.3, 1, 0.3]
@@ -231,7 +246,8 @@ export default function LoadingSpinner({
         </div>
         {text && (
           <motion.p
-            className={clsx('text-matrix-600 font-medium font-mono', textSizes[size])}
+            className={clsx('font-medium font-mono', textSizes[size])}
+            style={{ color: '#15803d' }}
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
