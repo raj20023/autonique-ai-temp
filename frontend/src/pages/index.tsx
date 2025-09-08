@@ -16,7 +16,7 @@ import {
   Users
 } from 'lucide-react';
 import { isAuthenticated } from '@/utils/auth';
-import Logo from '@/components/ui/Logo';
+import LogoSimple from '@/components/ui/LogoSimple';
 import Button from '@/components/ui/Button';
 import { FeatureCard } from '@/components/ui/Card';
 import AnimatedContainer, { StaggerContainer, StaggerItem } from '@/components/ui/AnimatedContainer';
@@ -330,7 +330,7 @@ export default function HomePage() {
                     transition: { duration: 0.5 }
                   }}
                 >
-                  <Logo variant="icon" size="lg" className="text-white" />
+                  <LogoSimple variant="icon" size="lg" className="text-white" />
                 </motion.div>
               </div>
               <h2 className="text-4xl md:text-6xl font-bold text-neutral-900 mb-8">
@@ -400,7 +400,7 @@ export default function HomePage() {
                       </div>
                       <div className="border-t border-neutral-200 pt-4">
                         <div className="flex items-center space-x-3 mb-3">
-                          <Logo variant="icon" size="sm" />
+                          <LogoSimple variant="icon" size="sm" />
                           <p className="font-semibold text-neutral-900">AutoniqueAI</p>
                         </div>
                         <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-2xl p-4">
@@ -431,7 +431,7 @@ export default function HomePage() {
                     whileHover={{ scale: 1.05, rotate: 5 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <Logo variant="icon" size="lg" className="text-white" />
+                    <LogoSimple variant="icon" size="lg" className="text-white" />
                   </motion.div>
                 </div>
 
@@ -516,7 +516,7 @@ export default function HomePage() {
                           className="w-10 h-10 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg"
                           whileHover={{ scale: 1.1 }}
                         >
-                          <Logo variant="icon" size="xs" />
+                          <LogoSimple variant="icon" size="xs" />
                         </motion.div>
                         <p className="font-semibold text-white">AutoniqueAI</p>
                       </div>
@@ -573,7 +573,7 @@ export default function HomePage() {
                   ease: "easeInOut"
                 }}
               >
-                <Logo variant="icon" size="2xl" className="mx-auto" />
+                <LogoSimple variant="icon" size="2xl" className="mx-auto" />
               </motion.div>
             </AnimatedContainer>
 
@@ -656,9 +656,9 @@ export default function HomePage() {
                     transition={{ duration: 0.2 }}
                   >
                     <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-3 shadow-lg">
-                      <Logo variant="icon" size="md" />
+                      <LogoSimple variant="icon" size="md" />
                     </div>
-                    <Logo variant="name" size="lg" theme="dark" />
+                    <LogoSimple variant="name" size="lg" theme="dark" />
                   </motion.div>
                   <p className="text-neutral-400 text-lg leading-relaxed max-w-md">
                     Automate your Instagram customer service with AI-powered responses.

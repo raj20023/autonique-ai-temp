@@ -118,8 +118,8 @@ export default function Logo({
     }
   };
 
-  // Show fallback if image failed to load or if we want to show fallback
-  if (imageError || !showFallback) {
+  // Show fallback if image failed to load and we allow fallback
+  if (imageError && showFallback) {
     const FallbackComponent = (
       <div className={`${sizeClasses[size]} bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-lg ${className}`}>
         <Bot className={`${size === 'xs' ? 'h-2 w-2' : size === 'sm' ? 'h-3 w-3' : size === 'md' ? 'h-4 w-4' : size === 'lg' ? 'h-6 w-6' : size === 'xl' ? 'h-8 w-8' : 'h-12 w-12'} text-white`} />
