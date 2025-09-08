@@ -235,42 +235,82 @@ export default function AnimatedContainer({
   const optimizedVariants = getOptimizedVariants();
   const reducedMotion = prefersReducedMotion();
 
-  // Use optimized variants if available, fallback to custom variants
-  const variants = optimizedVariants[animation as keyof typeof optimizedVariants] ||
-                   { ...animationVariants[animation] };
-
   // Skip animations if user prefers reduced motion
   if (reducedMotion) {
     return <div className={className}>{children}</div>;
   }
 
-  // Override duration, delay, or spring config if provided
-  if (variants.visible && typeof variants.visible === 'object') {
-    const currentTransition = variants.visible.transition || {};
+  // Use optimized variants if available, fallback to custom variants
+  let variants: any;
+  const optimizedVariant = optimizedVariants[animation as keyof typeof optimizedVariants];
 
-    variants.visible.transition = {
-      ...currentTransition,
-      ...(duration && { duration }),
-      ...(delay && { delay }),
-      ...(springConfig && {
-        type: "spring",
-        stiffness: springConfig.stiffness || animConfig.stiffness,
-        damping: springConfig.damping || animConfig.damping,
-        mass: springConfig.mass || animConfig.mass
-      })
-    };
+  if (optimizedVariant) {
+    // Use optimized variants (these use initial/animate structure)
+    variants = { ...optimizedVariant };
+
+    // Override transition properties if provided
+    if (variants.transition) {
+      variants.transition = {
+        ...variants.transition,
+        ...(duration && { duration }),
+        ...(delay && { delay }),
+        ...(springConfig && {
+          type: "spring",
+          stiffness: springConfig.stiffness || animConfig.stiffness,
+          damping: springConfig.damping || animConfig.damping,
+          mass: springConfig.mass || animConfig.mass
+        })
+      };
+    }
+  } else {
+    // Use custom variants (these use hidden/visible structure)
+    variants = { ...animationVariants[animation] };
+
+    // Override duration, delay, or spring config if provided
+    if (variants.visible && typeof variants.visible === 'object') {
+      const currentTransition = variants.visible.transition || {};
+
+      variants.visible.transition = {
+        ...currentTransition,
+        ...(duration && { duration }),
+        ...(delay && { delay }),
+        ...(springConfig && {
+          type: "spring",
+          stiffness: springConfig.stiffness || animConfig.stiffness,
+          damping: springConfig.damping || animConfig.damping,
+          mass: springConfig.mass || animConfig.mass
+        })
+      };
+    }
   }
 
+  // Determine if we're using optimized variants or custom variants
+  const isOptimizedVariant = optimizedVariants[animation as keyof typeof optimizedVariants];
+
   const motionProps: any = {
-    variants,
-    initial: "hidden",
-    animate: "visible",
     className
   };
 
-  if (once) {
-    motionProps.whileInView = "visible";
-    motionProps.viewport = { once: true, amount: 0.3 };
+  if (isOptimizedVariant) {
+    // Use optimized variant structure (initial/animate)
+    motionProps.initial = variants.initial;
+    motionProps.animate = variants.animate;
+    motionProps.transition = variants.transition;
+
+    if (once) {
+      motionProps.whileInView = variants.animate;
+      motionProps.viewport = { once: true, amount: 0.3 };
+    }
+  } else {
+    // Use custom variant structure (hidden/visible)
+    motionProps.variants = variants;
+    motionProps.initial = "hidden";
+    motionProps.animate = "visible";
+
+    if (once) {
+      motionProps.whileInView = "visible";
+      motionProps.viewport = { once: true, amount: 0.3 };
+    }
   }
 
   if (hover) {
@@ -279,6 +319,7 @@ export default function AnimatedContainer({
 
   if (stagger > 0) {
     motionProps.transition = {
+      ...motionProps.transition,
       staggerChildren: stagger
     };
   }

@@ -1,4 +1,5 @@
 // Performance optimization utilities for animations and UI
+import React from 'react';
 
 // Detect user's motion preferences
 export const prefersReducedMotion = () => {
