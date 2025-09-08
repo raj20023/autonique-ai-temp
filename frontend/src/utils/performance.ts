@@ -153,12 +153,13 @@ export const createLazyComponent = <T extends React.ComponentType<any>>(
   fallback?: React.ComponentType
 ) => {
   const LazyComponent = React.lazy(importFunc);
-  
-  return (props: React.ComponentProps<T>) => (
-    <React.Suspense fallback={fallback ? React.createElement(fallback) : null}>
-      <LazyComponent {...props} />
-    </React.Suspense>
-  );
+
+  return (props: React.ComponentProps<T>) =>
+    React.createElement(
+      React.Suspense,
+      { fallback: fallback ? React.createElement(fallback) : null },
+      React.createElement(LazyComponent, props)
+    );
 };
 
 // Intersection Observer for performance-aware animations
