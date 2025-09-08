@@ -2,19 +2,163 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* Custom font faces for premium typography */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/SF-Pro-Display-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/SF-Pro-Display-Semibold.woff2') format('woff2');
+  font-weight: 600;
+  font-display: swap;
+}
 
 @layer base {
+  :root {
+    /* AI-inspired color variables */
+    --gradient-ai-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-ai-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-ai-neural: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+
+    /* Typography scale */
+    --font-display: 'Inter Display', 'SF Pro Display', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+    --font-accent: 'Space Grotesk', system-ui, sans-serif;
+
+    /* Animation variables */
+    --spring-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --spring-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --spring-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
   html {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-body);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   body {
-    @apply bg-gradient-to-br from-gray-50 to-accent-50 text-gray-900;
+    @apply bg-gradient-to-br from-neutral-25 via-neutral-50 to-orange-25/30 text-neutral-900;
+    background-attachment: fixed;
+    min-height: 100vh;
   }
 
   * {
     @apply scroll-smooth;
+  }
+
+  /* Enhanced scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-neutral-100/50;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neutral-300 hover:bg-neutral-400;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-neutral-400;
+  }
+}
+
+@layer components {
+  /* Typography utilities */
+  .text-display {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+
+  .text-accent {
+    font-family: var(--font-accent);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .text-mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Glass morphism utilities */
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .glass-dark {
+    background: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* AI-inspired gradients */
+  .gradient-ai-primary {
+    background: var(--gradient-ai-primary);
+  }
+
+  .gradient-ai-secondary {
+    background: var(--gradient-ai-secondary);
+  }
+
+  .gradient-ai-neural {
+    background: var(--gradient-ai-neural);
+  }
+
+  /* Advanced shadow utilities */
+  .shadow-ai {
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  }
+
+  .shadow-neural {
+    box-shadow:
+      0 10px 25px -3px rgba(79, 172, 254, 0.1),
+      0 4px 6px -2px rgba(79, 172, 254, 0.05),
+      0 0 0 1px rgba(79, 172, 254, 0.1) inset;
+  }
+
+  /* Floating animation */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-10px) rotate(1deg); }
+    66% { transform: translateY(5px) rotate(-1deg); }
+  }
+
+  /* Glow effects */
+  .glow-ai {
+    box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
+    animation: glow-pulse 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes glow-pulse {
+    from { box-shadow: 0 0 20px rgba(79, 172, 254, 0.3); }
+    to { box-shadow: 0 0 30px rgba(79, 172, 254, 0.5); }
   }
 }
 

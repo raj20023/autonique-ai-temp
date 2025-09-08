@@ -120,6 +120,78 @@ module.exports = {
           800: '#9d174d',
           900: '#831843',
         },
+        // AI-inspired color palettes
+        neural: {
+          25: '#fafcff',
+          50: '#f0f6ff',
+          100: '#e0ecff',
+          200: '#b8d4ff',
+          300: '#7db3ff',
+          400: '#4facfe',
+          500: '#2563eb',
+          600: '#1d4ed8',
+          700: '#1e40af',
+          800: '#1e3a8a',
+          900: '#1e3a8a',
+          950: '#0f172a',
+        },
+        cyber: {
+          25: '#fafcfe',
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
+          800: '#075985',
+          900: '#0c4a6e',
+          950: '#082f49',
+        },
+        quantum: {
+          25: '#fefaff',
+          50: '#fdf4ff',
+          100: '#fae8ff',
+          200: '#f3d4fe',
+          300: '#e9b3fd',
+          400: '#d946ef',
+          500: '#c026d3',
+          600: '#a21caf',
+          700: '#86198f',
+          800: '#701a75',
+          900: '#581c87',
+          950: '#3b0764',
+        },
+        matrix: {
+          25: '#f0fdf4',
+          50: '#dcfce7',
+          100: '#bbf7d0',
+          200: '#86efac',
+          300: '#4ade80',
+          400: '#22c55e',
+          500: '#16a34a',
+          600: '#15803d',
+          700: '#166534',
+          800: '#14532d',
+          900: '#14532d',
+          950: '#052e16',
+        },
+      },
+      // Enhanced background gradients
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'gradient-ai-primary': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        'gradient-ai-secondary': 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        'gradient-ai-neural': 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+        'gradient-ai-quantum': 'linear-gradient(135deg, #d946ef 0%, #c026d3 50%, #a21caf 100%)',
+        'gradient-ai-cyber': 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 50%, #0369a1 100%)',
+        'gradient-ai-matrix': 'linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #15803d 100%)',
+        'gradient-glass': 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+        'gradient-glass-dark': 'linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.05) 100%)',
+        'shimmer': 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent)',
+        'neural-flow': 'linear-gradient(45deg, #4facfe 0%, #00f2fe 25%, #667eea 50%, #764ba2 75%, #4facfe 100%)',
       },
       fontFamily: {
         sans: [
@@ -139,8 +211,17 @@ module.exports = {
           'Segoe UI Symbol',
           'Noto Color Emoji'
         ],
+        display: [
+          'Inter Display',
+          'SF Pro Display',
+          'Inter',
+          'ui-sans-serif',
+          'system-ui',
+          'sans-serif'
+        ],
         mono: [
           'JetBrains Mono',
+          'SF Mono',
           'ui-monospace',
           'SFMono-Regular',
           'Monaco',
@@ -149,7 +230,15 @@ module.exports = {
           'Courier New',
           'monospace'
         ],
-        display: [
+        accent: [
+          'Space Grotesk',
+          'Inter',
+          'ui-sans-serif',
+          'system-ui',
+          'sans-serif'
+        ],
+        body: [
+          'Manrope',
           'Inter',
           'ui-sans-serif',
           'system-ui',
@@ -287,6 +376,77 @@ module.exports = {
           '0%': { boxShadow: '0 0 5px rgb(247 144 9 / 0.2), 0 0 10px rgb(247 144 9 / 0.2), 0 0 15px rgb(247 144 9 / 0.2)' },
           '100%': { boxShadow: '0 0 10px rgb(247 144 9 / 0.4), 0 0 20px rgb(247 144 9 / 0.4), 0 0 30px rgb(247 144 9 / 0.4)' },
         },
+        // AI-inspired advanced animations
+        neuralPulse: {
+          '0%, 100%': {
+            transform: 'scale(1)',
+            boxShadow: '0 0 0 0 rgba(79, 172, 254, 0.7)'
+          },
+          '50%': {
+            transform: 'scale(1.05)',
+            boxShadow: '0 0 0 10px rgba(79, 172, 254, 0)'
+          },
+        },
+        morphGlow: {
+          '0%': {
+            borderRadius: '1rem',
+            boxShadow: '0 0 20px rgba(102, 126, 234, 0.3)'
+          },
+          '33%': {
+            borderRadius: '2rem',
+            boxShadow: '0 0 30px rgba(240, 147, 251, 0.4)'
+          },
+          '66%': {
+            borderRadius: '1.5rem',
+            boxShadow: '0 0 25px rgba(79, 172, 254, 0.35)'
+          },
+          '100%': {
+            borderRadius: '1rem',
+            boxShadow: '0 0 20px rgba(102, 126, 234, 0.3)'
+          },
+        },
+        dataFlow: {
+          '0%': {
+            transform: 'translateX(-100%) scaleX(0)',
+            opacity: '0'
+          },
+          '50%': {
+            transform: 'translateX(0%) scaleX(1)',
+            opacity: '1'
+          },
+          '100%': {
+            transform: 'translateX(100%) scaleX(0)',
+            opacity: '0'
+          },
+        },
+        levitate: {
+          '0%, 100%': {
+            transform: 'translateY(0px) rotateX(0deg)',
+            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)'
+          },
+          '50%': {
+            transform: 'translateY(-20px) rotateX(2deg)',
+            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.15)'
+          },
+        },
+        shimmer: {
+          '0%': {
+            backgroundPosition: '-200% 0'
+          },
+          '100%': {
+            backgroundPosition: '200% 0'
+          },
+        },
+        breathe: {
+          '0%, 100%': {
+            transform: 'scale(1)',
+            opacity: '0.8'
+          },
+          '50%': {
+            transform: 'scale(1.02)',
+            opacity: '1'
+          },
+        },
       },
       backdropBlur: {
         xs: '2px',
@@ -294,6 +454,23 @@ module.exports = {
       transitionTimingFunction: {
         'bounce-in': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
         'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'elastic': 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        'neural': 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+        'ai-spring': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+        'morphic': 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+      },
+      // Enhanced backdrop blur options
+      backdropBlur: {
+        xs: '2px',
+        '3xl': '64px',
+      },
+      // Advanced box shadow utilities
+      boxShadow: {
+        'neural': '0 10px 25px -3px rgba(79, 172, 254, 0.1), 0 4px 6px -2px rgba(79, 172, 254, 0.05)',
+        'ai-glow': '0 0 20px rgba(102, 126, 234, 0.3), 0 0 40px rgba(102, 126, 234, 0.1)',
+        'morphic': '0 8px 32px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.05) inset',
+        'glass': '0 8px 32px rgba(31, 38, 135, 0.37), 0 0 0 1px rgba(255, 255, 255, 0.18) inset',
+        'levitate': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
       },
     },
   },

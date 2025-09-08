@@ -5,18 +5,24 @@ import { clsx } from 'clsx';
 interface CardProps {
   children: ReactNode;
   className?: string;
-  variant?: 'default' | 'elevated' | 'outlined' | 'glass';
+  variant?: 'default' | 'elevated' | 'outlined' | 'glass' | 'neural' | 'cyber' | 'quantum' | 'floating';
   padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
   hover?: boolean;
   animated?: boolean;
   onClick?: () => void;
+  glow?: boolean;
+  pulse?: boolean;
 }
 
 const variants = {
   default: 'bg-white border border-neutral-200 shadow-sm',
   elevated: 'bg-white shadow-lg border border-neutral-100',
   outlined: 'bg-white border-2 border-neutral-300',
-  glass: 'bg-white/80 backdrop-blur-md border border-white/20 shadow-xl'
+  glass: 'glass shadow-glass border border-white/20',
+  neural: 'glass shadow-neural border border-neural-200/30 relative overflow-hidden',
+  cyber: 'glass shadow-ai border border-cyber-200/30 relative overflow-hidden',
+  quantum: 'glass shadow-morphic border border-quantum-200/30 relative overflow-hidden',
+  floating: 'glass shadow-levitate border border-white/10 relative'
 };
 
 const paddings = {
@@ -31,7 +37,11 @@ const hoverEffects = {
   default: 'hover:shadow-md hover:border-neutral-300',
   elevated: 'hover:shadow-xl hover:-translate-y-1',
   outlined: 'hover:border-orange-300 hover:shadow-sm',
-  glass: 'hover:bg-white/90 hover:shadow-2xl'
+  glass: 'hover:bg-white/90 hover:shadow-2xl',
+  neural: 'hover:shadow-neural hover:border-neural-300/50 hover:-translate-y-2 hover:scale-[1.02]',
+  cyber: 'hover:shadow-ai hover:border-cyber-300/50 hover:-translate-y-2 hover:scale-[1.02]',
+  quantum: 'hover:shadow-morphic hover:border-quantum-300/50 hover:-translate-y-2 hover:scale-[1.02]',
+  floating: 'hover:shadow-levitate hover:-translate-y-4 hover:scale-[1.01]'
 };
 
 export default function Card({
@@ -41,14 +51,18 @@ export default function Card({
   padding = 'md',
   hover = false,
   animated = true,
-  onClick
+  onClick,
+  glow = false,
+  pulse = false
 }: CardProps) {
   const baseClasses = clsx(
-    'rounded-2xl transition-all duration-200',
+    'rounded-2xl transition-all duration-300',
     variants[variant],
     paddings[padding],
     hover && hoverEffects[variant],
     onClick && 'cursor-pointer',
+    glow && 'glow-ai',
+    pulse && 'animate-neuralPulse',
     className
   );
 
@@ -60,21 +74,74 @@ export default function Card({
     );
   }
 
+  const getAnimationProps = () => {
+    const baseProps = {
+      initial: { opacity: 0, y: 20 },
+      whileInView: { opacity: 1, y: 0 },
+      viewport: { once: true, amount: 0.3 },
+      transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }
+    };
+
+    if (variant === 'neural' || variant === 'cyber' || variant === 'quantum') {
+      baseProps.initial = { opacity: 0, scale: 0.9, rotateX: -10 };
+      baseProps.whileInView = { opacity: 1, scale: 1, rotateX: 0 };
+      baseProps.transition = {
+        duration: 0.8,
+        ease: [0.34, 1.56, 0.64, 1],
+        type: "spring",
+        stiffness: 100,
+        damping: 20
+      };
+    }
+
+    if (variant === 'floating') {
+      baseProps.initial = { opacity: 0, y: 30, rotateY: -15 };
+      baseProps.whileInView = { opacity: 1, y: 0, rotateY: 0 };
+      baseProps.transition = {
+        duration: 1.0,
+        ease: [0.175, 0.885, 0.32, 1.275],
+        type: "spring",
+        stiffness: 120,
+        damping: 25
+      };
+    }
+
+    return baseProps;
+  };
+
   return (
     <motion.div
       className={baseClasses}
       onClick={onClick}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      whileHover={hover ? { 
-        scale: 1.02,
-        transition: { duration: 0.2 }
+      {...getAnimationProps()}
+      whileHover={hover ? {
+        scale: variant === 'floating' ? 1.01 : 1.02,
+        y: variant === 'floating' ? -4 : -2,
+        transition: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }
       } : undefined}
-      whileTap={onClick ? { scale: 0.98 } : undefined}
+      whileTap={onClick ? { scale: 0.98, y: 0 } : undefined}
     >
-      {children}
+      {/* AI Accent Lines for Neural Variants */}
+      {(variant === 'neural' || variant === 'cyber' || variant === 'quantum') && (
+        <>
+          <div className={clsx(
+            "absolute top-0 left-0 w-full h-0.5 rounded-t-2xl",
+            variant === 'neural' && "bg-gradient-to-r from-neural-400 to-neural-600",
+            variant === 'cyber' && "bg-gradient-to-r from-cyber-400 to-cyber-600",
+            variant === 'quantum' && "bg-gradient-to-r from-quantum-400 to-quantum-600"
+          )} />
+          <div className={clsx(
+            "absolute top-0 left-0 w-0.5 h-full rounded-l-2xl",
+            variant === 'neural' && "bg-gradient-to-b from-neural-400 to-neural-600",
+            variant === 'cyber' && "bg-gradient-to-b from-cyber-400 to-cyber-600",
+            variant === 'quantum' && "bg-gradient-to-b from-quantum-400 to-quantum-600"
+          )} />
+        </>
+      )}
+
+      <div className="relative z-10">
+        {children}
+      </div>
     </motion.div>
   );
 }

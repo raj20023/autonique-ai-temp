@@ -13,13 +13,17 @@ import {
   CheckCircle,
   Sparkles,
   Clock,
-  Users
+  Users,
+  Brain,
+  Cpu,
+  Layers
 } from 'lucide-react';
 import { isAuthenticated } from '@/utils/auth';
 import LogoSimple from '@/components/ui/LogoSimple';
 import Button from '@/components/ui/Button';
 import { FeatureCard } from '@/components/ui/Card';
 import AnimatedContainer, { StaggerContainer, StaggerItem } from '@/components/ui/AnimatedContainer';
+import ParticleSystem, { ParticlePresets } from '@/components/ui/ParticleSystem';
 
 const features = [
   {
@@ -86,10 +90,23 @@ export default function HomePage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-white via-orange-50/30 to-orange-100/50">
+      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-neutral-25 via-neural-50/30 to-cyber-50/20">
+        {/* Particle Background */}
+        <ParticleSystem
+          {...ParticlePresets.neural}
+          className="absolute inset-0 z-0"
+        />
+
+        {/* Animated Background Gradients */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-ai-neural opacity-20 rounded-full blur-3xl animate-float" />
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-ai-quantum opacity-15 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+          <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-gradient-ai-cyber opacity-10 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }} />
+        </div>
+
         {/* Header */}
         <motion.header
-          className="relative z-50 bg-white/95 backdrop-blur-2xl border-b border-neutral-200/20"
+          className="relative z-50 glass border-b border-white/10"
           initial={{ y: -100 }}
           animate={{ y: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -137,38 +154,65 @@ export default function HomePage() {
 
         {/* Hero Section */}
         <section className="relative overflow-hidden">
-          {/* Background Elements */}
+          {/* AI-Inspired Background Elements */}
           <div className="absolute inset-0">
+            {/* Neural Network Nodes */}
             <motion.div
-              className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-orange-400/20 to-orange-600/20 rounded-full blur-3xl"
+              className="absolute top-20 left-10 w-4 h-4 bg-neural-400 rounded-full shadow-neural"
               animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.3, 0.6, 0.3],
-                x: [0, 50, 0],
-                y: [0, -30, 0]
+                scale: [1, 1.5, 1],
+                opacity: [0.6, 1, 0.6],
               }}
-              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             />
             <motion.div
-              className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-orange-300/20 to-orange-500/20 rounded-full blur-3xl"
+              className="absolute top-32 left-32 w-3 h-3 bg-cyber-400 rounded-full shadow-ai"
               animate={{
                 scale: [1, 1.3, 1],
-                opacity: [0.2, 0.5, 0.2],
-                x: [0, -30, 0],
-                y: [0, 20, 0]
+                opacity: [0.5, 0.9, 0.5],
               }}
-              transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
             />
+            <motion.div
+              className="absolute top-40 right-20 w-5 h-5 bg-quantum-400 rounded-full shadow-neural"
+              animate={{
+                scale: [1, 1.4, 1],
+                opacity: [0.7, 1, 0.7],
+              }}
+              transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            />
+
+            {/* Floating AI Elements */}
+            <motion.div
+              className="absolute top-1/4 right-1/4 w-20 h-20 glass rounded-2xl flex items-center justify-center"
+              animate={{
+                y: [0, -20, 0],
+                rotateY: [0, 180, 360],
+              }}
+              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <Brain className="w-8 h-8 text-neural-500" />
+            </motion.div>
+
+            <motion.div
+              className="absolute bottom-1/3 left-1/4 w-16 h-16 glass rounded-xl flex items-center justify-center"
+              animate={{
+                y: [0, 15, 0],
+                rotateX: [0, 180, 360],
+              }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            >
+              <Cpu className="w-6 h-6 text-cyber-500" />
+            </motion.div>
           </div>
 
           <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-24 lg:py-32">
             <div className="text-center">
-              {/* Logo Hero */}
-              <motion.div
+              {/* AI-Enhanced Logo Hero */}
+              <AnimatedContainer
+                animation="neuralPulse"
                 className="mb-16"
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
+                delay={0.2}
               >
                 <motion.div
                   className="inline-block relative"
@@ -181,8 +225,8 @@ export default function HomePage() {
                     ease: "easeInOut"
                   }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-orange-600/20 rounded-3xl blur-2xl scale-110"></div>
-                  <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50">
+                  <div className="absolute inset-0 bg-gradient-ai-neural rounded-3xl blur-2xl scale-110 opacity-30"></div>
+                  <div className="relative glass rounded-3xl p-8 shadow-neural border border-white/20 glow-ai">
                     <img
                       src="/logos/logo_icon.png"
                       alt="AutoniqueAI"
@@ -191,64 +235,113 @@ export default function HomePage() {
                         e.currentTarget.style.display = 'none';
                       }}
                     />
+                    {/* AI Pulse Ring */}
+                    <div className="absolute inset-0 rounded-3xl border-2 border-neural-400/50 animate-neuralPulse"></div>
                   </div>
                 </motion.div>
-              </motion.div>
+              </AnimatedContainer>
 
-              {/* Main Headline */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
+              {/* AI-Enhanced Main Headline */}
+              <AnimatedContainer
+                animation="morphGlow"
+                delay={0.4}
                 className="mb-8"
               >
-                <h1 className="text-6xl md:text-7xl lg:text-8xl font-black text-neutral-900 mb-6 leading-[0.9] tracking-tight">
-                  Automate Your{' '}
-                  <span className="relative">
-                    <span className="bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 bg-clip-text text-transparent">
-                      Instagram DMs
+                <h1 className="text-display text-6xl md:text-7xl lg:text-8xl font-black text-neutral-900 mb-6 leading-[0.9] tracking-tight">
+                  <span className="relative inline-block">
+                    AI-Powered{' '}
+                    <motion.div
+                      className="absolute -inset-1 bg-gradient-ai-neural rounded-lg blur-sm opacity-30"
+                      animate={{
+                        scale: [1, 1.05, 1],
+                        opacity: [0.3, 0.6, 0.3]
+                      }}
+                      transition={{ duration: 3, repeat: Infinity }}
+                    />
+                  </span>
+                  <br />
+                  <span className="relative inline-block">
+                    <span className="bg-gradient-to-r from-neural-500 via-cyber-500 to-quantum-500 bg-clip-text text-transparent">
+                      Instagram
                     </span>
                     <motion.div
-                      className="absolute -inset-2 bg-gradient-to-r from-orange-500/20 to-orange-600/20 rounded-2xl blur-xl"
-                      animate={{ opacity: [0.5, 0.8, 0.5] }}
+                      className="absolute -inset-2 bg-gradient-ai-quantum rounded-2xl blur-xl opacity-40"
+                      animate={{
+                        opacity: [0.4, 0.8, 0.4],
+                        scale: [1, 1.1, 1]
+                      }}
                       transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  </span>{' '}
+                  <span className="relative inline-block">
+                    Automation
+                    <motion.div
+                      className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-neural-400 to-cyber-400 rounded-full"
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 1.5, delay: 1 }}
                     />
                   </span>
                 </h1>
-              </motion.div>
+              </AnimatedContainer>
 
-              {/* Subtitle */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.5 }}
+              {/* AI-Enhanced Subtitle */}
+              <AnimatedContainer
+                animation="dataFlow"
+                delay={0.6}
                 className="mb-12"
               >
-                <p className="text-xl md:text-2xl text-neutral-600 max-w-4xl mx-auto leading-relaxed font-medium">
+                <p className="text-body text-xl md:text-2xl text-neutral-600 max-w-4xl mx-auto leading-relaxed font-medium">
                   Transform your Instagram customer service with{' '}
-                  <span className="text-orange-600 font-semibold">AI-powered automation</span>.
+                  <span className="relative">
+                    <span className="bg-gradient-to-r from-neural-600 via-cyber-600 to-quantum-600 bg-clip-text text-transparent font-semibold">
+                      Neural AI Technology
+                    </span>
+                    <motion.div
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-neural-400 to-cyber-400"
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 1, delay: 1.2 }}
+                    />
+                  </span>
+                  .<br />
                   Save 10+ hours weekly while providing instant, intelligent responses.
                 </p>
-              </motion.div>
+              </AnimatedContainer>
 
-              {/* CTA Buttons */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.7 }}
+              {/* AI-Enhanced CTA Buttons */}
+              <StaggerContainer
+                stagger={0.2}
                 className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
               >
-                <motion.button
-                  onClick={handleGetStarted}
-                  className="group relative bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 shadow-2xl hover:shadow-orange-500/25 flex items-center space-x-3"
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Instagram className="h-6 w-6" />
-                  <span>Start Free Trial</span>
-                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-500 rounded-2xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity -z-10"></div>
-                </motion.button>
+                <StaggerItem>
+                  <Button
+                    variant="ai"
+                    size="xl"
+                    onClick={handleGetStarted}
+                    icon={<Brain className="h-6 w-6" />}
+                    iconPosition="left"
+                    shimmer={true}
+                    glow={true}
+                    className="px-10 py-5 text-lg font-bold"
+                  >
+                    Start AI Journey
+                    <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </StaggerItem>
+
+                <StaggerItem>
+                  <Button
+                    variant="glass"
+                    size="xl"
+                    icon={<Layers className="h-5 w-5" />}
+                    iconPosition="left"
+                    className="px-8 py-5 text-lg font-semibold"
+                  >
+                    Watch Neural Demo
+                  </Button>
+                </StaggerItem>
+              </StaggerContainer>
 
                 <motion.div
                   className="flex items-center space-x-3 text-neutral-600 bg-white/90 backdrop-blur-xl px-6 py-4 rounded-2xl border border-neutral-200/50 shadow-lg"

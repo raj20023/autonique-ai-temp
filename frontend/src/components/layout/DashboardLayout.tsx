@@ -13,12 +13,16 @@ import {
   User,
   Bell,
   Search,
-  ChevronDown
+  ChevronDown,
+  Brain,
+  Cpu,
+  Layers
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import Logo from '@/components/ui/Logo';
 import Button from '@/components/ui/Button';
 import AnimatedContainer from '@/components/ui/AnimatedContainer';
+import ParticleSystem, { ParticlePresets } from '@/components/ui/ParticleSystem';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -74,7 +78,39 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-orange-50/30">
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-neutral-25 via-neural-50/20 to-cyber-50/10">
+      {/* AI Dashboard Particle Background */}
+      <ParticleSystem
+        {...ParticlePresets.aiGlow}
+        className="absolute inset-0 z-0"
+        particleCount={20}
+        interactive={false}
+      />
+
+      {/* Floating AI Elements */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <motion.div
+          className="absolute top-20 right-20 w-12 h-12 glass rounded-xl flex items-center justify-center"
+          animate={{
+            y: [0, -10, 0],
+            rotateY: [0, 180, 360],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <Brain className="w-6 h-6 text-neural-500" />
+        </motion.div>
+
+        <motion.div
+          className="absolute bottom-32 left-20 w-10 h-10 glass rounded-lg flex items-center justify-center"
+          animate={{
+            y: [0, 8, 0],
+            rotateX: [0, 180, 360],
+          }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        >
+          <Cpu className="w-5 h-5 text-cyber-500" />
+        </motion.div>
+      </div>
       {/* Mobile sidebar */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -87,7 +123,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
               onClick={() => setSidebarOpen(false)}
             />
             <motion.div
-              className="fixed inset-y-0 left-0 flex w-72 flex-col bg-white shadow-2xl border-r border-neutral-100"
+              className="fixed inset-y-0 left-0 flex w-72 flex-col glass shadow-neural border-r border-white/20"
               initial={{ x: -288 }}
               animate={{ x: 0 }}
               exit={{ x: -288 }}
@@ -163,12 +199,15 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col">
         <motion.div
-          className="flex flex-col flex-grow bg-white shadow-xl border-r border-neutral-100"
+          className="flex flex-col flex-grow glass shadow-neural border-r border-white/20 relative"
           initial={{ x: -288 }}
           animate={{ x: 0 }}
           transition={{ type: "spring", damping: 25, stiffness: 200 }}
         >
-          <div className="flex h-20 items-center px-6 border-b border-neutral-100">
+          {/* AI Sidebar Accent */}
+          <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-neural-400 via-cyber-400 to-quantum-400"></div>
+
+          <div className="flex h-20 items-center px-6 border-b border-white/10">
             <motion.div
               className="flex items-center"
               whileHover={{ scale: 1.02 }}
@@ -273,7 +312,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
       <div className="lg:pl-72">
         {/* Top bar */}
         <motion.div
-          className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-neutral-100 shadow-sm"
+          className="sticky top-0 z-40 glass border-b border-white/10 shadow-ai"
           initial={{ y: -80 }}
           animate={{ y: 0 }}
           transition={{ type: "spring", damping: 25, stiffness: 200 }}
@@ -289,7 +328,10 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                 <Menu className="h-5 w-5" />
               </motion.button>
               {title && (
-                <h1 className="text-xl font-bold text-neutral-900">{title}</h1>
+                <h1 className="text-display text-xl font-bold text-neutral-900 relative">
+                  {title}
+                  <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-neural-400 to-cyber-400 rounded-full"></div>
+                </h1>
               )}
             </div>
 

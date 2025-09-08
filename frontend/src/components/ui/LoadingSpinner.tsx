@@ -4,7 +4,7 @@ import Logo from './Logo';
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
-  variant?: 'spinner' | 'dots' | 'pulse' | 'logo';
+  variant?: 'spinner' | 'dots' | 'pulse' | 'logo' | 'neural' | 'cyber' | 'quantum' | 'matrix';
   className?: string;
   text?: string;
 }
@@ -88,6 +88,150 @@ export default function LoadingSpinner({
         {text && (
           <motion.p
             className={clsx('text-neutral-600 font-medium', textSizes[size])}
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            {text}
+          </motion.p>
+        )}
+      </div>
+    );
+  }
+
+  if (variant === 'neural') {
+    return (
+      <div className={clsx('flex flex-col items-center justify-center space-y-4', className)}>
+        <div className="relative">
+          {/* Outer Neural Ring */}
+          <motion.div
+            className={clsx('border-2 border-transparent border-t-neural-500 border-r-neural-300 rounded-full', sizes[size])}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          />
+          {/* Inner Neural Ring */}
+          <motion.div
+            className={clsx('absolute inset-2 border-2 border-transparent border-b-neural-400 border-l-neural-200 rounded-full')}
+            animate={{ rotate: -360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          />
+          {/* Neural Core */}
+          <motion.div
+            className="absolute inset-1/2 w-2 h-2 bg-neural-500 rounded-full transform -translate-x-1/2 -translate-y-1/2"
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.7, 1, 0.7]
+            }}
+            transition={{ duration: 1, repeat: Infinity }}
+          />
+        </div>
+        {text && (
+          <motion.p
+            className={clsx('text-neural-600 font-medium', textSizes[size])}
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            {text}
+          </motion.p>
+        )}
+      </div>
+    );
+  }
+
+  if (variant === 'cyber') {
+    return (
+      <div className={clsx('flex flex-col items-center justify-center space-y-4', className)}>
+        <div className="relative">
+          {/* Cyber Grid */}
+          <motion.div
+            className={clsx('border border-cyber-400 rounded-lg', sizes[size])}
+            animate={{
+              rotateY: [0, 180, 360],
+              scale: [1, 1.1, 1]
+            }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <div className="absolute inset-1 border border-cyber-300 rounded-sm" />
+            <div className="absolute inset-2 bg-cyber-500 rounded-xs opacity-50" />
+          </motion.div>
+        </div>
+        {text && (
+          <motion.p
+            className={clsx('text-cyber-600 font-medium font-mono', textSizes[size])}
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            {text}
+          </motion.p>
+        )}
+      </div>
+    );
+  }
+
+  if (variant === 'quantum') {
+    return (
+      <div className={clsx('flex flex-col items-center justify-center space-y-4', className)}>
+        <div className="relative">
+          {/* Quantum Particles */}
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-quantum-500 rounded-full"
+              style={{
+                top: '50%',
+                left: '50%',
+                transformOrigin: '0 0'
+              }}
+              animate={{
+                rotate: [0, 360],
+                scale: [1, 0.5, 1],
+                opacity: [1, 0.3, 1]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                delay: i * 0.6,
+                ease: "easeInOut"
+              }}
+            />
+          ))}
+        </div>
+        {text && (
+          <motion.p
+            className={clsx('text-quantum-600 font-medium', textSizes[size])}
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            {text}
+          </motion.p>
+        )}
+      </div>
+    );
+  }
+
+  if (variant === 'matrix') {
+    return (
+      <div className={clsx('flex flex-col items-center justify-center space-y-4', className)}>
+        <div className="flex space-x-1">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <motion.div
+              key={i}
+              className="w-1 bg-matrix-500 rounded-full"
+              animate={{
+                height: [4, 16, 4],
+                opacity: [0.3, 1, 0.3]
+              }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                delay: i * 0.1,
+                ease: "easeInOut"
+              }}
+            />
+          ))}
+        </div>
+        {text && (
+          <motion.p
+            className={clsx('text-matrix-600 font-medium font-mono', textSizes[size])}
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >

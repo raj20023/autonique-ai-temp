@@ -5,21 +5,26 @@ import { clsx } from 'clsx';
 
 interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, keyof MotionProps> {
   children: ReactNode;
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'neural' | 'glass' | 'ai';
   size?: 'sm' | 'md' | 'lg' | 'xl';
   loading?: boolean;
   icon?: ReactNode;
   iconPosition?: 'left' | 'right';
   fullWidth?: boolean;
   animated?: boolean;
+  shimmer?: boolean;
+  glow?: boolean;
 }
 
 const variants = {
-  primary: 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl',
-  secondary: 'bg-neutral-100 hover:bg-neutral-200 text-neutral-900 border border-neutral-300 hover:border-neutral-400',
-  outline: 'border-2 border-orange-500 text-orange-600 hover:bg-orange-50 hover:text-orange-700',
-  ghost: 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100',
-  danger: 'bg-gradient-to-r from-error-500 to-error-600 hover:from-error-600 hover:to-error-700 text-white shadow-lg hover:shadow-xl'
+  primary: 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl relative overflow-hidden',
+  secondary: 'bg-white/80 backdrop-blur-xl hover:bg-white/90 text-neutral-900 border border-neutral-200/50 hover:border-neutral-300/50 shadow-sm hover:shadow-md',
+  outline: 'bg-transparent hover:bg-orange-50/50 text-orange-600 border-2 border-orange-500/50 hover:border-orange-600/50 backdrop-blur-sm',
+  ghost: 'bg-transparent hover:bg-neutral-100/50 text-neutral-600 hover:text-neutral-900 backdrop-blur-sm',
+  danger: 'bg-gradient-to-r from-error-500 to-error-600 hover:from-error-600 hover:to-error-700 text-white shadow-lg hover:shadow-xl relative overflow-hidden',
+  neural: 'bg-gradient-to-r from-blue-500 via-purple-500 to-blue-600 hover:from-blue-600 hover:via-purple-600 hover:to-blue-700 text-white shadow-neural hover:shadow-ai relative overflow-hidden',
+  glass: 'glass hover:bg-white/20 text-neutral-900 hover:text-neutral-800 shadow-glass border border-white/20 hover:border-white/30',
+  ai: 'bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 hover:from-purple-600 hover:via-blue-600 hover:to-cyan-600 text-white shadow-ai hover:shadow-neural relative overflow-hidden'
 };
 
 const sizes = {
@@ -45,6 +50,8 @@ export default function Button({
   iconPosition = 'left',
   fullWidth = false,
   animated = true,
+  shimmer = false,
+  glow = false,
   className = '',
   disabled,
   ...props
@@ -54,6 +61,8 @@ export default function Button({
     variants[variant],
     sizes[size],
     fullWidth && 'w-full',
+    shimmer && 'bg-gradient-to-r bg-[length:200%_100%] animate-shimmer',
+    glow && 'animate-glow',
     className
   );
 
@@ -89,8 +98,14 @@ export default function Button({
   }
 
   const motionProps = {
-    whileHover: { scale: 1.02 },
-    whileTap: { scale: 0.98 },
+    whileHover: {
+      scale: 1.02,
+      y: -2,
+      boxShadow: variant === 'neural' || variant === 'ai'
+        ? "0 10px 25px rgba(79, 172, 254, 0.3)"
+        : "0 10px 25px rgba(0, 0, 0, 0.15)"
+    },
+    whileTap: { scale: 0.98, y: 0 },
     transition: {
       type: "spring" as const,
       stiffness: 400,
@@ -105,7 +120,12 @@ export default function Button({
       {...motionProps}
       {...(props as any)}
     >
-      {buttonContent}
+      {shimmer && (
+        <div className="absolute inset-0 -top-[2px] -bottom-[2px] bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+      )}
+      <span className="relative z-10">
+        {buttonContent}
+      </span>
     </motion.button>
   );
 }
