@@ -37,25 +37,50 @@ const getUserStats = async () => {
   return response.json();
 };
 
-const StatCard = ({ title, value, icon: Icon, color, change }: any) => (
+const StatCard = ({ title, value, icon: Icon, gradient, change, index }: any) => (
   <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.4 }}
-    className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+    initial={{ opacity: 0, y: 30, scale: 0.9 }}
+    animate={{ opacity: 1, y: 0, scale: 1 }}
+    transition={{ duration: 0.6, delay: index * 0.1 }}
+    className="group relative"
+    whileHover={{ y: -5, scale: 1.02 }}
   >
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-sm font-medium text-gray-600">{title}</p>
-        <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
-        {change !== null && change !== undefined && (
-          <p className={`text-sm mt-1 ${change > 0 ? 'text-green-600' : change < 0 ? 'text-red-600' : 'text-gray-500'}`}>
-            {change > 0 ? '+' : ''}{change}% from last week
-          </p>
-        )}
-      </div>
-      <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${color}`}>
-        <Icon className="h-6 w-6 text-white" />
+    {/* Glowing Background */}
+    <div className={`absolute inset-0 bg-gradient-to-r ${gradient} rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500`}></div>
+
+    {/* Card */}
+    <div className="relative backdrop-blur-xl bg-white/10 rounded-2xl shadow-2xl border border-white/20 p-8 group-hover:border-white/30 transition-all duration-300">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-semibold text-white/70 mb-2">{title}</p>
+          <motion.p
+            className="text-3xl font-black text-white mb-2"
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          >
+            {value}
+          </motion.p>
+          {change !== null && change !== undefined && (
+            <p className={`text-sm font-medium ${change > 0 ? 'text-emerald-400' : change < 0 ? 'text-red-400' : 'text-white/60'}`}>
+              {change > 0 ? '+' : ''}{change}% neural boost
+            </p>
+          )}
+        </div>
+        <motion.div
+          className={`w-16 h-16 bg-gradient-to-r ${gradient} rounded-2xl flex items-center justify-center shadow-lg`}
+          animate={{
+            rotate: [0, 5, 0, -5, 0],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: index * 0.5
+          }}
+        >
+          <Icon className="h-8 w-8 text-white" />
+        </motion.div>
       </div>
     </div>
   </motion.div>
@@ -126,25 +151,45 @@ export default function DashboardPage() {
     }
   }, [isClient, router]);
 
-  // Show loading state while client-side hydration happens
+  // Epic loading state while client-side hydration happens
   if (!isClient) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center relative overflow-hidden">
+        {/* Cosmic Background */}
+        <div className="absolute inset-0">
+          <motion.div
+            className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-purple-400/30 to-pink-400/30 rounded-full blur-3xl"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </div>
+        <div className="text-center relative z-10">
+          <motion.div
+            className="w-20 h-20 border-4 border-transparent bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mx-auto mb-6"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            style={{
+              background: 'conic-gradient(from 0deg, #8b5cf6, #ec4899, #06b6d4, #8b5cf6)',
+              mask: 'radial-gradient(circle at center, transparent 60%, black 60%)',
+            }}
+          />
+          <p className="text-2xl font-bold text-white">Initializing Neural Network...</p>
         </div>
       </div>
     );
   }
 
-  // Show loading if not authenticated (will redirect)
+  // Epic redirect loading
   if (!isAuthenticated()) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Redirecting...</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center relative overflow-hidden">
+        <div className="text-center relative z-10">
+          <motion.div
+            className="w-16 h-16 border-4 border-cyan-400 rounded-full mx-auto mb-4"
+            animate={{ rotate: 360, scale: [1, 1.1, 1] }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          />
+          <p className="text-xl font-bold text-white">Quantum Redirect...</p>
         </div>
       </div>
     );
@@ -167,114 +212,193 @@ export default function DashboardPage() {
 
       <SubscriptionBanner />
 
-      <DashboardLayout title="Dashboard">
-        <div className="space-y-8">
-          {/* Welcome Section */}
-          <div className="bg-gradient-to-r from-brand-950 to-accent-500 rounded-2xl p-8 text-white shadow-2xl">
-            <h1 className="text-3xl font-bold mb-3">
-              Welcome back, {user?.name}! 👋
-            </h1>
-            <p className="text-white/90 text-lg">
-              Your Instagram auto-reply system is ready to help your customers 24/7.
-            </p>
-          </div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+        {/* Epic Background */}
+        <div className="absolute inset-0">
+          <motion.div
+            className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"
+            animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 rounded-full blur-3xl"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          />
+        </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <StatCard
-              title="Active FAQs"
-              value={activeFAQs}
-              icon={MessageSquare}
-              color="bg-blue-500"
-              change={null}
-            />
-            <StatCard
-              title="Connected Pages"
-              value={connectedPages}
-              icon={Instagram}
-              color="bg-purple-500"
-              change={null}
-            />
-            <StatCard
-              title="Auto-Replies Sent"
-              value={stats?.auto_replies_sent || 0}
-              icon={TrendingUp}
-              color="bg-green-500"
-              change={stats?.recent_activity?.auto_reply_change_percent || null}
-            />
-            <StatCard
-              title="Response Time"
-              value={stats?.avg_response_time || "< 1s"}
-              icon={Clock}
-              color="bg-orange-500"
-              change={null}
-            />
-          </div>
-
-
-
-          {/* Quick Actions & Status */}
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Quick Actions */}
+        <DashboardLayout title="Neural Command Center">
+          <div className="space-y-12 relative z-10">
+            {/* Epic Welcome Section */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1 }}
+              className="relative group"
             >
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-              <div className="space-y-3">
-                <button
-                  onClick={() => router.push('/dashboard/faqs')}
-                  className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+              {/* Glowing Background */}
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-cyan-500/20 rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-500"></div>
+
+              <div className="relative backdrop-blur-2xl bg-white/10 rounded-3xl p-10 border border-white/20 shadow-2xl">
+                <motion.h1
+                  className="text-4xl lg:text-5xl font-black mb-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
                 >
-                  <div className="flex items-center space-x-3">
-                    <Plus className="h-5 w-5 text-primary-600" />
-                    <span className="font-medium text-gray-900">Add New FAQ</span>
-                  </div>
-                  <span className="text-sm text-gray-500">→</span>
-                </button>
-                
-                <button
-                  onClick={() => router.push('/dashboard/faqs?tab=upload')}
-                  className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                  <span className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+                    Welcome back,
+                  </span>
+                  <br />
+                  <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                    {user?.name}! 🚀
+                  </span>
+                </motion.h1>
+                <motion.p
+                  className="text-xl text-white/80 leading-relaxed"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
                 >
-                  <div className="flex items-center space-x-3">
-                    <MessageSquare className="h-5 w-5 text-green-600" />
-                    <span className="font-medium text-gray-900">Upload FAQ CSV</span>
-                  </div>
-                  <span className="text-sm text-gray-500">→</span>
-                </button>
-
-                <div className="text-center py-6">
-                  <p className="text-sm text-gray-600 mb-4">
-                    Your Instagram auto-reply system is ready to help customers 24/7!
-                  </p>
-
-                  <div className="space-y-3">
-                    <a
-                      href="/live-monitor"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
-                    >
-                      <Activity className="h-4 w-4 mr-2" />
-                      View Live Message Monitor
-                    </a>
-
-
-                  </div>
-
-                  <p className="text-xs text-gray-500 mt-3">
-                    For Facebook reviewers: This shows real-time message processing
-                  </p>
-                </div>
-
-
-
-
+                  Your <span className="text-transparent bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text font-bold">Neural AI Network</span> is revolutionizing customer engagement 24/7.
+                </motion.p>
               </div>
             </motion.div>
+
+            {/* Revolutionary Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <StatCard
+                title="Neural FAQs"
+                value={activeFAQs}
+                icon={MessageSquare}
+                gradient="from-purple-500 to-pink-500"
+                change={null}
+                index={0}
+              />
+              <StatCard
+                title="Connected Empires"
+                value={connectedPages}
+                icon={Instagram}
+                gradient="from-cyan-500 to-blue-500"
+                change={null}
+                index={1}
+              />
+              <StatCard
+                title="AI Responses Sent"
+                value={stats?.auto_replies_sent || 0}
+                icon={TrendingUp}
+                gradient="from-emerald-500 to-teal-500"
+                change={stats?.recent_activity?.auto_reply_change_percent || null}
+                index={2}
+              />
+              <StatCard
+                title="Quantum Speed"
+                value={stats?.avg_response_time || "< 1s"}
+                icon={Clock}
+                gradient="from-orange-500 to-red-500"
+                change={null}
+                index={3}
+              />
+            </div>
+
+
+
+            {/* Revolutionary Quick Actions & Status */}
+            <div className="grid lg:grid-cols-2 gap-12">
+              {/* Epic Quick Actions */}
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="relative group"
+              >
+                {/* Glowing Background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-500"></div>
+
+                <div className="relative backdrop-blur-xl bg-white/10 rounded-3xl shadow-2xl border border-white/20 p-8">
+                  <h2 className="text-2xl font-bold text-white mb-8 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    Neural Commands
+                  </h2>
+
+                  <div className="space-y-6">
+                    <motion.button
+                      onClick={() => router.push('/dashboard/faqs')}
+                      className="group/btn w-full flex items-center justify-between p-6 backdrop-blur-xl bg-white/5 hover:bg-white/10 rounded-2xl transition-all duration-300 border border-white/10 hover:border-white/20"
+                      whileHover={{ x: 10, scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <motion.div
+                          className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center"
+                          animate={{ rotate: [0, 5, 0, -5, 0] }}
+                          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                        >
+                          <Plus className="h-6 w-6 text-white" />
+                        </motion.div>
+                        <span className="font-bold text-white text-lg group-hover/btn:text-transparent group-hover/btn:bg-gradient-to-r group-hover/btn:from-purple-400 group-hover/btn:to-pink-400 group-hover/btn:bg-clip-text transition-all duration-300">
+                          Create Neural FAQ
+                        </span>
+                      </div>
+                      <motion.span
+                        className="text-white/60 text-xl"
+                        animate={{ x: [0, 5, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                      >
+                        →
+                      </motion.span>
+                    </motion.button>
+
+                    <motion.button
+                      onClick={() => router.push('/dashboard/faqs?tab=upload')}
+                      className="group/btn w-full flex items-center justify-between p-6 backdrop-blur-xl bg-white/5 hover:bg-white/10 rounded-2xl transition-all duration-300 border border-white/10 hover:border-white/20"
+                      whileHover={{ x: 10, scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <motion.div
+                          className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center"
+                          animate={{ rotate: [0, 5, 0, -5, 0] }}
+                          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                        >
+                          <MessageSquare className="h-6 w-6 text-white" />
+                        </motion.div>
+                        <span className="font-bold text-white text-lg group-hover/btn:text-transparent group-hover/btn:bg-gradient-to-r group-hover/btn:from-cyan-400 group-hover/btn:to-blue-400 group-hover/btn:bg-clip-text transition-all duration-300">
+                          Upload AI Dataset
+                        </span>
+                      </div>
+                      <motion.span
+                        className="text-white/60 text-xl"
+                        animate={{ x: [0, 5, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                      >
+                        →
+                      </motion.span>
+                    </motion.button>
+
+                    <div className="text-center py-8">
+                      <p className="text-lg text-white/80 mb-6 font-semibold">
+                        Your <span className="text-transparent bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text">Neural Network</span> is revolutionizing engagement!
+                      </p>
+
+                      <motion.a
+                        href="/live-monitor"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold rounded-2xl transition-all duration-300 shadow-lg shadow-emerald-500/25"
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <Activity className="h-5 w-5 mr-3" />
+                        Neural Monitor Live
+                      </motion.a>
+
+                      <p className="text-sm text-white/50 mt-4">
+                        Real-time quantum processing visualization
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
 
             {/* System Status */}
             <motion.div
@@ -476,8 +600,9 @@ export default function DashboardPage() {
               </div>
             </div>
           </motion.div>
-        </div>
-      </DashboardLayout>
+          </div>
+        </DashboardLayout>
+      </div>
     </>
   );
 }

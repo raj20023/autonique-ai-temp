@@ -106,104 +106,250 @@ export default function CallbackPage() {
         <meta name="description" content="Connecting your Instagram Business account..." />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-orange-50/30 to-orange-100/50 relative overflow-hidden">
-        {/* Background Elements */}
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+        {/* Epic Cosmic Background */}
         <div className="absolute inset-0">
           <motion.div
-            className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-orange-400/10 to-orange-600/10 rounded-full blur-3xl"
+            className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-r from-purple-400/30 to-pink-400/30 rounded-full blur-3xl"
             animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.6, 0.3],
-              x: [0, 50, 0],
-              y: [0, -30, 0]
+              scale: [1, 1.4, 1],
+              opacity: [0.3, 0.7, 0.3],
+              x: [0, 80, 0],
+              y: [0, -60, 0]
             }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div
-            className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-orange-300/10 to-orange-500/10 rounded-full blur-3xl"
+            className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-cyan-400/25 to-blue-400/25 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.5, 1],
+              opacity: [0.2, 0.6, 0.2],
+              x: [0, -70, 0],
+              y: [0, 50, 0]
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+          />
+          <motion.div
+            className="absolute top-1/2 left-1/3 w-64 h-64 bg-gradient-to-r from-emerald-400/20 to-teal-400/20 rounded-full blur-3xl"
             animate={{
               scale: [1, 1.3, 1],
-              opacity: [0.2, 0.5, 0.2],
-              x: [0, -30, 0],
-              y: [0, 20, 0]
+              opacity: [0.4, 0.8, 0.4],
+              rotate: [0, 360]
             }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
           />
+
+          {/* Floating Particles */}
+          {[...Array(40)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-white/30 rounded-full"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [0, -150, 0],
+                opacity: [0, 1, 0],
+                scale: [0, 1.5, 0],
+              }}
+              transition={{
+                duration: Math.random() * 5 + 4,
+                repeat: Infinity,
+                delay: Math.random() * 4,
+                ease: "easeInOut"
+              }}
+            />
+          ))}
         </div>
 
-        <div className="relative flex items-center justify-center min-h-screen p-6">
-          <div className="max-w-lg w-full">
+        <div className="relative flex items-center justify-center min-h-screen p-6 z-10">
+          <div className="max-w-2xl w-full">
             <motion.div
-              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8 md:p-12 text-center"
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="relative group"
             >
-              {/* Logo Header */}
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-                className="mb-8"
-              >
-                <div className="inline-block relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-orange-600/20 rounded-2xl blur-xl scale-110"></div>
-                  <div className="relative bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white/50">
-                    <img
-                      src="/logos/logo_icon.png"
-                      alt="AutoniqueAI"
-                      className="h-12 w-12 mx-auto"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
+              {/* Epic Glowing Background */}
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-cyan-500/20 rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-500"></div>
+
+              <div className="relative backdrop-blur-2xl bg-white/10 rounded-3xl shadow-2xl border border-white/20 p-12 md:p-16 text-center">
+                {/* Epic Logo Header */}
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.3, type: "spring", stiffness: 200, damping: 15 }}
+                  className="mb-12"
+                >
+                  <div className="inline-block relative">
+                    {/* Holographic Glow */}
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-purple-500/40 via-pink-500/40 to-cyan-500/40 rounded-3xl blur-2xl scale-150"
+                      animate={{
+                        scale: [1.4, 1.6, 1.4],
+                        opacity: [0.4, 0.8, 0.4],
+                        rotate: [0, 180, 360]
+                      }}
+                      transition={{
+                        duration: 8,
+                        repeat: Infinity,
+                        ease: "easeInOut"
                       }}
                     />
-                  </div>
-                </div>
-              </motion.div>
 
-              {/* Status Icon */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5, duration: 0.6, type: "spring", stiffness: 200 }}
-                className="mb-8"
-              >
-                {status === 'loading' && (
-                  <div className="relative">
+                    {/* Logo Container */}
                     <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                      className="w-20 h-20 mx-auto"
+                      className="relative backdrop-blur-xl bg-white/10 rounded-3xl p-8 shadow-2xl border border-white/20"
+                      animate={{
+                        y: [0, -15, 0],
+                      }}
+                      transition={{
+                        duration: 6,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
                     >
-                      <div className="w-20 h-20 border-4 border-orange-200 border-t-orange-500 rounded-full"></div>
-                    </motion.div>
-                    <motion.div
-                      animate={{ scale: [1, 1.1, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="absolute inset-0 flex items-center justify-center"
-                    >
-                      <Instagram className="w-8 h-8 text-orange-500" />
+                      <img
+                        src="/logos/logo_icon.png"
+                        alt="AutoniqueAI"
+                        className="h-20 w-20 mx-auto filter drop-shadow-2xl"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+
+                      {/* Rotating Ring */}
+                      <motion.div
+                        className="absolute inset-0 rounded-3xl border-2 border-gradient-to-r from-purple-400 via-pink-400 to-cyan-400"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+                      />
                     </motion.div>
                   </div>
-                )}
+                </motion.div>
 
-                {status === 'success' && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: 0.6, type: "spring", stiffness: 200 }}
-                    className="relative"
-                  >
-                    <div className="w-20 h-20 mx-auto bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-xl">
-                      <CheckCircle className="w-10 h-10 text-white" />
+                {/* Epic Status Icon */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.6, duration: 0.8, type: "spring", stiffness: 200 }}
+                  className="mb-12"
+                >
+                  {status === 'loading' && (
+                    <div className="relative">
+                      {/* Quantum Loading Ring */}
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                        className="w-32 h-32 mx-auto"
+                      >
+                        <div className="w-32 h-32 border-4 border-transparent bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 rounded-full"
+                             style={{
+                               background: 'conic-gradient(from 0deg, #8b5cf6, #ec4899, #06b6d4, #8b5cf6)',
+                               mask: 'radial-gradient(circle at center, transparent 70%, black 70%)',
+                             }}
+                        />
+                      </motion.div>
+
+                      {/* Pulsing Center */}
+                      <motion.div
+                        animate={{ scale: [1, 1.2, 1], opacity: [0.8, 1, 0.8] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="absolute inset-0 flex items-center justify-center"
+                      >
+                        <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-2xl">
+                          <Instagram className="w-10 h-10 text-white" />
+                        </div>
+                      </motion.div>
+
+                      {/* Floating Particles */}
+                      {[...Array(8)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          className="absolute w-2 h-2 bg-cyan-400 rounded-full"
+                          style={{
+                            left: '50%',
+                            top: '50%',
+                            marginLeft: '-4px',
+                            marginTop: '-4px',
+                          }}
+                          animate={{
+                            x: Math.cos(i * 45 * Math.PI / 180) * 60,
+                            y: Math.sin(i * 45 * Math.PI / 180) * 60,
+                            scale: [0, 1, 0],
+                            opacity: [0, 1, 0],
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            delay: i * 0.2,
+                            ease: "easeInOut"
+                          }}
+                        />
+                      ))}
                     </div>
+                  )}
+
+                  {status === 'success' && (
                     <motion.div
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 1, repeat: 3 }}
-                      className="absolute inset-0 bg-green-400/30 rounded-full blur-xl"
-                    />
-                  </motion.div>
-                )}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.8, type: "spring", stiffness: 200 }}
+                      className="relative"
+                    >
+                      {/* Epic Success Explosion */}
+                      <motion.div
+                        className="w-32 h-32 mx-auto bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full flex items-center justify-center shadow-2xl"
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
+                      >
+                        <CheckCircle className="w-16 h-16 text-white" />
+                      </motion.div>
+
+                      {/* Success Rings */}
+                      {[...Array(3)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          className="absolute inset-0 border-4 border-emerald-400/50 rounded-full"
+                          animate={{
+                            scale: [1, 2, 3],
+                            opacity: [0.8, 0.4, 0]
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            delay: i * 0.5,
+                            ease: "easeOut"
+                          }}
+                        />
+                      ))}
+
+                      {/* Sparkle Effects */}
+                      {[...Array(12)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          className="absolute w-1 h-1 bg-yellow-400 rounded-full"
+                          style={{
+                            left: '50%',
+                            top: '50%',
+                          }}
+                          animate={{
+                            x: Math.cos(i * 30 * Math.PI / 180) * (80 + Math.random() * 40),
+                            y: Math.sin(i * 30 * Math.PI / 180) * (80 + Math.random() * 40),
+                            scale: [0, 1, 0],
+                            opacity: [0, 1, 0],
+                          }}
+                          transition={{
+                            duration: 1.5,
+                            repeat: Infinity,
+                            delay: i * 0.1,
+                            ease: "easeOut"
+                          }}
+                        />
+                      ))}
+                    </motion.div>
+                  )}
 
                 {status === 'setup_required' && (
                   <motion.div
@@ -331,6 +477,7 @@ export default function CallbackPage() {
                   </div>
                 )}
               </motion.div>
+              </div>
             </motion.div>
           </div>
         </div>
