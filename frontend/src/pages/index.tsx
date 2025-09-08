@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import {
   MessageCircle,
   Zap,
@@ -11,71 +10,63 @@ import {
   Instagram,
   ArrowRight,
   CheckCircle,
-  Sparkles,
   Clock,
-  Users,
   Brain,
-  Cpu,
-  Layers
+  Menu
 } from 'lucide-react';
 import { isAuthenticated } from '@/utils/auth';
-import LogoSimple from '@/components/ui/LogoSimple';
 import Button from '@/components/ui/Button';
-import { FeatureCard } from '@/components/ui/Card';
-import AnimatedContainer, { StaggerContainer, StaggerItem } from '@/components/ui/AnimatedContainer';
-import ParticleSystem, { ParticlePresets } from '@/components/ui/ParticleSystem';
 
 const features = [
   {
-    icon: <MessageCircle className="h-8 w-8" />,
+    icon: <MessageCircle className="h-6 w-6 text-blue-600" />,
     title: 'AI-Powered Auto-Reply',
     description: 'Intelligent responses to Instagram DMs using advanced AI and FAQ matching for natural conversations'
   },
   {
-    icon: <Zap className="h-8 w-8" />,
+    icon: <Zap className="h-6 w-6 text-blue-600" />,
     title: 'Lightning Fast Setup',
     description: 'Connect your Instagram Business account in under 2 minutes with secure Facebook OAuth integration'
   },
   {
-    icon: <Shield className="h-8 w-8" />,
+    icon: <Shield className="h-6 w-6 text-blue-600" />,
     title: 'Enterprise Security',
     description: 'Bank-grade encryption, secure token storage, and GDPR-compliant data handling'
   },
   {
-    icon: <BarChart3 className="h-8 w-8" />,
+    icon: <BarChart3 className="h-6 w-6 text-blue-600" />,
     title: 'Advanced Analytics',
     description: 'Real-time insights, response rates, customer satisfaction metrics, and engagement analytics'
   },
   {
-    icon: <Clock className="h-8 w-8" />,
-    title: '24/7 Availability',
-    description: 'Never miss a customer inquiry with round-the-clock automated responses'
+    icon: <Clock className="h-6 w-6 text-blue-600" />,
+    title: '24/7 Automation',
+    description: 'Never miss a customer inquiry with round-the-clock automated responses and smart escalation'
   },
   {
-    icon: <Users className="h-8 w-8" />,
-    title: 'Multi-Account Support',
-    description: 'Manage multiple Instagram Business accounts from a single, unified dashboard'
+    icon: <Brain className="h-6 w-6 text-blue-600" />,
+    title: 'Smart Learning',
+    description: 'AI continuously learns from your responses to improve accuracy and maintain your brand voice'
   }
 ];
 
 const benefits = [
-  'Save 10+ hours weekly on manual customer service',
-  'Achieve 99.9% response rate with zero missed inquiries',
-  'Provide instant responses in under 0.5 seconds',
-  'Boost customer satisfaction by 40% on average',
-  'Scale to handle 1000+ daily messages effortlessly',
-  'Reduce customer service costs by up to 80%'
+  'Save 10+ hours weekly on customer service',
+  'Increase response rate by 300%',
+  'Improve customer satisfaction scores',
+  'Scale your business without hiring',
+  'Never miss a potential sale',
+  'Maintain consistent brand voice'
 ];
 
 export default function HomePage() {
   const router = useRouter();
 
-  // Temporarily disable auth check to debug
-  // useEffect(() => {
-  //   if (isAuthenticated()) {
-  //     router.push('/dashboard');
-  //   }
-  // }, [router]);
+  useEffect(() => {
+    if (isAuthenticated()) {
+      router.push('/dashboard');
+    }
+  }, [router]);
 
   const handleGetStarted = () => {
     router.push('/auth/login');
@@ -84,769 +75,259 @@ export default function HomePage() {
   return (
     <>
       <Head>
-        <title>AutoniqueAI - Instagram Auto-Reply SaaS</title>
-        <meta name="description" content="Automatically respond to Instagram DMs with AI-powered FAQ matching. Save time and never miss a customer inquiry." />
+        <title>AutoniqueAI - AI-Powered Instagram Customer Service Automation</title>
+        <meta name="description" content="Transform your Instagram customer service with Neural AI Technology. Save 10+ hours weekly while providing instant, intelligent responses." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-neutral-50 via-blue-50/30 to-cyan-50/20">
-        {/* Particle Background */}
-        <ParticleSystem
-          {...ParticlePresets.neural}
-          className="absolute inset-0 z-0"
-        />
-
-        {/* Animated Background Gradients */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-ai-neural opacity-20 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-ai-quantum opacity-15 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
-          <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-gradient-ai-cyber opacity-10 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }} />
-        </div>
-
+      <div className="min-h-screen bg-white">
         {/* Header */}
-        <motion.header
-          className="relative z-50 glass border-b border-white/10"
-          initial={{ y: -100 }}
-          animate={{ y: 0 }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        >
-          <nav className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
+        <header className="bg-white border-b border-gray-200">
+          <nav className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
             <div className="flex justify-between items-center">
-              <motion.div
-                className="flex items-center"
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
-              >
+              <div className="flex items-center">
                 <img
                   src="/logos/full_logo_light_theam.png"
                   alt="AutoniqueAI"
-                  className="h-10 w-auto"
+                  className="h-8 w-auto"
                   onError={(e) => {
                     e.currentTarget.src = "/logos/logo_icon.png";
-                    e.currentTarget.className = "h-10 w-10";
+                    e.currentTarget.className = "h-8 w-8";
                   }}
                 />
-              </motion.div>
-              <div className="hidden lg:flex items-center space-x-12">
-                <Link href="#features" className="text-neutral-700 hover:text-orange-600 transition-all duration-200 font-medium text-sm tracking-wide">
+              </div>
+              
+              <div className="hidden md:flex items-center space-x-8">
+                <Link href="#features" className="text-gray-600 hover:text-gray-900 transition-colors font-medium">
                   Features
                 </Link>
-                <Link href="#benefits" className="text-neutral-700 hover:text-orange-600 transition-all duration-200 font-medium text-sm tracking-wide">
+                <Link href="#benefits" className="text-gray-600 hover:text-gray-900 transition-colors font-medium">
                   Benefits
                 </Link>
-                <Link href="#pricing" className="text-neutral-700 hover:text-orange-600 transition-all duration-200 font-medium text-sm tracking-wide">
+                <Link href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors font-medium">
                   Pricing
                 </Link>
-                <motion.button
+                <Button
                   onClick={handleGetStarted}
-                  className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 rounded-2xl font-semibold text-sm transition-all duration-200 shadow-lg hover:shadow-xl flex items-center space-x-2"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors"
                 >
-                  <span>Get Started</span>
-                  <ArrowRight className="h-4 w-4" />
-                </motion.button>
+                  Start Free Trial
+                </Button>
               </div>
+              
+              <button className="md:hidden p-2">
+                <Menu className="h-6 w-6 text-gray-700" />
+              </button>
             </div>
           </nav>
-        </motion.header>
+        </header>
 
         {/* Hero Section */}
-        <section className="relative overflow-hidden">
-          {/* AI-Inspired Background Elements */}
-          <div className="absolute inset-0">
-            {/* Neural Network Nodes */}
-            <motion.div
-              className="absolute top-20 left-10 w-4 h-4 rounded-full shadow-lg"
-              style={{ backgroundColor: '#4facfe' }}
-              animate={{
-                scale: [1, 1.5, 1],
-                opacity: [0.6, 1, 0.6],
-              }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.div
-              className="absolute top-32 left-32 w-3 h-3 rounded-full shadow-lg"
-              style={{ backgroundColor: '#38bdf8' }}
-              animate={{
-                scale: [1, 1.3, 1],
-                opacity: [0.5, 0.9, 0.5],
-              }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-            />
-            <motion.div
-              className="absolute top-40 right-20 w-5 h-5 rounded-full shadow-lg"
-              style={{ backgroundColor: '#d946ef' }}
-              animate={{
-                scale: [1, 1.4, 1],
-                opacity: [0.7, 1, 0.7],
-              }}
-              transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-            />
-
-            {/* Floating AI Elements */}
-            <motion.div
-              className="absolute top-1/4 right-1/4 w-20 h-20 glass rounded-2xl flex items-center justify-center"
-              animate={{
-                y: [0, -20, 0],
-                rotateY: [0, 180, 360],
-              }}
-              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <Brain className="w-8 h-8" style={{ color: '#4facfe' }} />
-            </motion.div>
-
-            <motion.div
-              className="absolute bottom-1/3 left-1/4 w-16 h-16 glass rounded-xl flex items-center justify-center"
-              animate={{
-                y: [0, 15, 0],
-                rotateX: [0, 180, 360],
-              }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-            >
-              <Cpu className="w-6 h-6" style={{ color: '#38bdf8' }} />
-            </motion.div>
-          </div>
-
-          <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-24 lg:py-32">
+        <section className="py-20 lg:py-32 bg-gradient-to-b from-gray-50 to-white">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="text-center">
-              {/* AI-Enhanced Logo Hero */}
-              <AnimatedContainer
-                animation="neuralPulse"
-                className="mb-16"
-                delay={0.2}
-              >
-                <motion.div
-                  className="inline-block relative"
-                  animate={{
-                    y: [0, -8, 0],
+              {/* Logo */}
+              <div className="mb-8">
+                <img
+                  src="/logos/logo_icon.png"
+                  alt="AutoniqueAI"
+                  className="h-16 w-16 mx-auto"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
                   }}
-                  transition={{
-                    duration: 4,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
+                />
+              </div>
+
+              {/* Main Headline */}
+              <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
+                Transform Your Instagram
+                <br />
+                <span className="text-blue-600">Customer Service</span>
+              </h1>
+
+              {/* Subtitle */}
+              <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
+                Transform your Instagram customer service with Neural AI Technology.
+                <br />
+                Save 10+ hours weekly while providing instant, intelligent responses.
+              </p>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+                <Button
+                  onClick={handleGetStarted}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold text-lg flex items-center space-x-2"
                 >
-                  <div className="absolute inset-0 bg-gradient-ai-neural rounded-3xl blur-2xl scale-110 opacity-30"></div>
-                  <div className="relative glass rounded-3xl p-8 shadow-neural border border-white/20 glow-ai">
-                    <img
-                      src="/logos/logo_icon.png"
-                      alt="AutoniqueAI"
-                      className="h-20 w-20 mx-auto"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                    {/* AI Pulse Ring */}
-                    <div className="absolute inset-0 rounded-3xl border-2 border-blue-400/50 animate-pulse"></div>
-                  </div>
-                </motion.div>
-              </AnimatedContainer>
-
-              {/* AI-Enhanced Main Headline */}
-              <AnimatedContainer
-                animation="morphGlow"
-                delay={0.4}
-                className="mb-8"
-              >
-                <h1 className="text-display text-6xl md:text-7xl lg:text-8xl font-black text-neutral-900 mb-6 leading-[0.9] tracking-tight">
-                  <span className="relative inline-block">
-                    AI-Powered{' '}
-                    <motion.div
-                      className="absolute -inset-1 bg-gradient-ai-neural rounded-lg blur-sm opacity-30"
-                      animate={{
-                        scale: [1, 1.05, 1],
-                        opacity: [0.3, 0.6, 0.3]
-                      }}
-                      transition={{ duration: 3, repeat: Infinity }}
-                    />
-                  </span>
-                  <br />
-                  <span className="relative inline-block">
-                    <span className="bg-gradient-to-r from-blue-500 via-cyan-500 to-purple-500 bg-clip-text text-transparent">
-                      Instagram
-                    </span>
-                    <motion.div
-                      className="absolute -inset-2 bg-gradient-ai-quantum rounded-2xl blur-xl opacity-40"
-                      animate={{
-                        opacity: [0.4, 0.8, 0.4],
-                        scale: [1, 1.1, 1]
-                      }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                  </span>{' '}
-                  <span className="relative inline-block">
-                    Automation
-                    <motion.div
-                      className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full"
-                      initial={{ scaleX: 0 }}
-                      animate={{ scaleX: 1 }}
-                      transition={{ duration: 1.5, delay: 1 }}
-                    />
-                  </span>
-                </h1>
-              </AnimatedContainer>
-
-              {/* AI-Enhanced Subtitle */}
-              <AnimatedContainer
-                animation="dataFlow"
-                delay={0.6}
-                className="mb-12"
-              >
-                <p className="text-body text-xl md:text-2xl text-neutral-600 max-w-4xl mx-auto leading-relaxed font-medium">
-                  Transform your Instagram customer service with{' '}
-                  <span className="relative">
-                    <span className="bg-gradient-to-r from-blue-600 via-cyan-600 to-purple-600 bg-clip-text text-transparent font-semibold">
-                      Neural AI Technology
-                    </span>
-                    <motion.div
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-400 to-cyan-400"
-                      initial={{ scaleX: 0 }}
-                      animate={{ scaleX: 1 }}
-                      transition={{ duration: 1, delay: 1.2 }}
-                    />
-                  </span>
-                  .<br />
-                  Save 10+ hours weekly while providing instant, intelligent responses.
-                </p>
-              </AnimatedContainer>
-
-              {/* AI-Enhanced CTA Buttons */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.8 }}
-              >
-                <StaggerContainer
-                  stagger={0.2}
-                  className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
+                  <Instagram className="h-5 w-5" />
+                  <span>Start AI Journey</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-4 rounded-lg font-semibold text-lg"
                 >
-                <StaggerItem>
-                  <Button
-                    variant="ai"
-                    size="xl"
-                    onClick={handleGetStarted}
-                    icon={<Brain className="h-6 w-6" />}
-                    iconPosition="left"
-                    shimmer={true}
-                    glow={true}
-                    className="px-10 py-5 text-lg font-bold"
-                  >
-                    Start AI Journey
-                    <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </StaggerItem>
+                  Watch Neural Demo
+                </Button>
+              </div>
 
-                <StaggerItem>
-                  <Button
-                    variant="glass"
-                    size="xl"
-                    icon={<Layers className="h-5 w-5" />}
-                    iconPosition="left"
-                    className="px-8 py-5 text-lg font-semibold"
-                  >
-                    Watch Neural Demo
-                  </Button>
-                </StaggerItem>
-              </StaggerContainer>
-
-                <motion.div
-                  className="flex items-center space-x-3 text-neutral-600 bg-white/90 backdrop-blur-xl px-6 py-4 rounded-2xl border border-neutral-200/50 shadow-lg"
-                  whileHover={{ scale: 1.02, y: -1 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                  <span className="font-medium">14-day free trial • No credit card required</span>
-                </motion.div>
-              </motion.div>
+              {/* Trust Badge */}
+              <div className="flex items-center justify-center space-x-3 text-gray-600 bg-white/90 px-6 py-4 rounded-xl border border-gray-200 shadow-sm inline-flex">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                <span className="font-medium">14-day free trial • No credit card required</span>
+              </div>
 
               {/* Social Proof */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.9 }}
-                className="flex flex-col lg:flex-row items-center justify-center space-y-6 lg:space-y-0 lg:space-x-12 text-neutral-600"
-              >
+              <div className="mt-16 flex flex-col lg:flex-row items-center justify-center space-y-6 lg:space-y-0 lg:space-x-12 text-gray-600">
                 <div className="flex items-center space-x-4">
                   <div className="flex -space-x-3">
                     {[
-                      'bg-gradient-to-r from-blue-500 to-blue-600',
-                      'bg-gradient-to-r from-green-500 to-green-600',
-                      'bg-gradient-to-r from-purple-500 to-purple-600',
-                      'bg-gradient-to-r from-pink-500 to-pink-600'
+                      'bg-blue-500',
+                      'bg-green-500',
+                      'bg-purple-500',
+                      'bg-pink-500'
                     ].map((bg, i) => (
-                      <motion.div
+                      <div
                         key={i}
                         className={`w-10 h-10 ${bg} rounded-full border-3 border-white flex items-center justify-center text-white text-sm font-bold shadow-lg`}
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 1.1 + i * 0.1, type: "spring", stiffness: 200 }}
                       >
                         {String.fromCharCode(65 + i)}
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                   <div>
-                    <p className="font-semibold text-neutral-900">1000+ businesses</p>
-                    <p className="text-sm text-neutral-600">trust AutoniqueAI</p>
+                    <p className="font-semibold text-gray-900">1000+ businesses</p>
+                    <p className="text-sm">trust AutoniqueAI</p>
                   </div>
                 </div>
-
-                <div className="flex items-center space-x-3">
-                  <div className="flex items-center space-x-1">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, scale: 0, rotate: -180 }}
-                        animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                        transition={{ delay: 1.3 + i * 0.1, type: "spring", stiffness: 200 }}
-                        className="text-yellow-400 text-xl"
-                      >
-                        ⭐
-                      </motion.div>
+                
+                <div className="flex items-center space-x-2">
+                  <div className="flex space-x-1">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="w-5 h-5 text-yellow-400 fill-current">⭐</div>
                     ))}
                   </div>
                   <div>
-                    <p className="font-semibold text-neutral-900">4.9/5 rating</p>
-                    <p className="text-sm text-neutral-600">from 500+ reviews</p>
+                    <p className="font-semibold text-gray-900">4.9/5 rating</p>
+                    <p className="text-sm">from 500+ reviews</p>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             </div>
           </div>
-
         </section>
 
         {/* Features Section */}
-        <section id="features" className="py-24 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <AnimatedContainer animation="slideUp" className="text-center mb-20">
-              <div className="mb-8">
-                <motion.div
-                  className="inline-block bg-gradient-to-r from-orange-500 to-orange-600 rounded-3xl p-4 shadow-xl"
-                  whileHover={{
-                    scale: 1.05,
-                    rotate: [0, -5, 5, 0],
-                    transition: { duration: 0.5 }
-                  }}
-                >
-                  <LogoSimple variant="icon" size="lg" className="text-white" />
-                </motion.div>
-              </div>
-              <h2 className="text-4xl md:text-6xl font-bold text-neutral-900 mb-8">
-                Everything you need to{' '}
-                <span className="bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
-                  automate customer service
-                </span>
+        <section id="features" className="py-20 bg-white">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                Powerful Features for Modern Businesses
               </h2>
-              <p className="text-xl md:text-2xl text-neutral-600 max-w-4xl mx-auto leading-relaxed">
-                Powerful AI-driven features designed to transform your Instagram customer support experience
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Everything you need to automate and scale your Instagram customer service
               </p>
-            </AnimatedContainer>
+            </div>
 
-            <StaggerContainer className="grid md:grid-cols-2 lg:grid-cols-3 gap-8" stagger={0.15}>
-              {features.map((feature, index) => (
-                <StaggerItem key={feature.title}>
-                  <FeatureCard
-                    icon={feature.icon}
-                    title={feature.title}
-                    description={feature.description}
-                    className="h-full"
-                  />
-                </StaggerItem>
-              ))}
-            </StaggerContainer>
-
-            {/* Feature Highlight */}
-            <AnimatedContainer animation="scaleIn" delay={0.8} className="mt-20">
-              <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-4xl p-8 md:p-12 border border-orange-200">
-                <div className="grid lg:grid-cols-2 gap-12 items-center">
-                  <div>
-                    <h3 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-6">
-                      See AutoniqueAI in action
-                    </h3>
-                    <p className="text-lg text-neutral-600 mb-8 leading-relaxed">
-                      Watch how our AI seamlessly handles customer inquiries, providing instant,
-                      accurate responses that feel natural and helpful.
-                    </p>
-                    <Button
-                      variant="primary"
-                      size="lg"
-                      icon={<ArrowRight className="h-5 w-5" />}
-                      iconPosition="right"
-                    >
-                      Watch Demo
-                    </Button>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {features.map((feature) => (
+                <div key={feature.title} className="bg-white p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow">
+                  <div className="mb-4">
+                    {feature.icon}
                   </div>
-                  <div className="relative">
-                    <motion.div
-                      className="bg-white rounded-3xl shadow-2xl p-6 border border-neutral-200"
-                      whileHover={{ scale: 1.02 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <div className="flex items-center space-x-3 mb-4">
-                        <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center">
-                          <Instagram className="h-5 w-5 text-white" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-neutral-900">Customer Message</p>
-                          <p className="text-sm text-neutral-500">Just now</p>
-                        </div>
-                      </div>
-                      <div className="bg-neutral-100 rounded-2xl p-4 mb-4">
-                        <p className="text-neutral-800">
-                          "What are your store hours and do you offer same-day delivery?"
-                        </p>
-                      </div>
-                      <div className="border-t border-neutral-200 pt-4">
-                        <div className="flex items-center space-x-3 mb-3">
-                          <LogoSimple variant="icon" size="sm" />
-                          <p className="font-semibold text-neutral-900">AutoniqueAI</p>
-                        </div>
-                        <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-2xl p-4">
-                          <p className="text-neutral-800 mb-2">
-                            "Hi! We're open Monday-Friday 9AM-6PM and Saturday 10AM-4PM.
-                            Yes, we offer same-day delivery for orders placed before 2PM within our delivery zone.
-                            Would you like to check if your area is covered?"
-                          </p>
-                          <p className="text-xs text-orange-600 font-medium">✓ Auto-replied in 0.3s</p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-600">
+                    {feature.description}
+                  </p>
                 </div>
-              </div>
-            </AnimatedContainer>
+              ))}
+            </div>
           </div>
         </section>
 
         {/* Benefits Section */}
-        <section id="benefits" className="py-24 bg-gradient-to-br from-neutral-900 via-neutral-800 to-orange-900">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section id="benefits" className="py-20 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <AnimatedContainer animation="slideRight">
-                <div className="mb-8">
-                  <motion.div
-                    className="bg-white/10 backdrop-blur-sm rounded-3xl p-4 w-fit shadow-xl border border-white/20"
-                    whileHover={{ scale: 1.05, rotate: 5 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <LogoSimple variant="icon" size="lg" className="text-white" />
-                  </motion.div>
-                </div>
-
-                <h2 className="text-4xl md:text-6xl font-bold text-white mb-8">
-                  Transform your{' '}
-                  <span className="bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">
-                    customer service
-                  </span>
+              <div>
+                <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
+                  Why Choose AutoniqueAI?
                 </h2>
-                <p className="text-xl text-white/90 mb-12 leading-relaxed">
-                  Join 1000+ businesses already using AutoniqueAI to provide
-                  lightning-fast, intelligent customer support on Instagram.
+                <p className="text-xl text-gray-600 mb-8">
+                  Join thousands of businesses already saving time and improving customer satisfaction
                 </p>
 
-                <StaggerContainer className="space-y-6" stagger={0.1}>
-                  {benefits.map((benefit, index) => (
-                    <StaggerItem key={benefit}>
-                      <motion.div
-                        className="flex items-center space-x-4"
-                        whileHover={{ x: 10 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <motion.div
-                          className="bg-gradient-to-r from-orange-400 to-orange-500 rounded-full p-1 shadow-lg"
-                          whileHover={{ scale: 1.2, rotate: 180 }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          <CheckCircle className="h-6 w-6 text-white" />
-                        </motion.div>
-                        <span className="text-white text-lg font-medium">{benefit}</span>
-                      </motion.div>
-                    </StaggerItem>
+                <div className="space-y-4">
+                  {benefits.map((benefit) => (
+                    <div key={benefit} className="flex items-center space-x-4">
+                      <CheckCircle className="h-6 w-6 text-green-500 flex-shrink-0" />
+                      <span className="text-gray-700 font-medium">{benefit}</span>
+                    </div>
                   ))}
-                </StaggerContainer>
-              </AnimatedContainer>
-
-              <AnimatedContainer animation="slideLeft" delay={0.3}>
-                <div className="relative">
-                  {/* Floating background elements */}
-                  <motion.div
-                    className="absolute -top-4 -right-4 w-24 h-24 bg-orange-500/20 rounded-full blur-xl"
-                    animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
-                    transition={{ duration: 4, repeat: Infinity }}
-                  />
-                  <motion.div
-                    className="absolute -bottom-4 -left-4 w-32 h-32 bg-orange-400/20 rounded-full blur-xl"
-                    animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.5, 0.2] }}
-                    transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-                  />
-
-                  <motion.div
-                    className="bg-white/10 backdrop-blur-xl rounded-4xl shadow-2xl p-8 border border-white/20 relative z-10"
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className="flex items-center space-x-4 mb-6">
-                      <motion.div
-                        className="w-12 h-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg"
-                        whileHover={{ rotate: 360 }}
-                        transition={{ duration: 0.5 }}
-                      >
-                        <MessageCircle className="h-6 w-6 text-white" />
-                      </motion.div>
-                      <div>
-                        <p className="font-semibold text-white">Customer Message</p>
-                        <p className="text-sm text-white/70">Just now</p>
-                      </div>
-                    </div>
-                    <motion.div
-                      className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 mb-6"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 }}
-                    >
-                      <p className="text-white font-medium">
-                        "Do you have this product in stock? What's the delivery time to New York?"
-                      </p>
-                    </motion.div>
-                    <div className="border-t border-white/20 pt-6">
-                      <div className="flex items-center space-x-4 mb-4">
-                        <motion.div
-                          className="w-10 h-10 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg"
-                          whileHover={{ scale: 1.1 }}
-                        >
-                          <LogoSimple variant="icon" size="xs" />
-                        </motion.div>
-                        <p className="font-semibold text-white">AutoniqueAI</p>
-                      </div>
-                      <motion.div
-                        className="bg-gradient-to-r from-orange-400/20 to-orange-500/20 backdrop-blur-sm rounded-2xl p-4"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.8 }}
-                      >
-                        <p className="text-white mb-3">
-                          "Yes, we have it in stock! For New York delivery, we offer:
-                          • Standard delivery: 2-3 business days ($5.99)
-                          • Express delivery: Next business day ($12.99)
-
-                          Would you like me to help you place an order?"
-                        </p>
-                        <motion.p
-                          className="text-xs text-orange-300 font-medium"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 1.2 }}
-                        >
-                          ✓ Auto-replied in 0.2s with inventory check
-                        </motion.p>
-                      </motion.div>
-                    </div>
-                  </motion.div>
                 </div>
-              </AnimatedContainer>
+              </div>
+
+              <div className="bg-white p-8 rounded-xl shadow-lg">
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                    See AutoniqueAI in action
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Watch how our AI seamlessly handles customer inquiries, providing instant, accurate responses that feel natural and helpful.
+                  </p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium">
+                    Watch Demo
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
         {/* CTA Section */}
-        <section className="py-24 bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 relative overflow-hidden">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 left-0 w-full h-full" style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-            }}></div>
-          </div>
-
-          <div className="max-w-5xl mx-auto text-center px-4 sm:px-6 lg:px-8 relative z-10">
-            <AnimatedContainer animation="bounceIn" className="mb-12">
-              <motion.div
-                className="inline-block bg-white/20 backdrop-blur-xl rounded-4xl p-8 shadow-2xl border border-white/30"
-                animate={{
-                  y: [0, -10, 0],
-                  rotate: [0, 2, -2, 0]
-                }}
-                transition={{
-                  duration: 6,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
+        <section className="py-20 bg-blue-600">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
+            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
+              Ready to Transform Your Customer Service?
+            </h2>
+            <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+              Join 1000+ businesses already saving 10+ hours weekly with intelligent automation
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button
+                onClick={handleGetStarted}
+                className="bg-white text-blue-600 hover:bg-gray-50 px-8 py-4 rounded-lg font-semibold text-lg flex items-center space-x-2"
               >
-                <LogoSimple variant="icon" size="2xl" className="mx-auto" />
-              </motion.div>
-            </AnimatedContainer>
-
-            <AnimatedContainer animation="slideUp" delay={0.2}>
-              <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-8 drop-shadow-lg leading-tight">
-                Ready to{' '}
-                <span className="relative">
-                  automate
-                  <motion.div
-                    className="absolute -bottom-2 left-0 right-0 h-1 bg-white/30 rounded-full"
-                    initial={{ scaleX: 0 }}
-                    whileInView={{ scaleX: 1 }}
-                    transition={{ duration: 0.8, delay: 0.5 }}
-                  />
-                </span>
-                {' '}your Instagram customer service?
-              </h2>
-            </AnimatedContainer>
-
-            <AnimatedContainer animation="fadeIn" delay={0.4}>
-              <p className="text-xl md:text-2xl text-white/90 mb-12 font-medium max-w-3xl mx-auto leading-relaxed">
-                Join 1000+ businesses already saving 10+ hours weekly with intelligent automation
-              </p>
-            </AnimatedContainer>
-
-            <AnimatedContainer animation="scaleIn" delay={0.6}>
-              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                <Button
-                  onClick={handleGetStarted}
-                  variant="secondary"
-                  size="xl"
-                  icon={<Instagram className="h-7 w-7" />}
-                  className="bg-white text-orange-600 hover:bg-neutral-50 shadow-2xl hover:shadow-3xl border-0"
-                >
-                  Start Free Trial
-                  <ArrowRight className="h-6 w-6 ml-2" />
-                </Button>
-
-                <motion.div
-                  className="flex items-center space-x-3 text-white/90 bg-white/10 backdrop-blur-sm px-6 py-4 rounded-2xl border border-white/20"
-                  whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.15)" }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Sparkles className="h-5 w-5" />
-                  <span className="font-medium">Setup takes less than 2 minutes</span>
-                </motion.div>
+                <Instagram className="h-5 w-5" />
+                <span>Start Free Trial</span>
+                <ArrowRight className="h-5 w-5" />
+              </Button>
+              <div className="text-blue-100 text-sm">
+                ✨ Setup takes less than 2 minutes
               </div>
-            </AnimatedContainer>
-
-            {/* Floating elements */}
-            <motion.div
-              className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl"
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.3, 0.6, 0.3]
-              }}
-              transition={{ duration: 4, repeat: Infinity }}
-            />
-            <motion.div
-              className="absolute bottom-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-xl"
-              animate={{
-                scale: [1, 1.3, 1],
-                opacity: [0.2, 0.5, 0.2]
-              }}
-              transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-            />
+            </div>
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="bg-neutral-900 text-white py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <AnimatedContainer animation="slideUp">
-              <div className="grid md:grid-cols-4 gap-12 mb-12">
-                {/* Brand Section */}
-                <div className="md:col-span-2">
-                  <motion.div
-                    className="flex items-center space-x-4 mb-6"
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-3 shadow-lg">
-                      <LogoSimple variant="icon" size="md" />
-                    </div>
-                    <LogoSimple variant="name" size="lg" theme="dark" />
-                  </motion.div>
-                  <p className="text-neutral-400 text-lg leading-relaxed max-w-md">
-                    Automate your Instagram customer service with AI-powered responses.
-                    Save time, improve satisfaction, and scale your business effortlessly.
-                  </p>
-                  <div className="flex items-center space-x-4 mt-6">
-                    <motion.div
-                      className="flex items-center space-x-2 text-orange-400"
-                      whileHover={{ scale: 1.05 }}
-                    >
-                      <CheckCircle className="h-5 w-5" />
-                      <span className="text-sm font-medium">1000+ businesses trust us</span>
-                    </motion.div>
-                  </div>
-                </div>
-
-                {/* Quick Links */}
-                <div>
-                  <h3 className="text-lg font-semibold mb-6">Product</h3>
-                  <ul className="space-y-4">
-                    {['Features', 'Pricing', 'Demo', 'API'].map((item) => (
-                      <li key={item}>
-                        <motion.a
-                          href={`#${item.toLowerCase()}`}
-                          className="text-neutral-400 hover:text-white transition-colors"
-                          whileHover={{ x: 5 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          {item}
-                        </motion.a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Support */}
-                <div>
-                  <h3 className="text-lg font-semibold mb-6">Support</h3>
-                  <ul className="space-y-4">
-                    {['Help Center', 'Contact', 'Status', 'Community'].map((item) => (
-                      <li key={item}>
-                        <motion.a
-                          href={`/${item.toLowerCase().replace(' ', '-')}`}
-                          className="text-neutral-400 hover:text-white transition-colors"
-                          whileHover={{ x: 5 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          {item}
-                        </motion.a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              {/* Bottom Section */}
-              <div className="border-t border-neutral-800 pt-8">
-                <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                  <div className="flex items-center space-x-6">
-                    <Link href="/privacy" className="text-neutral-400 hover:text-white text-sm transition-colors">
-                      Privacy Policy
-                    </Link>
-                    <Link href="/terms" className="text-neutral-400 hover:text-white text-sm transition-colors">
-                      Terms of Service
-                    </Link>
-                    <span className="text-neutral-500 text-sm">
-                      © 2024 AutoniqueAI. All rights reserved.
-                    </span>
-                  </div>
-
-                  <motion.div
-                    className="flex items-center space-x-2 text-neutral-400"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    <span className="text-sm">Made with</span>
-                    <motion.span
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 1, repeat: Infinity }}
-                      className="text-orange-500"
-                    >
-                      ❤️
-                    </motion.span>
-                    <span className="text-sm">for Instagram businesses</span>
-                  </motion.div>
-                </div>
-              </div>
-            </AnimatedContainer>
+        <footer className="bg-gray-900 text-white py-12">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="text-center">
+              <img
+                src="/logos/full_logo_dark_theam.png"
+                alt="AutoniqueAI"
+                className="h-8 w-auto mx-auto mb-4"
+                onError={(e) => {
+                  e.currentTarget.src = "/logos/logo_icon.png";
+                  e.currentTarget.className = "h-8 w-8 mx-auto mb-4";
+                }}
+              />
+              <p className="text-gray-400">
+                © 2024 AutoniqueAI. All rights reserved.
+              </p>
+            </div>
           </div>
         </footer>
       </div>
