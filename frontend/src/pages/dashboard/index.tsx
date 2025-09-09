@@ -265,21 +265,21 @@ export default function DashboardPage() {
               </div>
             </motion.div>
 
-            {/* Revolutionary Stats Grid */}
+            {/* Professional Stats Grid - Cohesive Color Strategy */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <StatCard
                 title="Neural FAQs"
                 value={activeFAQs}
                 icon={MessageSquare}
-                gradient="from-purple-500 to-pink-500"
+                gradient="from-indigo-500 to-indigo-600"
                 change={null}
                 index={0}
               />
               <StatCard
-                title="Connected Empires"
+                title="Connected Accounts"
                 value={connectedPages}
                 icon={Instagram}
-                gradient="from-cyan-500 to-blue-500"
+                gradient="from-indigo-600 to-purple-600"
                 change={null}
                 index={1}
               />
@@ -287,15 +287,15 @@ export default function DashboardPage() {
                 title="AI Responses Sent"
                 value={stats?.auto_replies_sent || 0}
                 icon={TrendingUp}
-                gradient="from-emerald-500 to-teal-500"
+                gradient="from-purple-600 to-violet-600"
                 change={stats?.recent_activity?.auto_reply_change_percent || null}
                 index={2}
               />
               <StatCard
-                title="Quantum Speed"
+                title="Response Speed"
                 value={stats?.avg_response_time || "< 1s"}
                 icon={Clock}
-                gradient="from-orange-500 to-red-500"
+                gradient="from-violet-600 to-purple-700"
                 change={null}
                 index={3}
               />
@@ -312,12 +312,12 @@ export default function DashboardPage() {
                 transition={{ duration: 0.8, delay: 0.4 }}
                 className="relative group"
               >
-                {/* Glowing Background */}
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-500"></div>
+                {/* Professional Glow */}
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
 
                 <div className="relative backdrop-blur-xl bg-white/10 rounded-3xl shadow-2xl border border-white/20 p-8">
-                  <h2 className="text-2xl font-bold text-white mb-8 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                    Neural Commands
+                  <h2 className="text-2xl font-bold text-white mb-8 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                    Quick Actions
                   </h2>
 
                   <div className="space-y-6">
@@ -329,14 +329,14 @@ export default function DashboardPage() {
                     >
                       <div className="flex items-center space-x-4">
                         <motion.div
-                          className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center"
+                          className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center"
                           animate={{ rotate: [0, 5, 0, -5, 0] }}
                           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                         >
                           <Plus className="h-6 w-6 text-white" />
                         </motion.div>
-                        <span className="font-bold text-white text-lg group-hover/btn:text-transparent group-hover/btn:bg-gradient-to-r group-hover/btn:from-purple-400 group-hover/btn:to-pink-400 group-hover/btn:bg-clip-text transition-all duration-300">
-                          Create Neural FAQ
+                        <span className="font-bold text-white text-lg group-hover/btn:text-transparent group-hover/btn:bg-gradient-to-r group-hover/btn:from-indigo-400 group-hover/btn:to-purple-400 group-hover/btn:bg-clip-text transition-all duration-300">
+                          Create FAQ
                         </span>
                       </div>
                       <motion.span
@@ -356,14 +356,14 @@ export default function DashboardPage() {
                     >
                       <div className="flex items-center space-x-4">
                         <motion.div
-                          className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center"
+                          className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center"
                           animate={{ rotate: [0, 5, 0, -5, 0] }}
                           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
                         >
                           <MessageSquare className="h-6 w-6 text-white" />
                         </motion.div>
-                        <span className="font-bold text-white text-lg group-hover/btn:text-transparent group-hover/btn:bg-gradient-to-r group-hover/btn:from-cyan-400 group-hover/btn:to-blue-400 group-hover/btn:bg-clip-text transition-all duration-300">
-                          Upload AI Dataset
+                        <span className="font-bold text-white text-lg group-hover/btn:text-transparent group-hover/btn:bg-gradient-to-r group-hover/btn:from-purple-400 group-hover/btn:to-violet-400 group-hover/btn:bg-clip-text transition-all duration-300">
+                          Upload Dataset
                         </span>
                       </div>
                       <motion.span
@@ -377,23 +377,23 @@ export default function DashboardPage() {
 
                     <div className="text-center py-8">
                       <p className="text-lg text-white/80 mb-6 font-semibold">
-                        Your <span className="text-transparent bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text">Neural Network</span> is revolutionizing engagement!
+                        Your <span className="text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text">AI System</span> is revolutionizing engagement!
                       </p>
 
                       <motion.a
                         href="/live-monitor"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold rounded-2xl transition-all duration-300 shadow-lg shadow-emerald-500/25"
+                        className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-violet-500 to-violet-600 hover:from-violet-600 hover:to-purple-600 text-white font-bold rounded-2xl transition-all duration-300 shadow-lg shadow-violet-500/25"
                         whileHover={{ scale: 1.05, y: -2 }}
                         whileTap={{ scale: 0.95 }}
                       >
                         <Activity className="h-5 w-5 mr-3" />
-                        Neural Monitor Live
+                        Live Monitor
                       </motion.a>
 
                       <p className="text-sm text-white/50 mt-4">
-                        Real-time quantum processing visualization
+                        Real-time activity monitoring
                       </p>
                     </div>
                   </div>
