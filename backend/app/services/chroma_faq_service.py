@@ -142,7 +142,7 @@ class ChromaFAQService:
                     # Check if meets threshold (use distance-based threshold for ChromaDB)
                     # ChromaDB uses cosine distance, so lower distance = better match
                     # A distance of 0.6 or less is considered a good match
-                    distance_threshold = 0.6
+                    distance_threshold = 0.2
                     if distance <= distance_threshold:
                         matches.append({
                             "faq_id": metadata['faq_id'],
