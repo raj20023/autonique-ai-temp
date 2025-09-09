@@ -364,11 +364,6 @@ export default function HomePage() {
 
         {/* Revolutionary Features Section */}
         <section id="features" className="py-32 bg-gradient-to-b from-slate-900 via-gray-900 to-black relative overflow-hidden">
-          {/* Background Effects */}
-          <div className="absolute inset-0">
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          </div>
 
           <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
             <AnimatedContainer
@@ -461,34 +456,6 @@ export default function HomePage() {
 
         {/* Mind-Blowing Benefits Section */}
         <section id="benefits" className="py-32 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 relative overflow-hidden">
-          {/* Animated Background */}
-          <div className="absolute inset-0">
-            <motion.div
-              className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-400/30 to-purple-400/30 rounded-full blur-3xl"
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.3, 0.6, 0.3],
-              }}
-              transition={{
-                duration: 8,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
-            <motion.div
-              className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-pink-400/30 to-cyan-400/30 rounded-full blur-3xl"
-              animate={{
-                scale: [1, 1.3, 1],
-                opacity: [0.2, 0.5, 0.2],
-              }}
-              transition={{
-                duration: 10,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 2
-              }}
-            />
-          </div>
 
           <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
             <div className="grid lg:grid-cols-2 gap-20 items-center">
@@ -601,7 +568,7 @@ export default function HomePage() {
                       whileTap={{ scale: 0.95 }}
                     >
                       <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl shadow-cyan-500/25">
-                        Experience the Future
+                        Watch Demo
                       </Button>
                     </motion.div>
                   </div>

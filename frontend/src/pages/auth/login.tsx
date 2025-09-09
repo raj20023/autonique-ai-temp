@@ -50,64 +50,10 @@ export default function LoginPage() {
       </Head>
 
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-        {/* Epic Background Elements */}
+        {/* Subtle Background Elements */}
         <div className="absolute inset-0">
-          {/* Floating Cosmic Orbs */}
-          <motion.div
-            className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-r from-purple-400/30 to-pink-400/30 rounded-full blur-3xl"
-            animate={{
-              scale: [1, 1.3, 1],
-              opacity: [0.3, 0.7, 0.3],
-              x: [0, 80, 0],
-              y: [0, -50, 0]
-            }}
-            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.div
-            className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-cyan-400/25 to-blue-400/25 rounded-full blur-3xl"
-            animate={{
-              scale: [1, 1.4, 1],
-              opacity: [0.2, 0.6, 0.2],
-              x: [0, -60, 0],
-              y: [0, 40, 0]
-            }}
-            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-          />
-          <motion.div
-            className="absolute top-1/2 left-1/4 w-64 h-64 bg-gradient-to-r from-emerald-400/20 to-teal-400/20 rounded-full blur-3xl"
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.4, 0.8, 0.4],
-              rotate: [0, 180, 360]
-            }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          />
-
-          {/* Neural Network Grid */}
+          {/* Simple grid pattern */}
           <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
-
-          {/* Floating Particles */}
-          {[...Array(30)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-white/40 rounded-full"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                y: [0, -100, 0],
-                opacity: [0, 1, 0],
-                scale: [0, 1, 0],
-              }}
-              transition={{
-                duration: Math.random() * 4 + 3,
-                repeat: Infinity,
-                delay: Math.random() * 3,
-                ease: "easeInOut"
-              }}
-            />
-          ))}
         </div>
 
         <div className="relative flex items-center justify-center min-h-screen p-6 z-10">
@@ -136,18 +82,6 @@ export default function LoginPage() {
 
               {/* Main Card */}
               <div className="relative backdrop-blur-2xl bg-white/10 rounded-3xl shadow-2xl border border-white/20 p-10 md:p-12">
-                {/* Holographic Border */}
-                <motion.div
-                  className="absolute inset-0 rounded-3xl border-2 border-transparent bg-gradient-to-r from-purple-400/30 via-pink-400/30 to-cyan-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  animate={{
-                    rotate: [0, 360],
-                  }}
-                  transition={{
-                    duration: 20,
-                    repeat: Infinity,
-                    ease: "linear"
-                  }}
-                />
                 {/* Epic Logo & Header */}
                 <div className="text-center mb-12">
                   <motion.div
@@ -157,32 +91,8 @@ export default function LoginPage() {
                     className="mb-8"
                   >
                     <div className="inline-block relative">
-                      {/* Holographic Glow */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-purple-500/40 via-pink-500/40 to-cyan-500/40 rounded-3xl blur-2xl scale-125"
-                        animate={{
-                          scale: [1.2, 1.4, 1.2],
-                          opacity: [0.4, 0.8, 0.4],
-                        }}
-                        transition={{
-                          duration: 4,
-                          repeat: Infinity,
-                          ease: "easeInOut"
-                        }}
-                      />
-
                       {/* Logo Container */}
-                      <motion.div
-                        className="relative backdrop-blur-xl bg-white/10 rounded-3xl p-6 shadow-2xl border border-white/20"
-                        animate={{
-                          y: [0, -10, 0],
-                        }}
-                        transition={{
-                          duration: 6,
-                          repeat: Infinity,
-                          ease: "easeInOut"
-                        }}
-                      >
+                      <div className="relative backdrop-blur-xl bg-white/10 rounded-3xl p-6 shadow-2xl border border-white/20">
                         <img
                           src="/logos/favicon_auto.svg"
                           alt="AutoniqueAI"
@@ -191,14 +101,7 @@ export default function LoginPage() {
                             e.currentTarget.style.display = 'none';
                           }}
                         />
-
-                        {/* Rotating Ring */}
-                        <motion.div
-                          className="absolute inset-0 rounded-3xl border-2 border-gradient-to-r from-purple-400 via-pink-400 to-cyan-400"
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                        />
-                      </motion.div>
+                      </div>
                     </div>
                   </motion.div>
 

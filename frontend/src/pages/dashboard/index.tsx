@@ -21,7 +21,16 @@ import { useAutoExpressions } from '@/contexts/AutoContext';
 
 // API function to get user statistics
 const getUserStats = async () => {
-  const response = await fetch('/api/stats');
+  const token = localStorage.getItem('access_token');
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.autonique.in';
+
+  const response = await fetch(`${API_URL}/api/v1/users/stats`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
   if (!response.ok) {
     throw new Error('Failed to fetch stats');
   }
@@ -36,13 +45,14 @@ export default function DashboardPage() {
 
 
 
-  const { data: stats } = useQuery(
+  const { data: stats, isLoading: statsLoading, error: statsError } = useQuery(
     'stats',
     getUserStats,
     {
       enabled: isClient && isLoggedIn,
-      retry: 1,
+      retry: 2,
       refetchOnWindowFocus: false,
+      refetchInterval: 30000, // Refresh every 30 seconds
     }
   );
 
@@ -167,7 +177,13 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-white/70">Active FAQs</p>
-                    <p className="text-3xl font-bold text-white drop-shadow-lg">{activeFAQs}</p>
+                    <p className="text-3xl font-bold text-white drop-shadow-lg">
+                      {statsLoading ? (
+                        <span className="animate-pulse">...</span>
+                      ) : (
+                        activeFAQs
+                      )}
+                    </p>
                   </div>
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
                     <MessageSquare className="h-6 w-6 text-white" />
@@ -184,7 +200,13 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-white/70">Connected Pages</p>
-                    <p className="text-3xl font-bold text-white drop-shadow-lg">{connectedPages}</p>
+                    <p className="text-3xl font-bold text-white drop-shadow-lg">
+                      {statsLoading ? (
+                        <span className="animate-pulse">...</span>
+                      ) : (
+                        connectedPages
+                      )}
+                    </p>
                   </div>
                   <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
                     <Instagram className="h-6 w-6 text-white" />
@@ -201,7 +223,13 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-white/70">Auto Replies</p>
-                    <p className="text-3xl font-bold text-white drop-shadow-lg">{stats?.auto_replies_sent || 0}</p>
+                    <p className="text-3xl font-bold text-white drop-shadow-lg">
+                      {statsLoading ? (
+                        <span className="animate-pulse">...</span>
+                      ) : (
+                        stats?.auto_replies_sent || 0
+                      )}
+                    </p>
                   </div>
                   <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
                     <TrendingUp className="h-6 w-6 text-white" />
@@ -218,7 +246,13 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-white/70">Response Time</p>
-                    <p className="text-3xl font-bold text-white drop-shadow-lg">{stats?.avg_response_time || "< 1s"}</p>
+                    <p className="text-3xl font-bold text-white drop-shadow-lg">
+                      {statsLoading ? (
+                        <span className="animate-pulse">...</span>
+                      ) : (
+                        stats?.avg_response_time || "< 1s"
+                      )}
+                    </p>
                   </div>
                   <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
                     <Clock className="h-6 w-6 text-white" />
@@ -305,20 +339,39 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="space-y-4">
-                  {stats?.recent_activity ? (
+                  {statsLoading ? (
+                    <div className="space-y-3">
+                      {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="flex items-center justify-between p-3 bg-white/10 rounded-lg border border-white/10">
+                          <span className="text-sm text-white/70 animate-pulse">Loading...</span>
+                          <span className="font-semibold text-white animate-pulse">...</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : statsError ? (
+                    <div className="text-center py-8">
+                      <AutoMascot expression="error" size="lg" animated={true} />
+                      <p className="text-red-400 mt-4">Failed to load statistics</p>
+                      <p className="text-white/60 text-sm mt-2">Please check your connection and try again</p>
+                    </div>
+                  ) : stats?.recent_activity ? (
                     <div className="space-y-3">
                       <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg border border-white/10">
-                        <span className="text-sm text-white/70">Auto replies sent today</span>
-                        <span className="font-semibold text-white">{stats.recent_activity.auto_replies_today || 0}</span>
+                        <span className="text-sm text-white/70">Auto replies this week</span>
+                        <span className="font-semibold text-white">{stats.recent_activity.auto_replies_this_week || 0}</span>
                       </div>
                       <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg border border-white/10">
-                        <span className="text-sm text-white/70">Messages processed</span>
-                        <span className="font-semibold text-white">{stats.recent_activity.messages_processed || 0}</span>
+                        <span className="text-sm text-white/70">Messages this week</span>
+                        <span className="font-semibold text-white">{stats.recent_activity.messages_this_week || 0}</span>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg border border-white/10">
+                        <span className="text-sm text-white/70">Total messages</span>
+                        <span className="font-semibold text-white">{stats.total_messages || 0}</span>
                       </div>
                       <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg border border-white/10">
                         <span className="text-sm text-white/70">System status</span>
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg">
-                          Active
+                          {statsError ? 'Error' : 'Active'}
                         </span>
                       </div>
                     </div>
