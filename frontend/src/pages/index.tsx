@@ -126,7 +126,7 @@ export default function HomePage() {
                 transition={{ duration: 0.2 }}
               >
                 <img
-                  src="/logos/header_white_background.svg"
+                  src="/logos/header_dark_background.svg"
                   alt="AutoniqueAI"
                   className="h-10 w-auto filter drop-shadow-lg"
                   onError={(e) => {

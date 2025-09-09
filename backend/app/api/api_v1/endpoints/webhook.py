@@ -19,6 +19,41 @@ from app.core.security import decrypt_token, encrypt_token
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+@router.get("/test-faq")
+async def test_faq_service():
+    """Test endpoint to check if FAQ service is working"""
+    try:
+        logger.info("🧪 Testing FAQ service...")
+
+        # Test basic FAQ service initialization
+        faq_service = FAQService()
+        logger.info("✅ FAQ service initialized successfully")
+
+        # Test Gemini service
+        gemini_service = faq_service.gemini_service
+        logger.info("✅ Gemini service accessed successfully")
+
+        # Test a simple embedding generation
+        test_text = "Hello, how are you?"
+        embedding = await gemini_service.get_embedding(test_text)
+        logger.info(f"✅ Embedding generated successfully, length: {len(embedding)}")
+
+        return {
+            "status": "success",
+            "message": "FAQ service is working correctly",
+            "embedding_length": len(embedding)
+        }
+
+    except Exception as e:
+        logger.error(f"❌ FAQ service test failed: {e}")
+        import traceback
+        logger.error(f"Full traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": str(e),
+            "type": type(e).__name__
+        }
+
 @router.post("/subscribe-webhook/{page_id}")
 async def subscribe_webhook_to_page(page_id: str):
     """Subscribe webhook to a specific page"""
@@ -284,7 +319,12 @@ async def process_webhook_entry(entry: dict):
             
             # Process each messaging event
             for messaging_event in messaging_events:
-                await process_message_event(db, user, page, messaging_event)
+                try:
+                    await process_message_event(db, user, page, messaging_event)
+                except Exception as e:
+                    logger.error(f"❌ Error processing individual message event: {e}")
+                    logger.error(f"Message event data: {messaging_event}")
+                    # Continue processing other events
                 
         finally:
             db.close()
@@ -295,10 +335,15 @@ async def process_webhook_entry(entry: dict):
 async def process_message_event(db: Session, user: User, page: Page, messaging_event: dict):
     """Process a single message event"""
     try:
+        logger.info(f"🔄 Starting process_message_event with data: {messaging_event}")
+
         # Check if this is an incoming message
         message_data = messaging_event.get("message")
         if not message_data:
+            logger.info("❌ No message data found in messaging event")
             return
+
+        logger.info(f"📨 Message data extracted: {message_data}")
         
         sender = messaging_event.get("sender", {})
         recipient = messaging_event.get("recipient", {})
@@ -311,6 +356,7 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
         is_echo = message_data.get("is_echo", False)
 
         logger.info(f"Processing message from {sender_id} to {recipient_id}")
+        logger.info(f"Message details - ID: {message_id}, Text: '{message_text}', is_echo: {is_echo}")
 
         if not sender_id or not message_id or not message_text:
             logger.warning(f"Incomplete message data - Sender ID: {sender_id}, Message ID: {message_id}, Text: '{message_text}'")
@@ -318,8 +364,10 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
 
         # IMPORTANT: Check for echo messages first (Instagram's built-in echo detection)
         if is_echo:
-            logger.info(f"Ignoring echo message (is_echo=true): '{message_text}'")
+            logger.info(f"🔄 Ignoring echo message (is_echo=true): '{message_text}'")
             return
+
+        logger.info(f"✅ Message passed echo check, continuing processing...")
 
         # IMPORTANT: Ignore messages sent by our own bot
         # When we send a message, Instagram sends it back to our webhook with sender_id = our Instagram Business ID
@@ -333,13 +381,21 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
             return
 
         # Check if we've already processed this message
-        existing_message = db.query(Message).filter(
-            Message.ig_message_id == message_id
-        ).first()
+        logger.info(f"🔍 Checking if message {message_id} was already processed...")
+        try:
+            existing_message = db.query(Message).filter(
+                Message.ig_message_id == message_id
+            ).first()
+            logger.info(f"✅ Database query completed successfully")
+        except Exception as e:
+            logger.error(f"❌ Database query failed: {e}")
+            raise
 
         if existing_message:
-            logger.info(f"Message {message_id} already processed")
+            logger.info(f"✅ Message {message_id} already processed, skipping")
             return
+
+        logger.info(f"✅ Message {message_id} is new, continuing processing...")
 
         # Enhanced safety check: See if this message text matches any recent response we sent
         # This catches cases where the bot message detection above might miss something
@@ -408,10 +464,19 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
         logger.info(f"User has {faq_count} active FAQs")
 
         # Find smart response (FAQ matching + AI fallback)
-        logger.info(f"Looking for smart response for message: '{message_text}'")
-        faq_service = FAQService()
-        response_text = await faq_service.find_smart_response(db, user.id, message_text)
-        logger.info(f"Smart response generated: '{response_text}'")
+        logger.info(f"🤖 Looking for smart response for message: '{message_text}'")
+        try:
+            faq_service = FAQService()
+            logger.info(f"✅ FAQService initialized successfully")
+
+            response_text = await faq_service.find_smart_response(db, user.id, message_text)
+            logger.info(f"🎯 Smart response generated: '{response_text}'")
+        except Exception as e:
+            logger.error(f"❌ Error generating smart response: {e}")
+            logger.error(f"Exception type: {type(e).__name__}")
+            import traceback
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            response_text = None
 
         if response_text:
             # Try to find FAQ match for logging
@@ -539,9 +604,13 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
             logger.error(f"Failed to broadcast message update: {e}")
         
     except Exception as e:
-        logger.error(f"Error processing message event: {e}")
+        logger.error(f"❌ CRITICAL ERROR in process_message_event: {e}")
         logger.error(f"Exception type: {type(e).__name__}")
         logger.error(f"Exception details: {str(e)}")
         import traceback
         logger.error(f"Full traceback: {traceback.format_exc()}")
-        db.rollback()
+        logger.error(f"Message event that caused error: {messaging_event}")
+        try:
+            db.rollback()
+        except:
+            pass
