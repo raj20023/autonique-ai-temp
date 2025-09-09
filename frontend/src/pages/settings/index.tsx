@@ -23,6 +23,8 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 import Button from '@/components/ui/Button';
 import Card, { CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import AnimatedContainer from '@/components/ui/AnimatedContainer';
+import AutoMascot from '@/components/ui/AutoMascot';
+import { useAutoExpressions } from '@/contexts/AutoContext';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -30,6 +32,7 @@ export default function SettingsPage() {
   const queryClient = useQueryClient();
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState('account');
+  const { showSuccess, showError } = useAutoExpressions();
 
   // Form states
   const [accountForm, setAccountForm] = useState({
@@ -126,10 +129,15 @@ export default function SettingsPage() {
     <DashboardLayout title="Settings">
       <div className="max-w-6xl mx-auto">
         <AnimatedContainer animation="fadeIn">
-          {/* Header */}
+          {/* Header with Auto */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-neutral-900 mb-2">Settings</h1>
-            <p className="text-neutral-600">Manage your account and preferences</p>
+            <div className="flex items-center space-x-4 mb-4">
+              <AutoMascot expression="curious" size="lg" animated={true} />
+              <div>
+                <h1 className="text-3xl font-bold text-neutral-900 mb-2">Settings</h1>
+                <p className="text-neutral-600">Auto is here to help you manage your account and preferences</p>
+              </div>
+            </div>
           </div>
 
           <div className="grid lg:grid-cols-4 gap-8">

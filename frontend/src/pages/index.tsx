@@ -100,7 +100,7 @@ export default function HomePage() {
         <meta name="description" content="Transform your Instagram customer service with Neural AI Technology. Save 10+ hours weekly while providing instant, intelligent responses." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/auto/favicon_auto.svg" type="image/svg+xml" />
-        <link rel="alternate icon" href="/favicon.ico" />
+        <link rel="alternate icon" href="/logos/logo_icon.png" type="image/png" />
       </Head>
 
       <div

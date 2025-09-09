@@ -212,16 +212,13 @@ module.exports = {
           'Noto Color Emoji'
         ],
         display: [
-          'Inter Display',
-          'SF Pro Display',
+          'Space Grotesk',
           'Inter',
           'ui-sans-serif',
           'system-ui',
           'sans-serif'
         ],
         mono: [
-          'JetBrains Mono',
-          'SF Mono',
           'ui-monospace',
           'SFMono-Regular',
           'Monaco',
@@ -238,7 +235,6 @@ module.exports = {
           'sans-serif'
         ],
         body: [
-          'Manrope',
           'Inter',
           'ui-sans-serif',
           'system-ui',

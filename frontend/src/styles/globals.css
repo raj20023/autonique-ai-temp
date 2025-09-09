@@ -2,20 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom font faces for premium typography */
-@font-face {
-  font-family: 'SF Pro Display';
-  src: url('/fonts/SF-Pro-Display-Medium.woff2') format('woff2');
-  font-weight: 500;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro Display';
-  src: url('/fonts/SF-Pro-Display-Semibold.woff2') format('woff2');
-  font-weight: 600;
-  font-display: swap;
-}
+/* Optimized typography using Google Fonts */
 
 @layer base {
   :root {
@@ -26,9 +13,9 @@
     --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
 
     /* Typography scale */
-    --font-display: 'Inter Display', 'SF Pro Display', system-ui, sans-serif;
+    --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
     --font-body: 'Inter', system-ui, sans-serif;
-    --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+    --font-mono: ui-monospace, SFMono-Regular, Consolas, monospace;
     --font-accent: 'Space Grotesk', system-ui, sans-serif;
 
     /* Animation variables */
