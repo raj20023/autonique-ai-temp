@@ -107,27 +107,14 @@ class ChromaFAQService:
         try:
             collection = self._get_collection()
 
-            # Search in ChromaDB using text query (ChromaDB will generate embeddings automatically)
-            # First try without filtering to see if we get any results
+            # Search in ChromaDB using text query with user_id filtering
             results = collection.query(
                 query_texts=[query],
+                where={"user_id": user_id},
                 n_results=n_results
             )
 
-            logger.info(f"🔍 ChromaDB raw results: {results}")
-
-            # If we got results, filter by user_id manually
-            if results['ids'] and len(results['ids'][0]) > 0:
-                filtered_results = {'ids': [[]], 'metadatas': [[]], 'distances': [[]]}
-                for i in range(len(results['ids'][0])):
-                    metadata = results['metadatas'][0][i]
-                    metadata_user_id = metadata.get('user_id')
-                    if metadata_user_id == user_id:
-                        filtered_results['ids'][0].append(results['ids'][0][i])
-                        filtered_results['metadatas'][0].append(metadata)
-                        if results['distances']:
-                            filtered_results['distances'][0].append(results['distances'][0][i])
-                results = filtered_results
+            logger.info(f"🔍 ChromaDB results for user {user_id}: {len(results['ids'][0]) if results['ids'] else 0} matches")
             
             # Process results
             matches = []
