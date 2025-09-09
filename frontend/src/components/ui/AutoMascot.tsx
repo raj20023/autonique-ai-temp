@@ -139,13 +139,13 @@ export function AutoHero({ className = '' }: { className?: string }) {
   );
 }
 
-export function AutoLoader({ 
+export function AutoLoader({
   expression = 'working',
   size = 'lg',
-  className = '' 
-}: { 
+  className = ''
+}: {
   expression?: 'working' | 'sleepy';
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
 }) {
   return (
