@@ -22,6 +22,11 @@ class Settings(BaseSettings):
     
     # Google Gemini
     GOOGLE_API_KEY: str
+
+    # ChromaDB
+    CHROMA_API_KEY: str
+    CHROMA_TENANT: str = "d3efa8ab-c029-47bf-afe9-4e0ca29bf288"
+    CHROMA_DATABASE: str = "ig_bot"
     
     # JWT
     JWT_SECRET_KEY: str

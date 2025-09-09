@@ -29,6 +29,9 @@ langchain-community
 numpy
 scikit-learn
 
+# Vector Database
+chromadb
+
 # Configuration & Validation
 pydantic[email]
 pydantic-settings

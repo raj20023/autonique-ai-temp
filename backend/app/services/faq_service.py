@@ -5,6 +5,7 @@ import logging
 from app.models.faq import FAQ
 from app.models.message import Message
 from app.services.gemini_service import GeminiService
+from app.services.chroma_faq_service import ChromaFAQService
 from app.schemas.faq import FAQMatch
 
 logger = logging.getLogger(__name__)
@@ -12,14 +13,15 @@ logger = logging.getLogger(__name__)
 class FAQService:
     def __init__(self):
         self.gemini_service = GeminiService()
+        self.chroma_service = ChromaFAQService()
 
     async def create_faq_with_embedding(self, db: Session, user_id: int, question: str, answer: str, similarity_threshold: float = 0.8) -> FAQ:
         """Create a new FAQ with embedding"""
         try:
-            # Generate embedding for the question
+            # Generate embedding for the question (for PostgreSQL compatibility)
             embedding = await self.gemini_service.get_embedding(question)
-            
-            # Create FAQ record
+
+            # Create FAQ record in PostgreSQL
             faq = FAQ(
                 user_id=user_id,
                 question=question,
@@ -27,12 +29,18 @@ class FAQService:
                 embedding_vector=embedding,
                 similarity_threshold=similarity_threshold
             )
-            
+
             db.add(faq)
             db.commit()
             db.refresh(faq)
-            
-            logger.info(f"Created FAQ with ID {faq.id} for user {user_id}")
+
+            # Also add to ChromaDB with enhanced question+answer embedding
+            try:
+                await self.chroma_service.add_faq_to_chroma(user_id, faq)
+                logger.info(f"✅ Created FAQ in both PostgreSQL and ChromaDB: {question[:50]}...")
+            except Exception as chroma_error:
+                logger.error(f"⚠️ FAQ created in PostgreSQL but failed to add to ChromaDB: {chroma_error}")
+
             return faq
             
         except Exception as e:
@@ -74,17 +82,44 @@ class FAQService:
             raise
 
     async def find_matching_faq(self, db: Session, user_id: int, user_message: str) -> Optional[FAQMatch]:
-        """Find the best matching FAQ for a user message"""
+        """Find the best matching FAQ using ChromaDB vector search"""
+        try:
+            logger.info(f"🔍 Searching for FAQ match using ChromaDB for user {user_id}")
+
+            # Use ChromaDB for enhanced vector search
+            best_match = await self.chroma_service.find_best_matching_faq(user_id, user_message)
+
+            if best_match:
+                # Update usage count in PostgreSQL
+                faq = db.query(FAQ).filter(FAQ.id == best_match.faq_id).first()
+                if faq:
+                    faq.usage_count += 1
+                    db.commit()
+
+                logger.info(f"✅ Found FAQ match via ChromaDB: {best_match.question} (score: {best_match.similarity_score:.3f})")
+                return best_match
+
+            logger.info(f"❌ No suitable FAQ match found in ChromaDB for user {user_id}")
+            return None
+
+        except Exception as e:
+            logger.error(f"❌ Error finding matching FAQ via ChromaDB: {e}")
+            # Fallback to old method if ChromaDB fails
+            logger.info("🔄 Falling back to PostgreSQL vector search...")
+            return await self._find_matching_faq_fallback(db, user_id, user_message)
+
+    async def _find_matching_faq_fallback(self, db: Session, user_id: int, user_message: str) -> Optional[FAQMatch]:
+        """Fallback method using PostgreSQL embeddings"""
         try:
             # Get user's FAQs
             faqs = db.query(FAQ).filter(
                 FAQ.user_id == user_id,
                 FAQ.is_active == True
             ).all()
-            
+
             if not faqs:
                 return None
-            
+
             # Generate embedding for user message
             message_embedding = await self.gemini_service.get_embedding(user_message)
 
@@ -102,20 +137,14 @@ class FAQService:
 
             # Find best match
             best_match = self.gemini_service.find_best_match(message_embedding, faq_embeddings)
-            
+
             if best_match:
-                # Update usage count
-                faq = db.query(FAQ).filter(FAQ.id == best_match["faq_id"]).first()
-                if faq:
-                    faq.usage_count += 1
-                    db.commit()
-                
                 return FAQMatch(**best_match)
-            
+
             return None
-            
+
         except Exception as e:
-            logger.error(f"Error finding matching FAQ: {e}")
+            logger.error(f"Error in fallback FAQ matching: {e}")
             return None
 
     async def update_faq_embedding(self, db: Session, faq_id: int) -> bool:
