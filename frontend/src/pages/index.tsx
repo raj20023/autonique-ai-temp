@@ -275,16 +275,20 @@ export default function HomePage() {
                     }}
                   />
 
-                  {/* Mascot Video Container */}
-                  <div className="relative z-10 w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden">
+                  {/* Mascot Video Container with Background Blending */}
+                  <div className="relative z-10 w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96">
+                    {/* Background Overlay to Match UI */}
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-slate-900/80 via-purple-900/60 to-slate-800/80 backdrop-blur-sm"></div>
+
                     <video
                       autoPlay
                       loop
                       muted
                       playsInline
-                      className="w-full h-full object-cover"
+                      className="relative z-10 w-full h-full object-cover rounded-full"
                       style={{
-                        filter: 'drop-shadow(0 0 40px rgba(168, 85, 247, 0.6))'
+                        filter: 'drop-shadow(0 0 40px rgba(168, 85, 247, 0.6)) contrast(1.1) brightness(1.1)',
+                        mixBlendMode: 'lighten',
                       }}
                     >
                       <source src="/auto/Starting_animation_floating.mp4" type="video/mp4" />
@@ -293,6 +297,15 @@ export default function HomePage() {
                         <span className="text-white text-8xl">🤖</span>
                       </div>
                     </video>
+
+                    {/* Additional Cosmic Overlay */}
+                    <div
+                      className="absolute inset-0 rounded-full opacity-30 pointer-events-none"
+                      style={{
+                        background: 'radial-gradient(circle at 30% 30%, rgba(6, 182, 212, 0.3) 0%, transparent 50%), radial-gradient(circle at 70% 70%, rgba(168, 85, 247, 0.3) 0%, transparent 50%)',
+                        mixBlendMode: 'overlay'
+                      }}
+                    ></div>
                   </div>
 
                   {/* Floating Sparkles around Mascot */}
