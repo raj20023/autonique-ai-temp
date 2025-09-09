@@ -133,7 +133,7 @@ class ChromaFAQService:
             matches = []
             if results['ids'] and len(results['ids'][0]) > 0:
                 logger.info(f"🔍 Found {len(results['ids'][0])} FAQ matches before filtering for user {user_id}")
-                logger.info("results", results)
+                logger.debug(f"🔍 ChromaDB raw results: {results}")
                 for i in range(len(results['ids'][0])):
                     metadata = results['metadatas'][0][i]
                     distance = results['distances'][0][i] if results['distances'] else None
@@ -144,7 +144,7 @@ class ChromaFAQService:
                     # Check if meets threshold (use distance-based threshold for ChromaDB)
                     # ChromaDB uses cosine distance, so lower distance = better match
                     # A distance of 0.6 or less is considered a good match
-                    distance_threshold = 0.2
+                    distance_threshold = 0.6  # For cosine distance: 0 = identical, 2 = opposite
                     if distance <= distance_threshold:
                         matches.append({
                             "faq_id": metadata['faq_id'],

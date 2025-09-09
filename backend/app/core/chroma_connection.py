@@ -33,7 +33,7 @@ def get_chroma_client() -> ClientAPI:
     return _client
 
 def get_chroma_collection(client: ClientAPI = Depends(get_chroma_client)) -> Collection:
-    """Get or create ChromaDB collection for FAQs"""
+    """Get or create ChromaDB collection for FAQs with cosine similarity"""
     global _collection
     if _collection is None:
         try:
@@ -42,16 +42,21 @@ def get_chroma_collection(client: ClientAPI = Depends(get_chroma_client)) -> Col
                 metadata={
                     "description": "FAQ question and answer embeddings for similarity search",
                     "version": "1.0"
+                },
+                configuration={
+                    "hnsw": {
+                        "space": "cosine"  # Use cosine similarity
+                    }
                 }
             )
-            logger.info("✅ ChromaDB collection 'faq_embeddings' ready")
+            logger.info("✅ ChromaDB collection 'faq_embeddings' ready with cosine similarity")
         except Exception as e:
             logger.error(f"❌ Failed to get ChromaDB collection: {e}")
             raise
     return _collection
 
 def get_chroma_collection_direct() -> Collection:
-    """Get ChromaDB collection without FastAPI dependency injection"""
+    """Get ChromaDB collection without FastAPI dependency injection with cosine similarity"""
     client = get_chroma_client()
     try:
         collection = client.get_or_create_collection(
@@ -59,6 +64,11 @@ def get_chroma_collection_direct() -> Collection:
             metadata={
                 "description": "FAQ question and answer embeddings for similarity search",
                 "version": "1.0"
+            },
+            configuration={
+                "hnsw": {
+                    "space": "cosine"  # Use cosine similarity
+                }
             }
         )
         return collection
