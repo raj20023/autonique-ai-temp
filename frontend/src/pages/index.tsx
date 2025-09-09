@@ -126,7 +126,7 @@ export default function HomePage() {
                 transition={{ duration: 0.2 }}
               >
                 <img
-                  src="/logos/full_white_background.svg"
+                  src="/logos/header_white_background.svg"
                   alt="AutoniqueAI"
                   className="h-10 w-auto filter drop-shadow-lg"
                   onError={(e) => {
@@ -779,7 +779,7 @@ export default function HomePage() {
                 transition={{ duration: 0.3 }}
               >
                 <img
-                  src="/logos/full_white_background.svg"
+                  src="/logos/header_white_background.svg"
                   alt="AutoniqueAI"
                   className="h-12 w-auto mx-auto filter drop-shadow-lg"
                   onError={(e) => {

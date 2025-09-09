@@ -135,7 +135,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                   whileHover={{ scale: 1.02 }}
                 >
                   <img
-                    src="/logos/full_dark_background.svg"
+                    src="/logos/header_dark_background.svg"
                     alt="AutoniqueAI"
                     className="h-8 w-auto"
                     onError={(e) => {
@@ -214,7 +214,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
               transition={{ duration: 0.2 }}
             >
               <img
-                src="/logos/full_white_background.svg"
+                src="/logos/header_white_background.svg"
                 alt="AutoniqueAI"
                 className="h-8 w-auto"
                 onError={(e) => {
