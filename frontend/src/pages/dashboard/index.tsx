@@ -21,6 +21,7 @@ import { isAuthenticated } from '@/utils/auth';
 import toast from 'react-hot-toast';
 import SubscriptionBanner from '@/components/SubscriptionBanner';
 import { BetaUserBadge, AccessStatusIndicator } from '@/components/SubscriptionBanner';
+import { AutoLoader } from '@/components/ui/AutoMascot';
 
 // API function to get user statistics
 const getUserStats = async () => {
@@ -184,12 +185,12 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center relative overflow-hidden">
         <div className="text-center relative z-10">
-          <motion.div
-            className="w-16 h-16 border-4 border-cyan-400 rounded-full mx-auto mb-4"
-            animate={{ rotate: 360, scale: [1, 1.1, 1] }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          <AutoLoader
+            expression="working"
+            size="lg"
+            className="mx-auto mb-4"
           />
-          <p className="text-xl font-bold text-white">Quantum Redirect...</p>
+          <p className="text-xl font-bold text-white">Auto is redirecting you...</p>
         </div>
       </div>
     );

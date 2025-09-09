@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { AutoError } from '@/components/ui/AutoMascot';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -39,12 +40,12 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
       return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
           <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
-            <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <AutoError className="mx-auto mb-4" />
             <h1 className="text-xl font-semibold text-gray-900 mb-2">
-              Something went wrong
+              Oops! Auto encountered an error
             </h1>
             <p className="text-gray-600 mb-6">
-              We encountered an unexpected error. Please try refreshing the page.
+              Don't worry, Auto is working on fixing this. Please try refreshing the page.
             </p>
             <div className="space-y-3">
               <button

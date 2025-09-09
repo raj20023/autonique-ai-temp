@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Instagram, ArrowLeft, Shield, Zap, MessageCircle, CheckCircle, Sparkles, ArrowRight } from 'lucide-react';
 import { isAuthenticated } from '@/utils/auth';
 import { buildFacebookOAuthUrl, getRedirectUri } from '@/config/facebook';
+import AutoMascot from '@/components/ui/AutoMascot';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -198,6 +199,20 @@ export default function LoginPage() {
                         />
                       </motion.div>
                     </div>
+                  </motion.div>
+
+                  {/* Auto Mascot */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.4, duration: 0.8 }}
+                    className="mb-8"
+                  >
+                    <AutoMascot
+                      expression="excited"
+                      size="lg"
+                      className="mx-auto"
+                    />
                   </motion.div>
 
                   <motion.div

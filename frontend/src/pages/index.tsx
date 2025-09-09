@@ -24,6 +24,7 @@ import {
 import { isAuthenticated } from '@/utils/auth';
 import Button from '@/components/ui/Button';
 import AnimatedContainer, { StaggerContainer, StaggerItem } from '@/components/ui/AnimatedContainer';
+import { AutoHero } from '@/components/ui/AutoMascot';
 
 const features = [
   {
@@ -98,86 +99,17 @@ export default function HomePage() {
         <title>AutoniqueAI - AI-Powered Instagram Customer Service Automation</title>
         <meta name="description" content="Transform your Instagram customer service with Neural AI Technology. Save 10+ hours weekly while providing instant, intelligent responses." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/auto/favicon_auto.svg" type="image/svg+xml" />
+        <link rel="alternate icon" href="/favicon.ico" />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0">
-          {/* Floating Orbs */}
-          <motion.div
-            className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-purple-400/30 to-pink-400/30 rounded-full blur-3xl"
-            animate={{
-              x: [0, 100, 0],
-              y: [0, -50, 0],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <motion.div
-            className="absolute top-40 right-32 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl"
-            animate={{
-              x: [0, -80, 0],
-              y: [0, 60, 0],
-              scale: [1, 0.8, 1],
-            }}
-            transition={{
-              duration: 10,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 2
-            }}
-          />
-          <motion.div
-            className="absolute bottom-20 left-1/3 w-80 h-80 bg-gradient-to-r from-emerald-400/25 to-teal-400/25 rounded-full blur-3xl"
-            animate={{
-              x: [0, 120, 0],
-              y: [0, -40, 0],
-              scale: [1, 1.3, 1],
-            }}
-            transition={{
-              duration: 12,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 4
-            }}
-          />
+      <div
+        className="min-h-screen relative overflow-hidden"
+        style={{
+          background: `radial-gradient(circle at center, #13132b 0%, #0f0f25 50%, #13132b 100%)`,
+        }}
+      >
 
-          {/* Neural Network Lines */}
-          <svg className="absolute inset-0 w-full h-full opacity-20">
-            <defs>
-              <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.8"/>
-                <stop offset="50%" stopColor="#06B6D4" stopOpacity="0.6"/>
-                <stop offset="100%" stopColor="#10B981" stopOpacity="0.4"/>
-              </linearGradient>
-            </defs>
-            {[...Array(15)].map((_, i) => (
-              <motion.line
-                key={i}
-                x1={`${Math.random() * 100}%`}
-                y1={`${Math.random() * 100}%`}
-                x2={`${Math.random() * 100}%`}
-                y2={`${Math.random() * 100}%`}
-                stroke="url(#lineGradient)"
-                strokeWidth="1"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 0.6 }}
-                transition={{
-                  duration: 3,
-                  delay: i * 0.2,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                  ease: "easeInOut"
-                }}
-              />
-            ))}
-          </svg>
-        </div>
 
         {/* Header */}
         <motion.header
@@ -260,89 +192,14 @@ export default function HomePage() {
                     y: { duration: 6, repeat: Infinity, ease: "easeInOut" },
                   }}
                 >
-                  {/* Cosmic Glow Background */}
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-cyan-500/40 via-purple-500/40 to-pink-500/40 rounded-full blur-3xl scale-150"
-                    animate={{
-                      scale: [1.4, 1.8, 1.4],
-                      opacity: [0.4, 0.7, 0.4],
-                      rotate: [0, 180, 360]
-                    }}
-                    transition={{
-                      duration: 12,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                  />
 
-                  {/* Mascot Video Container with Background Blending */}
-                  <div className="relative z-10 w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96">
-                    {/* Background Overlay to Match UI */}
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-slate-900/80 via-purple-900/60 to-slate-800/80 backdrop-blur-sm"></div>
 
-                    <video
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      className="relative z-10 w-full h-full object-cover rounded-full"
-                      style={{
-                        filter: 'drop-shadow(0 0 40px rgba(168, 85, 247, 0.6)) contrast(1.1) brightness(1.1)',
-                        mixBlendMode: 'lighten',
-                      }}
-                    >
-                      <source src="/auto/Starting_animation_floating.mp4" type="video/mp4" />
-                      {/* Fallback for browsers that don't support video */}
-                      <div className="w-full h-full bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-8xl">🤖</span>
-                      </div>
-                    </video>
+                  {/* Auto Mascot Hero */}
+                  <AutoHero />
 
-                    {/* Additional Cosmic Overlay */}
-                    <div
-                      className="absolute inset-0 rounded-full opacity-30 pointer-events-none"
-                      style={{
-                        background: 'radial-gradient(circle at 30% 30%, rgba(6, 182, 212, 0.3) 0%, transparent 50%), radial-gradient(circle at 70% 70%, rgba(168, 85, 247, 0.3) 0%, transparent 50%)',
-                        mixBlendMode: 'overlay'
-                      }}
-                    ></div>
-                  </div>
 
-                  {/* Floating Sparkles around Mascot */}
-                  {[...Array(16)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      className="absolute w-3 h-3 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full"
-                      style={{
-                        left: '50%',
-                        top: '50%',
-                        marginLeft: '-6px',
-                        marginTop: '-6px',
-                      }}
-                      animate={{
-                        x: Math.cos(i * 22.5 * Math.PI / 180) * (150 + Math.random() * 80),
-                        y: Math.sin(i * 22.5 * Math.PI / 180) * (150 + Math.random() * 80),
-                        scale: [0, 1, 0],
-                        opacity: [0, 1, 0],
-                      }}
-                      transition={{
-                        duration: 4 + Math.random() * 3,
-                        repeat: Infinity,
-                        delay: i * 0.15,
-                        ease: "easeInOut"
-                      }}
-                    />
-                  ))}
 
-                  {/* Holographic Ring */}
-                  <motion.div
-                    className="absolute inset-0 rounded-full border-2 border-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 opacity-60"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                    style={{
-                      background: 'conic-gradient(from 0deg, transparent, rgba(168, 85, 247, 0.3), transparent, rgba(6, 182, 212, 0.3), transparent)',
-                    }}
-                  />
+
                 </motion.div>
               </AnimatedContainer>
 

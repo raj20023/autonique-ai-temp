@@ -5,6 +5,7 @@ import { useState } from 'react';
 import Head from 'next/head';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { AutoProvider } from '@/contexts/AutoContext';
 
 import '@/styles/globals.css';
 
@@ -33,9 +34,10 @@ export default function App({ Component, pageProps }: AppProps) {
         <link rel="preload" href="/fonts/SF-Pro-Display-Semibold.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
       </Head>
       <ThemeProvider>
-        <QueryClientProvider client={queryClient}>
-          <Component {...pageProps} />
-          <Toaster
+        <AutoProvider>
+          <QueryClientProvider client={queryClient}>
+            <Component {...pageProps} />
+            <Toaster
             position="top-right"
             toastOptions={{
               duration: 4000,
@@ -75,7 +77,8 @@ export default function App({ Component, pageProps }: AppProps) {
               },
             }}
           />
-        </QueryClientProvider>
+          </QueryClientProvider>
+        </AutoProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

@@ -15,6 +15,8 @@ import { faqApi } from '@/utils/api';
 import { isAuthenticated } from '@/utils/auth';
 import toast from 'react-hot-toast';
 import { FAQ } from '@/types';
+import { AutoFAQ, AutoLoader } from '@/components/ui/AutoMascot';
+import { useAutoExpressions } from '@/contexts/AutoContext';
 
 export default function FAQsPage() {
   const router = useRouter();
@@ -22,6 +24,7 @@ export default function FAQsPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [newFAQ, setNewFAQ] = useState({ question: '', answer: '' });
   const [isClient, setIsClient] = useState(false);
+  const { showSuccess, showError } = useAutoExpressions();
 
   // Always call hooks at the top level
   const { data: faqs, isLoading } = useQuery(
@@ -35,12 +38,14 @@ export default function FAQsPage() {
     {
       onSuccess: () => {
         toast.success('FAQ added successfully!');
+        showSuccess(); // Show happy Auto
         queryClient.invalidateQueries('faqs');
         setNewFAQ({ question: '', answer: '' });
         setShowAddForm(false);
       },
       onError: (error: any) => {
         toast.error(error.response?.data?.detail || 'Failed to add FAQ');
+        showError(); // Show error Auto
       }
     }
   );
@@ -50,10 +55,12 @@ export default function FAQsPage() {
     {
       onSuccess: () => {
         toast.success('FAQ deleted successfully!');
+        showSuccess(); // Show happy Auto
         queryClient.invalidateQueries('faqs');
       },
       onError: (error: any) => {
         toast.error(error.response?.data?.detail || 'Failed to delete FAQ');
+        showError(); // Show error Auto
       }
     }
   );
@@ -111,9 +118,12 @@ export default function FAQsPage() {
         <div className="space-y-6">
           {/* Header */}
           <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">FAQ Management</h1>
-              <p className="text-gray-600">Manage your automated responses</p>
+            <div className="flex items-center space-x-4">
+              <AutoFAQ />
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">FAQ Management</h1>
+                <p className="text-gray-600">Auto is ready to help manage your automated responses</p>
+              </div>
             </div>
             <button
               onClick={() => setShowAddForm(true)}
@@ -217,13 +227,16 @@ export default function FAQsPage() {
             </div>
             <div className="divide-y divide-gray-200">
               {isLoading ? (
-                <div className="p-6 text-center text-gray-500">Loading FAQs...</div>
+                <div className="p-6 text-center text-gray-500">
+                  <AutoLoader expression="sleepy" size="md" className="mx-auto mb-4" />
+                  <p>Auto is loading your FAQs...</p>
+                </div>
               ) : activeFAQs.length === 0 ? (
                 <div className="p-6 text-center">
-                  <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <AutoFAQ className="mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No FAQs yet</h3>
                   <p className="text-gray-600 mb-4">
-                    Add your first FAQ to start automating customer responses
+                    Auto is ready to help! Add your first FAQ to start automating customer responses
                   </p>
                   <button
                     onClick={() => setShowAddForm(true)}

@@ -1,10 +1,11 @@
 import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
 import Logo from './Logo';
+import { AutoLoader } from './AutoMascot';
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
-  variant?: 'spinner' | 'dots' | 'pulse' | 'logo' | 'neural' | 'cyber' | 'quantum' | 'matrix';
+  variant?: 'spinner' | 'dots' | 'pulse' | 'logo' | 'neural' | 'cyber' | 'quantum' | 'matrix' | 'auto';
   className?: string;
   text?: string;
 }
@@ -23,12 +24,32 @@ const textSizes = {
   xl: 'text-xl'
 };
 
-export default function LoadingSpinner({ 
-  size = 'md', 
-  variant = 'spinner', 
+export default function LoadingSpinner({
+  size = 'md',
+  variant = 'spinner',
   className = '',
-  text 
+  text
 }: LoadingSpinnerProps) {
+  if (variant === 'auto') {
+    return (
+      <div className={clsx('flex flex-col items-center justify-center space-y-4', className)}>
+        <AutoLoader
+          expression="working"
+          size={size}
+        />
+        {text && (
+          <motion.p
+            className={clsx('text-neutral-600 font-medium', textSizes[size])}
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            {text}
+          </motion.p>
+        )}
+      </div>
+    );
+  }
+
   if (variant === 'logo') {
     return (
       <div className={clsx('flex flex-col items-center justify-center space-y-4', className)}>
@@ -276,7 +297,7 @@ export default function LoadingSpinner({
 }
 
 // Full page loading component
-export function PageLoader({ text = "Loading..." }: { text?: string }) {
+export function PageLoader({ text = "Auto is working..." }: { text?: string }) {
   return (
     <motion.div
       className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50"
@@ -284,7 +305,7 @@ export function PageLoader({ text = "Loading..." }: { text?: string }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <LoadingSpinner variant="logo" size="xl" text={text} />
+      <LoadingSpinner variant="auto" size="xl" text={text} />
     </motion.div>
   );
 }
