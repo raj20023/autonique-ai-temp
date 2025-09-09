@@ -132,6 +132,8 @@ class ChromaFAQService:
             # Process results
             matches = []
             if results['ids'] and len(results['ids'][0]) > 0:
+                logger.info(f"🔍 Found {len(results['ids'][0])} FAQ matches before filtering for user {user_id}")
+                logger.info("results", results)
                 for i in range(len(results['ids'][0])):
                     metadata = results['metadatas'][0][i]
                     distance = results['distances'][0][i] if results['distances'] else None
