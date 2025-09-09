@@ -7,6 +7,7 @@ export default function TermsPage() {
     <>
       <Head>
         <title>Terms of Service - AutoniqueAI</title>
+        <link rel="icon" href="/logos/favicon_auto.svg" type="image/svg+xml" />
       </Head>
 
       <div className="min-h-screen bg-gray-50 py-12">

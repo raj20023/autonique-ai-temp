@@ -127,51 +127,82 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout title="Settings">
-      <div className="max-w-6xl mx-auto">
-        <AnimatedContainer animation="fadeIn">
-          {/* Header with Auto */}
-          <div className="mb-8">
-            <div className="flex items-center space-x-4 mb-4">
-              <AutoMascot expression="curious" size="lg" animated={true} />
-              <div>
-                <h1 className="text-3xl font-bold text-neutral-900 mb-2">Settings</h1>
-                <p className="text-neutral-600">Auto is here to help you manage your account and preferences</p>
+      {/* Gradient Background */}
+      <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 relative overflow-hidden -m-6 p-6">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0">
+          <motion.div
+            className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.2, 0.4, 0.2],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div
+            className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-pink-400/20 to-cyan-400/20 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.1, 0.3, 0.1],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2
+            }}
+          />
+        </div>
+
+        <div className="max-w-6xl mx-auto relative z-10">
+          <AnimatedContainer animation="fadeIn">
+            {/* Header with Auto */}
+            <div className="mb-8">
+              <div className="flex items-center space-x-4 mb-4">
+                <AutoMascot expression="curious" size="lg" animated={true} />
+                <div>
+                  <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">Settings</h1>
+                  <p className="text-white/80 drop-shadow-md">Auto is here to help you manage your account and preferences</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="grid lg:grid-cols-4 gap-8">
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <Card className="p-0 overflow-hidden">
-                <nav className="space-y-1">
-                  {tabs.map((tab, index) => {
-                    const Icon = tab.icon;
-                    return (
-                      <motion.button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`w-full flex items-center px-6 py-4 text-left transition-all duration-200 ${
-                          activeTab === tab.id
-                            ? 'bg-orange-500 text-white shadow-lg'
-                            : 'text-neutral-700 hover:bg-neutral-50'
-                        }`}
-                        whileHover={{ x: activeTab === tab.id ? 0 : 5 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <Icon className="h-5 w-5 mr-3" />
-                        <div className="flex-1">
-                          <div className="font-medium">{tab.name}</div>
-                          <div className={`text-xs ${activeTab === tab.id ? 'text-white/80' : 'text-neutral-500'}`}>
-                            {tab.description}
+            <div className="grid lg:grid-cols-4 gap-8">
+              {/* Sidebar */}
+              <div className="lg:col-span-1">
+                <div className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-0 overflow-hidden">
+                  <nav className="space-y-1">
+                    {tabs.map((tab, index) => {
+                      const Icon = tab.icon;
+                      return (
+                        <motion.button
+                          key={tab.id}
+                          onClick={() => setActiveTab(tab.id)}
+                          className={`w-full flex items-center px-6 py-4 text-left transition-all duration-200 ${
+                            activeTab === tab.id
+                              ? 'bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg'
+                              : 'text-white/80 hover:bg-white/10'
+                          }`}
+                          whileHover={{ x: activeTab === tab.id ? 0 : 5 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <Icon className="h-5 w-5 mr-3" />
+                          <div className="flex-1">
+                            <div className="font-medium">{tab.name}</div>
+                            <div className={`text-xs ${activeTab === tab.id ? 'text-white/80' : 'text-white/60'}`}>
+                              {tab.description}
+                            </div>
                           </div>
-                        </div>
-                      </motion.button>
-                    );
-                  })}
-                </nav>
-              </Card>
-            </div>
+                        </motion.button>
+                      );
+                    })}
+                  </nav>
+                </div>
+              </div>
 
             {/* Main Content */}
             <div className="lg:col-span-3 space-y-6">
@@ -179,13 +210,13 @@ export default function SettingsPage() {
               {activeTab === 'account' && (
                 <AnimatedContainer animation="slideUp" className="space-y-6">
                   {/* Account Information */}
-                  <Card>
+                  <Card variant="glass">
                     <CardHeader>
-                      <CardTitle className="flex items-center space-x-2">
-                        <User className="h-5 w-5 text-orange-500" />
+                      <CardTitle className="flex items-center space-x-2 text-white">
+                        <User className="h-5 w-5 text-orange-400" />
                         <span>Account Information</span>
                       </CardTitle>
-                      <CardDescription>
+                      <CardDescription className="text-white/70">
                         Update your personal information and account details
                       </CardDescription>
                     </CardHeader>
@@ -193,27 +224,27 @@ export default function SettingsPage() {
                       <form onSubmit={handleAccountUpdate} className="space-y-6">
                         <div className="grid md:grid-cols-2 gap-6">
                           <div>
-                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                            <label className="block text-sm font-medium text-white/80 mb-2">
                               Full Name
                             </label>
                             <input
                               type="text"
                               value={accountForm.name}
                               onChange={(e) => setAccountForm({ ...accountForm, name: e.target.value })}
-                              className="w-full px-4 py-3 border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all text-white placeholder-white/60 backdrop-blur-sm"
                               required
                             />
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-neutral-700 mb-2">
+                            <label className="block text-sm font-medium text-white/80 mb-2">
                               Email Address
                             </label>
                             <input
                               type="email"
                               value={accountForm.email}
                               onChange={(e) => setAccountForm({ ...accountForm, email: e.target.value })}
-                              className="w-full px-4 py-3 border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all text-white placeholder-white/60 backdrop-blur-sm"
                             />
                           </div>
                         </div>
@@ -543,6 +574,7 @@ export default function SettingsPage() {
             </div>
           </div>
         </AnimatedContainer>
+        </div>
       </div>
     </DashboardLayout>
   );

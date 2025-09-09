@@ -63,17 +63,17 @@ export default function Logo({
 
     switch (variant) {
       case 'icon':
-        return '/logos/logo_icon.png';
+        return '/logos/favicon_auto.svg';
       case 'full':
         return themeToUse === 'dark'
-          ? '/logos/full_logo_dark_theam.png'
-          : '/logos/full_logo_light_theam.png';
+          ? '/logos/full_dark_background.svg'
+          : '/logos/full_white_background.svg';
       case 'name':
         return themeToUse === 'dark'
-          ? '/logos/name_logo_dark_theam.png'
-          : '/logos/name_log_light_theam.png';
+          ? '/logos/header_dark_background.svg'
+          : '/logos/header_white_background.svg';
       default:
-        return '/logos/logo_icon.png';
+        return '/logos/favicon_auto.svg';
     }
   };
 

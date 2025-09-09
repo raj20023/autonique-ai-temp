@@ -151,6 +151,7 @@ export default function PricingPage() {
       <Head>
         <title>Pricing - AutoniqueAI</title>
         <meta name="description" content="Choose the perfect plan for your Instagram automation needs" />
+        <link rel="icon" href="/logos/favicon_auto.svg" type="image/svg+xml" />
       </Head>
 
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">

@@ -99,8 +99,8 @@ export default function HomePage() {
         <title>AutoniqueAI - AI-Powered Instagram Customer Service Automation</title>
         <meta name="description" content="Transform your Instagram customer service with Neural AI Technology. Save 10+ hours weekly while providing instant, intelligent responses." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/auto/favicon_auto.svg" type="image/svg+xml" />
-        <link rel="alternate icon" href="/logos/logo_icon.png" type="image/png" />
+        <link rel="icon" href="/logos/favicon_auto.svg" type="image/svg+xml" />
+        <link rel="alternate icon" href="/logos/favicon_auto.svg" type="image/svg+xml" />
       </Head>
 
       <div
@@ -126,11 +126,11 @@ export default function HomePage() {
                 transition={{ duration: 0.2 }}
               >
                 <img
-                  src="/logos/full_logo_dark_theam.png"
+                  src="/logos/full_white_background.svg"
                   alt="AutoniqueAI"
                   className="h-10 w-auto filter drop-shadow-lg"
                   onError={(e) => {
-                    e.currentTarget.src = "/logos/logo_icon.png";
+                    e.currentTarget.src = "/logos/favicon_auto.svg";
                     e.currentTarget.className = "h-10 w-10 filter drop-shadow-lg";
                   }}
                 />
@@ -242,14 +242,14 @@ export default function HomePage() {
                 className="mb-16"
               >
                 <motion.p
-                  className="text-xl lg:text-2xl text-white/80 mb-4 max-w-4xl mx-auto leading-relaxed"
+                  className="text-xl lg:text-2xl text-white/80 mb-4 max-w-4xl mx-auto leading-relaxed drop-shadow-lg"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 1, delay: 0.8 }}
                 >
-                  Harness the power of <span className="text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text font-bold">Neural AI Technology</span>
+                  Harness the power of <span className="text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text font-bold drop-shadow-lg">Neural AI Technology</span>
                   <br />
-                  Save 10+ hours weekly while providing <span className="text-transparent bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text font-bold">quantum-speed responses</span>
+                  Save 10+ hours weekly while providing <span className="text-transparent bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text font-bold drop-shadow-lg">quantum-speed responses</span>
                 </motion.p>
               </AnimatedContainer>
 
@@ -545,7 +545,7 @@ export default function HomePage() {
                         >
                           <CheckCircle className="h-8 w-8 text-emerald-400 drop-shadow-lg group-hover:text-emerald-300 transition-colors" />
                         </motion.div>
-                        <span className="text-white font-semibold text-lg group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300">
+                        <span className="text-white font-semibold text-lg group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300 drop-shadow-lg">
                           {benefit}
                         </span>
                       </motion.div>
@@ -779,11 +779,11 @@ export default function HomePage() {
                 transition={{ duration: 0.3 }}
               >
                 <img
-                  src="/logos/full_logo_dark_theam.png"
+                  src="/logos/full_white_background.svg"
                   alt="AutoniqueAI"
                   className="h-12 w-auto mx-auto filter drop-shadow-lg"
                   onError={(e) => {
-                    e.currentTarget.src = "/logos/logo_icon.png";
+                    e.currentTarget.src = "/logos/favicon_auto.svg";
                     e.currentTarget.className = "h-12 w-12 mx-auto filter drop-shadow-lg";
                   }}
                 />

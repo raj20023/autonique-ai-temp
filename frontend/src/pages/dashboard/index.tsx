@@ -80,224 +80,257 @@ export default function DashboardPage() {
       <Head>
         <title>Dashboard - AutoniqueAI</title>
         <meta name="description" content="Manage your Instagram auto-reply system" />
+        <link rel="icon" href="/logos/favicon_auto.svg" type="image/svg+xml" />
       </Head>
 
       <SubscriptionBanner />
 
       <DashboardLayout title="Dashboard">
-        <div className="space-y-8">
-          {/* Modern Welcome Section with Auto */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-6">
-                <AutoMascot 
-                  expression="happy" 
-                  size="xl" 
-                  animated={true}
-                />
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                    Welcome back, {user?.name}! 👋
-                  </h1>
-                  <p className="text-lg text-gray-600">
-                    Auto is ready to help manage your Instagram automation
-                  </p>
-                </div>
-              </div>
-              <div className="hidden md:block">
-                <div className="text-right">
-                  <p className="text-sm text-gray-500">Today</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {new Date().toLocaleDateString('en-US', { 
-                      weekday: 'long',
-                      month: 'short', 
-                      day: 'numeric' 
-                    })}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Clean Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Gradient Background */}
+        <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 relative overflow-hidden -m-6 p-6">
+          {/* Animated Background Elements */}
+          <div className="absolute inset-0">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Active FAQs</p>
-                  <p className="text-3xl font-bold text-gray-900">{activeFAQs}</p>
-                </div>
-                <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-                  <MessageSquare className="h-6 w-6 text-blue-600" />
-                </div>
-              </div>
-            </motion.div>
-
+              className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.2, 0.4, 0.2],
+              }}
+              transition={{
+                duration: 8,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Connected Pages</p>
-                  <p className="text-3xl font-bold text-gray-900">{connectedPages}</p>
-                </div>
-                <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
-                  <Instagram className="h-6 w-6 text-purple-600" />
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Auto Replies</p>
-                  <p className="text-3xl font-bold text-gray-900">{stats?.auto_replies_sent || 0}</p>
-                </div>
-                <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="h-6 w-6 text-green-600" />
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Response Time</p>
-                  <p className="text-3xl font-bold text-gray-900">{stats?.avg_response_time || "< 1s"}</p>
-                </div>
-                <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center">
-                  <Clock className="h-6 w-6 text-orange-600" />
-                </div>
-              </div>
-            </motion.div>
+              className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-pink-400/20 to-cyan-400/20 rounded-full blur-3xl"
+              animate={{
+                scale: [1, 1.3, 1],
+                opacity: [0.1, 0.3, 0.1],
+              }}
+              transition={{
+                duration: 10,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 2
+              }}
+            />
           </div>
 
-          {/* Quick Actions & Recent Activity */}
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Quick Actions */}
+          <div className="relative z-10 space-y-8">
+            {/* Modern Welcome Section with Auto */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="backdrop-blur-xl bg-white/10 rounded-2xl border border-white/20 shadow-2xl p-8"
             >
-              <div className="flex items-center space-x-3 mb-6">
-                <AutoMascot expression="working" size="md" animated={true} />
-                <h2 className="text-xl font-semibold text-gray-900">Quick Actions</h2>
-              </div>
-
-              <div className="space-y-4">
-                <button
-                  onClick={() => {
-                    router.push('/dashboard/faqs');
-                    showSuccess();
-                  }}
-                  className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Plus className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <span className="font-medium text-gray-900">Manage FAQs</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-6">
+                  <AutoMascot
+                    expression="happy"
+                    size="xl"
+                    animated={true}
+                  />
+                  <div>
+                    <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">
+                      Welcome back, {user?.name}! 👋
+                    </h1>
+                    <p className="text-lg text-white/80 drop-shadow-md">
+                      Auto is ready to help manage your Instagram automation
+                    </p>
                   </div>
-                  <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                </button>
-
-                <button
-                  onClick={() => {
-                    router.push('/settings');
-                    showSuccess();
-                  }}
-                  className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                      <Instagram className="h-5 w-5 text-purple-600" />
-                    </div>
-                    <span className="font-medium text-gray-900">Connect Instagram</span>
+                </div>
+                <div className="hidden md:block">
+                  <div className="text-right">
+                    <p className="text-sm text-white/60">Today</p>
+                    <p className="text-2xl font-bold text-white drop-shadow-lg">
+                      {new Date().toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </p>
                   </div>
-                  <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                </button>
-
-                <button
-                  onClick={() => {
-                    window.open('/live-monitor', '_blank');
-                    showSuccess();
-                  }}
-                  className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                      <Activity className="h-5 w-5 text-green-600" />
-                    </div>
-                    <span className="font-medium text-gray-900">Live Monitor</span>
-                  </div>
-                  <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                </button>
+                </div>
               </div>
             </motion.div>
 
-            {/* Recent Activity */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
-            >
-              <div className="flex items-center space-x-3 mb-6">
-                <AutoMascot expression="curious" size="md" animated={true} />
-                <h2 className="text-xl font-semibold text-gray-900">Recent Activity</h2>
-              </div>
+            {/* Beautiful Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 group hover:bg-white/15 transition-all duration-300"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-white/70">Active FAQs</p>
+                    <p className="text-3xl font-bold text-white drop-shadow-lg">{activeFAQs}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <MessageSquare className="h-6 w-6 text-white" />
+                  </div>
+                </div>
+              </motion.div>
 
-              <div className="space-y-4">
-                {stats?.recent_activity ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="text-sm text-gray-600">Auto replies sent today</span>
-                      <span className="font-semibold text-gray-900">{stats.recent_activity.auto_replies_today || 0}</span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="text-sm text-gray-600">Messages processed</span>
-                      <span className="font-semibold text-gray-900">{stats.recent_activity.messages_processed || 0}</span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="text-sm text-gray-600">System status</span>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        Active
-                      </span>
-                    </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 group hover:bg-white/15 transition-all duration-300"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-white/70">Connected Pages</p>
+                    <p className="text-3xl font-bold text-white drop-shadow-lg">{connectedPages}</p>
                   </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <AutoMascot expression="sleepy" size="lg" animated={true} />
-                    <p className="text-gray-500 mt-4">No recent activity</p>
+                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <Instagram className="h-6 w-6 text-white" />
                   </div>
-                )}
-              </div>
-            </motion.div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 group hover:bg-white/15 transition-all duration-300"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-white/70">Auto Replies</p>
+                    <p className="text-3xl font-bold text-white drop-shadow-lg">{stats?.auto_replies_sent || 0}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <TrendingUp className="h-6 w-6 text-white" />
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6 group hover:bg-white/15 transition-all duration-300"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-white/70">Response Time</p>
+                    <p className="text-3xl font-bold text-white drop-shadow-lg">{stats?.avg_response_time || "< 1s"}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <Clock className="h-6 w-6 text-white" />
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Quick Actions & Recent Activity */}
+            <div className="grid lg:grid-cols-2 gap-8">
+              {/* Quick Actions */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6"
+              >
+                <div className="flex items-center space-x-3 mb-6">
+                  <AutoMascot expression="working" size="md" animated={true} />
+                  <h2 className="text-xl font-semibold text-white drop-shadow-lg">Quick Actions</h2>
+                </div>
+
+                <div className="space-y-4">
+                  <button
+                    onClick={() => {
+                      router.push('/dashboard/faqs');
+                      showSuccess();
+                    }}
+                    className="w-full flex items-center justify-between p-4 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-300 group border border-white/10 hover:border-white/30"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center shadow-lg">
+                        <Plus className="h-5 w-5 text-white" />
+                      </div>
+                      <span className="font-medium text-white">Manage FAQs</span>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-white/60 group-hover:text-white transition-colors" />
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      router.push('/settings');
+                      showSuccess();
+                    }}
+                    className="w-full flex items-center justify-between p-4 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-300 group border border-white/10 hover:border-white/30"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow-lg">
+                        <Instagram className="h-5 w-5 text-white" />
+                      </div>
+                      <span className="font-medium text-white">Connect Instagram</span>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-white/60 group-hover:text-white transition-colors" />
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      window.open('/live-monitor', '_blank');
+                      showSuccess();
+                    }}
+                    className="w-full flex items-center justify-between p-4 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-300 group border border-white/10 hover:border-white/30"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center shadow-lg">
+                        <Activity className="h-5 w-5 text-white" />
+                      </div>
+                      <span className="font-medium text-white">Live Monitor</span>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-white/60 group-hover:text-white transition-colors" />
+                  </button>
+                </div>
+              </motion.div>
+
+              {/* Recent Activity */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+                className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl p-6"
+              >
+                <div className="flex items-center space-x-3 mb-6">
+                  <AutoMascot expression="curious" size="md" animated={true} />
+                  <h2 className="text-xl font-semibold text-white drop-shadow-lg">Recent Activity</h2>
+                </div>
+
+                <div className="space-y-4">
+                  {stats?.recent_activity ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg border border-white/10">
+                        <span className="text-sm text-white/70">Auto replies sent today</span>
+                        <span className="font-semibold text-white">{stats.recent_activity.auto_replies_today || 0}</span>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg border border-white/10">
+                        <span className="text-sm text-white/70">Messages processed</span>
+                        <span className="font-semibold text-white">{stats.recent_activity.messages_processed || 0}</span>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg border border-white/10">
+                        <span className="text-sm text-white/70">System status</span>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg">
+                          Active
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <AutoMascot expression="sleepy" size="lg" animated={true} />
+                      <p className="text-white/60 mt-4">No recent activity</p>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </div>
           </div>
         </div>
       </DashboardLayout>
