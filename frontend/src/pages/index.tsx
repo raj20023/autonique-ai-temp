@@ -245,7 +245,7 @@ export default function HomePage() {
         <section className="relative py-32 lg:py-48">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
             <div className="text-center">
-              {/* Floating Logo with Holographic Effect */}
+              {/* AI Mascot Hero */}
               <AnimatedContainer
                 animation="neuralPulse"
                 className="mb-16"
@@ -255,30 +255,81 @@ export default function HomePage() {
                   className="inline-block relative"
                   animate={{
                     y: [0, -20, 0],
-                    rotateY: [0, 360],
                   }}
                   transition={{
-                    y: { duration: 4, repeat: Infinity, ease: "easeInOut" },
-                    rotateY: { duration: 20, repeat: Infinity, ease: "linear" }
+                    y: { duration: 6, repeat: Infinity, ease: "easeInOut" },
                   }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 rounded-3xl blur-2xl scale-110 opacity-60 animate-pulse"></div>
-                  <div className="relative backdrop-blur-xl bg-white/10 rounded-3xl p-8 border border-white/20 shadow-2xl">
-                    <img
-                      src="/logos/logo_icon.png"
-                      alt="AutoniqueAI"
-                      className="h-24 w-24 mx-auto filter drop-shadow-2xl"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
+                  {/* Cosmic Glow Background */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-cyan-500/40 via-purple-500/40 to-pink-500/40 rounded-full blur-3xl scale-150"
+                    animate={{
+                      scale: [1.4, 1.8, 1.4],
+                      opacity: [0.4, 0.7, 0.4],
+                      rotate: [0, 180, 360]
+                    }}
+                    transition={{
+                      duration: 12,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  />
+
+                  {/* Mascot Video Container */}
+                  <div className="relative z-10 w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden">
+                    <video
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      className="w-full h-full object-cover"
+                      style={{
+                        filter: 'drop-shadow(0 0 40px rgba(168, 85, 247, 0.6))'
+                      }}
+                    >
+                      <source src="/auto/Starting_animation_floating.mp4" type="video/mp4" />
+                      {/* Fallback for browsers that don't support video */}
+                      <div className="w-full h-full bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-8xl">🤖</span>
+                      </div>
+                    </video>
+                  </div>
+
+                  {/* Floating Sparkles around Mascot */}
+                  {[...Array(16)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute w-3 h-3 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full"
+                      style={{
+                        left: '50%',
+                        top: '50%',
+                        marginLeft: '-6px',
+                        marginTop: '-6px',
+                      }}
+                      animate={{
+                        x: Math.cos(i * 22.5 * Math.PI / 180) * (150 + Math.random() * 80),
+                        y: Math.sin(i * 22.5 * Math.PI / 180) * (150 + Math.random() * 80),
+                        scale: [0, 1, 0],
+                        opacity: [0, 1, 0],
+                      }}
+                      transition={{
+                        duration: 4 + Math.random() * 3,
+                        repeat: Infinity,
+                        delay: i * 0.15,
+                        ease: "easeInOut"
                       }}
                     />
-                    {/* Holographic Ring */}
-                    <motion.div
-                      className="absolute inset-0 rounded-3xl border-2 border-gradient-to-r from-purple-400 via-pink-400 to-cyan-400"
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                    />
-                  </div>
+                  ))}
+
+                  {/* Holographic Ring */}
+                  <motion.div
+                    className="absolute inset-0 rounded-full border-2 border-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 opacity-60"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                    style={{
+                      background: 'conic-gradient(from 0deg, transparent, rgba(168, 85, 247, 0.3), transparent, rgba(6, 182, 212, 0.3), transparent)',
+                    }}
+                  />
                 </motion.div>
               </AnimatedContainer>
 
