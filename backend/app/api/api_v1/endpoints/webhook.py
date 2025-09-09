@@ -54,6 +54,37 @@ async def test_faq_service():
             "type": type(e).__name__
         }
 
+@router.get("/test-sentiment")
+async def test_sentiment_analysis():
+    """Test endpoint to check sentiment analysis"""
+    try:
+        logger.info("🧪 Testing sentiment analysis...")
+
+        # Test sentiment analysis
+        faq_service = FAQService()
+        gemini_service = faq_service.gemini_service
+
+        test_text = "I love this product! It's amazing!"
+        sentiment = await gemini_service.analyze_sentiment(test_text)
+        logger.info(f"✅ Sentiment analysis successful: {sentiment}")
+
+        return {
+            "status": "success",
+            "message": "Sentiment analysis working correctly",
+            "test_text": test_text,
+            "sentiment": sentiment
+        }
+
+    except Exception as e:
+        logger.error(f"❌ Sentiment analysis test failed: {e}")
+        import traceback
+        logger.error(f"Full traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": str(e),
+            "type": type(e).__name__
+        }
+
 @router.post("/subscribe-webhook/{page_id}")
 async def subscribe_webhook_to_page(page_id: str):
     """Subscribe webhook to a specific page"""

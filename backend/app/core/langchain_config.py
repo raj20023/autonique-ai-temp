@@ -70,17 +70,20 @@ class LangChainManager:
         # Sentiment analysis prompt
         self.sentiment_prompt = PromptTemplate(
             input_variables=["text"],
-            template="""Analyze the sentiment of the following customer message.
-            
-            Message: {text}
-            
-            Return only a JSON object with these fields:
-            - positive: score from 0 to 1
-            - negative: score from 0 to 1  
-            - neutral: score from 0 to 1
-            - overall: "positive", "negative", or "neutral"
-            
-            JSON:"""
+            template="""Analyze the sentiment of the following customer message and return ONLY a valid JSON object.
+
+Message: {text}
+
+Return exactly this JSON format (no additional text):
+{{"positive": 0.0, "negative": 0.0, "neutral": 1.0, "overall": "neutral"}}
+
+Replace the values with your analysis:
+- positive: score from 0.0 to 1.0
+- negative: score from 0.0 to 1.0
+- neutral: score from 0.0 to 1.0
+- overall: exactly one of "positive", "negative", or "neutral"
+
+JSON:"""
         )
         
         # Intent extraction prompt
@@ -202,10 +205,28 @@ class LangChainManager:
         try:
             result = await self.sentiment_chain.ainvoke({"text": text})
             result_text = result.content if hasattr(result, 'content') else str(result)
+
+            # Clean up the result text
+            result_text = result_text.strip()
+            logger.debug(f"Raw sentiment result: {result_text}")
+
+            # Try to extract JSON from the response
             import json
-            return json.loads(result_text.strip())
+            import re
+
+            # Look for JSON object in the response
+            json_match = re.search(r'\{[^}]*\}', result_text)
+            if json_match:
+                json_str = json_match.group()
+                return json.loads(json_str)
+            else:
+                # If no JSON found, try to parse the whole response
+                return json.loads(result_text)
+
         except Exception as e:
             logger.error(f"Error analyzing sentiment: {e}")
+            logger.error(f"Raw response was: {result_text if 'result_text' in locals() else 'N/A'}")
+            # Return default sentiment
             return {
                 "positive": 0.5,
                 "negative": 0.0,

@@ -160,11 +160,26 @@ class FAQService:
     async def analyze_message_context(self, db: Session, user_id: int, user_message: str) -> Dict:
         """Analyze message context using Gemini for better responses"""
         try:
-            # Get sentiment analysis
-            sentiment = await self.gemini_service.analyze_sentiment(user_message)
+            # Get sentiment analysis (with fallback)
+            try:
+                sentiment = await self.gemini_service.analyze_sentiment(user_message)
+                logger.debug(f"Sentiment analysis successful: {sentiment}")
+            except Exception as e:
+                logger.warning(f"Sentiment analysis failed, using default: {e}")
+                sentiment = {
+                    "positive": 0.5,
+                    "negative": 0.0,
+                    "neutral": 0.5,
+                    "overall": "neutral"
+                }
 
-            # Extract intent
-            intent = await self.gemini_service.extract_intent(user_message)
+            # Extract intent (with fallback)
+            try:
+                intent = await self.gemini_service.extract_intent(user_message)
+                logger.debug(f"Intent extraction successful: {intent}")
+            except Exception as e:
+                logger.warning(f"Intent extraction failed, using default: {e}")
+                intent = "other"
 
             # Get conversation history (last 5 messages)
             recent_messages = db.query(Message).filter(
