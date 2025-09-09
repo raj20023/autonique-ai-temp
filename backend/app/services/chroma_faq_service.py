@@ -141,18 +141,16 @@ class ChromaFAQService:
                     # Convert distance to similarity score (ChromaDB uses cosine distance)
                     similarity_score = 1 - distance if distance is not None else 0.0
 
-                    # Check if meets threshold (use distance-based threshold for ChromaDB)
+                    # No threshold filtering - let LLM decide if FAQ is relevant
                     # ChromaDB uses cosine distance, so lower distance = better match
-                    # A distance of 0.6 or less is considered a good match
-                    distance_threshold = 0.6  # For cosine distance: 0 = identical, 2 = opposite
-                    if distance <= distance_threshold:
-                        matches.append({
-                            "faq_id": metadata['faq_id'],
-                            "question": metadata['question'],
-                            "answer": metadata['answer'],
-                            "similarity_score": similarity_score,
-                            "distance": distance
-                        })
+                    # Convert distance to similarity score for consistency
+                    matches.append({
+                        "faq_id": metadata['faq_id'],
+                        "question": metadata['question'],
+                        "answer": metadata['answer'],
+                        "similarity_score": similarity_score,
+                        "distance": distance
+                    })
             
             logger.info(f"🔍 Found {len(matches)} FAQ matches for user {user_id}")
             return matches

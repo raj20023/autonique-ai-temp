@@ -238,28 +238,24 @@ class FAQService:
             }
 
     async def find_smart_response(self, db: Session, user_id: int, user_message: str) -> Optional[str]:
-        """Find response using both FAQ matching and smart generation"""
+        """Find response using FAQ matching with LLM relevance check"""
         try:
-            # First try FAQ matching
+            # First try FAQ matching (without strict threshold)
             faq_match = await self.find_matching_faq(db, user_id, user_message)
 
             if faq_match:
-                # Use FAQ-based response
-                return await self.gemini_service.generate_response(user_message, faq_match.answer)
+                # Let LLM decide if FAQ is relevant and generate appropriate response
+                return await self.gemini_service.generate_response_with_relevance_check(
+                    user_message, faq_match.answer, faq_match.question
+                )
 
-            # If no FAQ match, analyze context and generate smart response
-            context = await self.analyze_message_context(db, user_id, user_message)
-
-            # Generate contextual response
-            smart_response = await self.gemini_service.generate_smart_response(
-                user_message, context
-            )
-
-            return smart_response
+            # If no FAQ match found, return a polite "not found" message
+            logger.info(f"❌ No FAQ match found for user {user_id}, returning 'not found' message")
+            return "I couldn't find an answer to your question in our FAQs. Please wait for our team to get back to you, or feel free to ask something else!"
 
         except Exception as e:
             logger.error(f"Error finding smart response: {e}")
-            return None
+            return "I'm having trouble processing your request right now. Please wait for our team to assist you."
 
     async def improve_faq_from_interactions(self, db: Session, user_id: int) -> List[Dict]:
         """Analyze user interactions to suggest FAQ improvements"""

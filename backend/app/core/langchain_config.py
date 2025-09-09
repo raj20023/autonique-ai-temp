@@ -44,14 +44,34 @@ class LangChainManager:
         # Customer service response prompt
         self.response_prompt = PromptTemplate(
             input_variables=["user_message", "faq_answer"],
-            template="""You are a helpful customer service assistant for an Instagram business. 
-            Personalize the following FAQ answer to respond naturally to the user's message. 
+            template="""You are a helpful customer service assistant for an Instagram business.
+            Personalize the following FAQ answer to respond naturally to the user's message.
             Keep it friendly, conversational, and professional.
 
             User message: {user_message}
             FAQ answer: {faq_answer}
 
             Personalized response:"""
+        )
+
+        # Response with relevance check prompt
+        self.relevance_response_prompt = PromptTemplate(
+            input_variables=["user_message", "faq_answer", "faq_question"],
+            template="""You are a helpful customer service assistant for an Instagram business.
+
+            A user asked: "{user_message}"
+
+            We found this FAQ that might be relevant:
+            FAQ Question: "{faq_question}"
+            FAQ Answer: "{faq_answer}"
+
+            INSTRUCTIONS:
+            1. If the FAQ is relevant to the user's question, provide a personalized, friendly response based on the FAQ answer.
+            2. If the FAQ is NOT relevant to what the user is asking, respond EXACTLY with: "I couldn't find an answer to your question in our FAQs. Please wait for our team to get back to you, or feel free to ask something else!"
+
+            Be strict about relevance - only use the FAQ if it actually answers the user's question.
+
+            Response:"""
         )
         
         # Smart response prompt (no FAQ match)
@@ -148,6 +168,9 @@ JSON:"""
         # Response generation chain (modern pattern)
         self.response_chain = self.response_prompt | self.llm
 
+        # Response with relevance check chain
+        self.relevance_response_chain = self.relevance_response_prompt | self.llm
+
         # Smart response chain
         self.smart_response_chain = self.smart_response_prompt | self.llm
 
@@ -187,6 +210,19 @@ JSON:"""
         except Exception as e:
             logger.error(f"Error generating response: {e}")
             return faq_answer
+
+    async def generate_response_with_relevance_check(self, user_message: str, faq_answer: str, faq_question: str) -> str:
+        """Generate response with relevance check"""
+        try:
+            response = await self.relevance_response_chain.ainvoke({
+                "user_message": user_message,
+                "faq_answer": faq_answer,
+                "faq_question": faq_question
+            })
+            return response.content.strip() if hasattr(response, 'content') else str(response).strip()
+        except Exception as e:
+            logger.error(f"Error generating response with relevance check: {e}")
+            return "I couldn't find an answer to your question in our FAQs. Please wait for our team to get back to you, or feel free to ask something else!"
     
     async def generate_smart_response(self, user_message: str, context: str = "") -> str:
         """Generate smart response without FAQ"""

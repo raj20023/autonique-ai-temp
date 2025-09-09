@@ -122,6 +122,26 @@ class GeminiService:
 
         return response
 
+    async def generate_response_with_relevance_check(self, user_message: str, faq_answer: str, faq_question: str) -> str:
+        """Generate response with relevance check - if FAQ not relevant, return 'not found' message"""
+        # Create cache key for response
+        cache_key = f"relevance_response:{hashlib.md5(f'{user_message}:{faq_answer}:{faq_question}'.encode()).hexdigest()}"
+
+        # Try to get from cache first
+        cached_response = get_cached_response(cache_key)
+        if cached_response:
+            logger.debug(f"Cache hit for relevance response: {cache_key}")
+            return cached_response
+
+        # Generate response with relevance check
+        response = await self.langchain.generate_response_with_relevance_check(user_message, faq_answer, faq_question)
+
+        # Cache the result
+        cache_response(cache_key, response)
+        logger.debug(f"Cached new relevance response: {cache_key}")
+
+        return response
+
     async def analyze_sentiment(self, text: str) -> Dict[str, float]:
         """Analyze sentiment of user message using Gemini"""
         return await self.langchain.analyze_sentiment(text)
