@@ -29,8 +29,8 @@ import { AutoHero } from '@/components/ui/AutoMascot';
 const features = [
   {
     icon: <Brain className="h-8 w-8" />,
-    title: 'Neural AI Technology',
-    description: 'Advanced neural networks that understand context, emotion, and intent for human-like conversations',
+    title: 'AutoniqueAI Technology',
+    description: 'Advanced AI that understands context, emotion, and intent for human-like conversations',
     gradient: 'from-purple-500 via-pink-500 to-red-500',
     glowColor: 'shadow-purple-500/25'
   },
@@ -97,7 +97,7 @@ export default function HomePage() {
     <>
       <Head>
         <title>AutoniqueAI - AI-Powered Instagram Customer Service Automation</title>
-        <meta name="description" content="Transform your Instagram customer service with Neural AI Technology. Save 10+ hours weekly while providing instant, intelligent responses." />
+        <meta name="description" content="Transform your Instagram customer service with AutoniqueAI. Save 10+ hours weekly while providing instant, intelligent responses." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/logos/favicon_auto.svg" type="image/svg+xml" />
         <link rel="alternate icon" href="/logos/favicon_auto.svg" type="image/svg+xml" />
@@ -247,7 +247,7 @@ export default function HomePage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 1, delay: 0.8 }}
                 >
-                  Harness the power of <span className="text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text font-bold drop-shadow-lg">Neural AI Technology</span>
+                  Harness the power of <span className="text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text font-bold drop-shadow-lg">AutoniqueAI</span>
                   <br />
                   Save 10+ hours weekly while providing <span className="text-transparent bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text font-bold drop-shadow-lg">quantum-speed responses</span>
                 </motion.p>
@@ -287,7 +287,7 @@ export default function HomePage() {
                       className="relative backdrop-blur-xl bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-2xl font-bold text-lg flex items-center space-x-3 border border-white/30 shadow-2xl"
                     >
                       <Play className="h-6 w-6" />
-                      <span>Watch Neural Demo</span>
+                      <span>Watch Demo</span>
                     </Button>
                   </motion.div>
                 </StaggerItem>
@@ -354,7 +354,7 @@ export default function HomePage() {
                   </div>
                   <div>
                     <p className="font-bold text-xl text-white">4.98/5 Quantum Rating</p>
-                    <p className="text-white/60">from 50,000+ neural reviews</p>
+                    <p className="text-white/60">from 50,000+ customer reviews</p>
                   </div>
                 </div>
               </motion.div>
@@ -422,7 +422,7 @@ export default function HomePage() {
                           ease: "easeInOut",
                           delay: index * 0.2
                         }}
-                        whileHover={{ scale: 1.1, rotate: 360 }}
+                        whileHover={{ scale: 1.1 }}
                       >
                         <div className="text-white">
                           {feature.icon}
@@ -492,26 +492,16 @@ export default function HomePage() {
                 </motion.p>
 
                 <StaggerContainer className="space-y-6" stagger={0.1}>
-                  {benefits.map((benefit, index) => (
+                  {benefits.map((benefit) => (
                     <StaggerItem key={benefit}>
                       <motion.div
                         className="flex items-center space-x-4 group"
                         whileHover={{ x: 10, scale: 1.02 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <motion.div
-                          className="flex-shrink-0"
-                          animate={{
-                            rotate: [0, 360],
-                            scale: [1, 1.1, 1],
-                          }}
-                          transition={{
-                            rotate: { duration: 20, repeat: Infinity, ease: "linear" },
-                            scale: { duration: 2, repeat: Infinity, ease: "easeInOut", delay: index * 0.2 }
-                          }}
-                        >
+                        <div className="flex-shrink-0">
                           <CheckCircle className="h-8 w-8 text-emerald-400 drop-shadow-lg group-hover:text-emerald-300 transition-colors" />
-                        </motion.div>
+                        </div>
                         <span className="text-white font-semibold text-lg group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300 drop-shadow-lg">
                           {benefit}
                         </span>
@@ -555,12 +545,12 @@ export default function HomePage() {
 
                     <h3 className="text-3xl font-bold text-white mb-6">
                       <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                        Neural AI in Action
+                        AutoniqueAI in Action
                       </span>
                     </h3>
 
                     <p className="text-white/80 mb-8 text-lg leading-relaxed">
-                      Watch our quantum AI seamlessly handle customer inquiries with <span className="text-cyan-400 font-bold">99.7% accuracy</span> and <span className="text-emerald-400 font-bold">sub-second response times</span>
+                      Watch AutoniqueAI seamlessly handle customer inquiries with <span className="text-cyan-400 font-bold">99.7% accuracy</span> and <span className="text-emerald-400 font-bold">sub-second response times</span>
                     </p>
 
                     <motion.div
@@ -573,23 +563,7 @@ export default function HomePage() {
                     </motion.div>
                   </div>
 
-                  {/* Holographic Border Effect */}
-                  <motion.div
-                    className="absolute inset-0 rounded-3xl border-2 border-transparent bg-gradient-to-r from-purple-400/50 via-pink-400/50 to-cyan-400/50"
-                    animate={{
-                      rotate: [0, 360],
-                    }}
-                    transition={{
-                      duration: 20,
-                      repeat: Infinity,
-                      ease: "linear"
-                    }}
-                    style={{
-                      background: 'linear-gradient(45deg, transparent, transparent), linear-gradient(45deg, #a855f7, #ec4899, #06b6d4)',
-                      backgroundClip: 'padding-box, border-box',
-                      backgroundOrigin: 'padding-box, border-box',
-                    }}
-                  />
+
                 </motion.div>
               </motion.div>
             </div>
@@ -769,7 +743,7 @@ export default function HomePage() {
                   ease: "easeInOut"
                 }}
               >
-                Powered by Neural AI Technology • Built for the Future
+                Powered by AutoniqueAI • Built for the Future
               </motion.div>
             </div>
           </div>

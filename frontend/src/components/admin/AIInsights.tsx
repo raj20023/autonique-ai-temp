@@ -64,12 +64,9 @@ const AIInsights: React.FC<AIInsightsProps> = ({ insights, onDismiss, onAction }
         className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-6 text-white"
       >
         <div className="flex items-center space-x-3">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          >
+          <div>
             <Brain className="h-8 w-8" />
-          </motion.div>
+          </div>
           <div>
             <h2 className="text-2xl font-bold">AI-Powered Insights</h2>
             <p className="text-purple-100">Real-time intelligence for smarter decisions</p>
