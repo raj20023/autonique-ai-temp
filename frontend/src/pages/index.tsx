@@ -141,6 +141,10 @@ export default function HomePage() {
                   Features
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 group-hover:w-full transition-all duration-300"></span>
                 </Link>
+                <Link href="/demo" className="text-white/90 hover:text-white transition-all duration-300 font-medium relative group">
+                  Demo
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-400 group-hover:w-full transition-all duration-300"></span>
+                </Link>
                 <Link href="#benefits" className="text-white/90 hover:text-white transition-all duration-300 font-medium relative group">
                   Benefits
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-cyan-400 group-hover:w-full transition-all duration-300"></span>
@@ -283,12 +287,14 @@ export default function HomePage() {
                     className="relative group"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
-                    <Button
-                      className="relative backdrop-blur-xl bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-2xl font-bold text-lg flex items-center space-x-3 border border-white/30 shadow-2xl"
-                    >
-                      <Play className="h-6 w-6" />
-                      <span>Watch Demo</span>
-                    </Button>
+                    <Link href="/demo">
+                      <Button
+                        className="relative backdrop-blur-xl bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-2xl font-bold text-lg flex items-center space-x-3 border border-white/30 shadow-2xl"
+                      >
+                        <Play className="h-6 w-6" />
+                        <span>Watch Demo</span>
+                      </Button>
+                    </Link>
                   </motion.div>
                 </StaggerItem>
               </StaggerContainer>
@@ -557,9 +563,11 @@ export default function HomePage() {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl shadow-cyan-500/25">
-                        Watch Demo
-                      </Button>
+                      <Link href="/demo">
+                        <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl shadow-cyan-500/25">
+                          Watch Demo
+                        </Button>
+                      </Link>
                     </motion.div>
                   </div>
 
