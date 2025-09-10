@@ -153,17 +153,31 @@ export default function HomePage() {
                   Pricing
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-emerald-400 to-teal-400 group-hover:w-full transition-all duration-300"></span>
                 </Link>
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button
-                    onClick={handleGetStarted}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300"
+                <div className="flex items-center space-x-4">
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    Start Free Trial
-                  </Button>
-                </motion.div>
+                    <Link href="/auth/login">
+                      <Button
+                        className="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-full font-semibold border border-white/30 backdrop-blur-xl transition-all duration-300"
+                      >
+                        Login
+                      </Button>
+                    </Link>
+                  </motion.div>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Button
+                      onClick={handleGetStarted}
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300"
+                    >
+                      Start Free Trial
+                    </Button>
+                  </motion.div>
+                </div>
               </div>
 
               <motion.button
@@ -271,11 +285,13 @@ export default function HomePage() {
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl blur-xl opacity-75 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <Button
                       onClick={handleGetStarted}
-                      className="relative bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-10 py-5 rounded-2xl font-bold text-lg flex items-center space-x-3 shadow-2xl border border-white/20"
+                      className="relative bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-10 py-5 rounded-2xl font-bold text-lg shadow-2xl border border-white/20 min-w-[280px] h-[70px] flex items-center justify-center"
                     >
-                      <Instagram className="h-6 w-6" />
-                      <span>Start AI Revolution</span>
-                      <Sparkles className="h-5 w-5" />
+                      <div className="flex items-center justify-center space-x-3">
+                        <Instagram className="h-6 w-6 flex-shrink-0" />
+                        <span className="whitespace-nowrap">Start AI Revolution</span>
+                        <Sparkles className="h-5 w-5 flex-shrink-0" />
+                      </div>
                     </Button>
                   </motion.div>
                 </StaggerItem>
@@ -289,10 +305,12 @@ export default function HomePage() {
                     <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
                     <Link href="/demo">
                       <Button
-                        className="relative backdrop-blur-xl bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-2xl font-bold text-lg flex items-center space-x-3 border border-white/30 shadow-2xl"
+                        className="relative backdrop-blur-xl bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-2xl font-bold text-lg border border-white/30 shadow-2xl min-w-[280px] h-[70px] flex items-center justify-center"
                       >
-                        <Play className="h-6 w-6" />
-                        <span>Watch Demo</span>
+                        <div className="flex items-center justify-center space-x-3">
+                          <Play className="h-6 w-6 flex-shrink-0" />
+                          <span className="whitespace-nowrap">Watch Demo</span>
+                        </div>
                       </Button>
                     </Link>
                   </motion.div>
@@ -406,7 +424,7 @@ export default function HomePage() {
               {features.map((feature, index) => (
                 <StaggerItem key={feature.title}>
                   <motion.div
-                    className="group relative"
+                    className="group relative h-full"
                     whileHover={{ y: -10, scale: 1.02 }}
                     transition={{ duration: 0.3 }}
                   >
@@ -414,10 +432,10 @@ export default function HomePage() {
                     <div className={`absolute inset-0 bg-gradient-to-r ${feature.gradient} rounded-3xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500`}></div>
 
                     {/* Card */}
-                    <div className="relative backdrop-blur-xl bg-white/5 p-8 rounded-3xl border border-white/10 shadow-2xl group-hover:border-white/20 transition-all duration-500">
+                    <div className="relative backdrop-blur-xl bg-white/5 p-8 rounded-3xl border border-white/10 shadow-2xl group-hover:border-white/20 transition-all duration-500 h-full flex flex-col min-h-[320px]">
                       {/* Floating Icon */}
                       <motion.div
-                        className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r ${feature.gradient} rounded-2xl mb-6 shadow-lg ${feature.glowColor} group-hover:shadow-2xl`}
+                        className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r ${feature.gradient} rounded-2xl mb-6 shadow-lg ${feature.glowColor} group-hover:shadow-2xl flex-shrink-0`}
                         animate={{
                           y: [0, -5, 0],
                           rotate: [0, 5, 0, -5, 0],
@@ -436,12 +454,14 @@ export default function HomePage() {
                       </motion.div>
 
                       {/* Content */}
-                      <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300">
-                        {feature.title}
-                      </h3>
-                      <p className="text-white/70 leading-relaxed group-hover:text-white/90 transition-colors duration-300">
-                        {feature.description}
-                      </p>
+                      <div className="flex-grow flex flex-col">
+                        <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300 flex-shrink-0">
+                          {feature.title}
+                        </h3>
+                        <p className="text-white/70 leading-relaxed group-hover:text-white/90 transition-colors duration-300 flex-grow">
+                          {feature.description}
+                        </p>
+                      </div>
 
                       {/* Holographic Border */}
                       <motion.div
@@ -659,11 +679,13 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl blur-2xl opacity-75 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <Button
                   onClick={handleGetStarted}
-                  className="relative bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-12 py-6 rounded-3xl font-black text-xl flex items-center space-x-4 shadow-2xl border-2 border-white/20"
+                  className="relative bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-12 py-6 rounded-3xl font-black text-xl shadow-2xl border-2 border-white/20 min-w-[320px] h-[80px] flex items-center justify-center"
                 >
-                  <Instagram className="h-8 w-8" />
-                  <span>Launch AI Empire</span>
-                  <ArrowRight className="h-8 w-8" />
+                  <div className="flex items-center justify-center space-x-4">
+                    <Instagram className="h-8 w-8 flex-shrink-0" />
+                    <span className="whitespace-nowrap">Launch AI Empire</span>
+                    <ArrowRight className="h-8 w-8 flex-shrink-0" />
+                  </div>
                 </Button>
               </motion.div>
 
@@ -721,38 +743,84 @@ export default function HomePage() {
         {/* Futuristic Footer */}
         <footer className="bg-black border-t border-white/10 py-16">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
-            <div className="text-center">
-              <motion.div
-                className="mb-8"
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.3 }}
-              >
-                <img
-                  src="/logos/header_white_background.svg"
-                  alt="AutoniqueAI"
-                  className="h-12 w-auto mx-auto filter drop-shadow-lg"
-                  onError={(e) => {
-                    e.currentTarget.src = "/logos/favicon_auto.svg";
-                    e.currentTarget.className = "h-12 w-12 mx-auto filter drop-shadow-lg";
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+              {/* Logo and Description */}
+              <div className="md:col-span-2">
+                <motion.div
+                  className="mb-6"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <img
+                    src="/logos/header_dark_background.svg"
+                    alt="AutoniqueAI"
+                    className="h-12 w-auto filter drop-shadow-lg"
+                    onError={(e) => {
+                      e.currentTarget.src = "/logos/favicon_auto.svg";
+                      e.currentTarget.className = "h-12 w-12 filter drop-shadow-lg";
+                    }}
+                  />
+                </motion.div>
+                <p className="text-white/70 text-lg leading-relaxed mb-4">
+                  Transform your Instagram customer service with AI automation. Save 10+ hours weekly while providing quantum-speed responses.
+                </p>
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-green-400 text-sm font-medium">System Online</span>
+                  </div>
+                  <div className="text-white/40 text-sm">99.9% Uptime</div>
+                </div>
+              </div>
+
+              {/* Quick Links */}
+              <div>
+                <h4 className="text-white font-bold text-lg mb-4">Quick Links</h4>
+                <ul className="space-y-3">
+                  <li><Link href="#features" className="text-white/60 hover:text-white transition-colors">Features</Link></li>
+                  <li><Link href="/demo" className="text-white/60 hover:text-white transition-colors">Demo</Link></li>
+                  <li><Link href="#benefits" className="text-white/60 hover:text-white transition-colors">Benefits</Link></li>
+                  <li><Link href="#pricing" className="text-white/60 hover:text-white transition-colors">Pricing</Link></li>
+                  <li><Link href="/auth/login" className="text-white/60 hover:text-white transition-colors">Login</Link></li>
+                </ul>
+              </div>
+
+              {/* Support */}
+              <div>
+                <h4 className="text-white font-bold text-lg mb-4">Support</h4>
+                <ul className="space-y-3">
+                  <li><a href="mailto:support@autonique.in" className="text-white/60 hover:text-white transition-colors">Contact Support</a></li>
+                  <li><Link href="/demo" className="text-white/60 hover:text-white transition-colors">Documentation</Link></li>
+                  <li><a href="https://youtu.be/qxhFyY_hGF8" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-colors">Video Tutorials</a></li>
+                  <li><span className="text-white/60">24/7 AI Support</span></li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Bottom Bar */}
+            <div className="border-t border-white/10 pt-8">
+              <div className="flex flex-col md:flex-row justify-between items-center">
+                <p className="text-white/40 text-lg mb-4 md:mb-0">
+                  © 2024 AutoniqueAI. Revolutionizing Instagram customer service.
+                </p>
+                <motion.div
+                  className="flex items-center space-x-6 text-white/20 text-sm"
+                  animate={{
+                    opacity: [0.2, 0.5, 0.2],
                   }}
-                />
-              </motion.div>
-              <p className="text-white/40 text-lg">
-                © 2024 AutoniqueAI. Revolutionizing the future of customer service.
-              </p>
-              <motion.div
-                className="mt-4 text-white/20 text-sm"
-                animate={{
-                  opacity: [0.2, 0.5, 0.2],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              >
-                Powered by AutoniqueAI • Built for the Future
-              </motion.div>
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                >
+                  <span>Powered by AutoniqueAI</span>
+                  <span>•</span>
+                  <span>Built for the Future</span>
+                  <span>•</span>
+                  <span>Made with ❤️</span>
+                </motion.div>
+              </div>
             </div>
           </div>
         </footer>
