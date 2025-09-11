@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Lock, 
-  Eye, 
-  AlertTriangle, 
-  Crown, 
-  X, 
-  Upgrade,
+import {
+  Lock,
+  Eye,
+  AlertTriangle,
+  Crown,
+  X,
+  ArrowUp,
   CheckCircle,
   XCircle
 } from 'lucide-react';
