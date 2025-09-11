@@ -1,0 +1,27 @@
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { isAuthenticated } from '@/utils/auth';
+
+export default function AdminDashboard() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if user is authenticated
+    if (!isAuthenticated()) {
+      router.push('/auth/login');
+      return;
+    }
+
+    // Redirect to the actual admin dashboard
+    router.push('/admin/advanced-dashboard');
+  }, [router]);
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading admin dashboard...</p>
+      </div>
+    </div>
+  );
+}
