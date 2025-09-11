@@ -62,9 +62,14 @@ DEFAULT_ADMIN_SETTINGS = [
         "description": "Maximum number of beta users allowed"
     },
     {
-        "key": "trial_days",
+        "key": "trial_days_normal",
         "value": "14",
-        "description": "Number of free trial days for new users"
+        "description": "Number of free trial days for normal users"
+    },
+    {
+        "key": "trial_days_beta",
+        "value": "365",
+        "description": "Number of free trial days for beta users (1 year)"
     },
     {
         "key": "monthly_message_limit_trial",

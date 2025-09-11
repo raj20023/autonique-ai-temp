@@ -79,6 +79,34 @@ async def check_access(
 
     return access_info
 
+@router.get("/limited-access")
+async def get_limited_access_info(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get limited access information for expired trial users"""
+    user_service = UserManagementService(db)
+
+    # Get or create managed user
+    managed_user = user_service.get_or_create_user(
+        facebook_id=current_user.fb_user_id,
+        email=current_user.email or "",
+        name=current_user.name,
+        profile_picture=""
+    )
+
+    if not managed_user:
+        managed_user = current_user
+
+    limited_access_info = user_service.get_limited_access_features(managed_user.id)
+    access_info = user_service.check_user_access(managed_user.id)
+
+    return {
+        "limited_access": limited_access_info,
+        "access_status": access_info,
+        "user_role": managed_user.role
+    }
+
 @router.post("/upgrade-to-paid")
 async def upgrade_to_paid(
     current_user: User = Depends(get_current_user),
@@ -206,9 +234,10 @@ async def get_admin_settings(
     # Return basic admin settings with frontend-compatible field names
     settings = {
         "beta_users_limit": "20",
-        "trial_days": "7",
-        "monthly_message_limit_trial": "100",
-        "monthly_message_limit_paid": "1000",
+        "trial_days_normal": "14",
+        "trial_days_beta": "365",
+        "monthly_message_limit_trial": "1000",
+        "monthly_message_limit_paid": "10000",
         "app_maintenance_mode": "false",
         "auto_approve_beta": "false"
     }
@@ -301,7 +330,7 @@ async def change_user_role(
     new_role = request.get("role", "")
 
     # Validate role
-    valid_roles = ["trial", "beta", "paid", "admin"]
+    valid_roles = ["normal", "beta", "paid", "admin"]
     if new_role not in valid_roles:
         raise HTTPException(
             status_code=400,

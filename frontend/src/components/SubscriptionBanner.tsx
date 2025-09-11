@@ -66,8 +66,13 @@ export default function SubscriptionBanner() {
 
   const { user, access } = profile;
 
-  // Don't show banner for beta users or paid users
-  if (user.role === 'beta' || user.role === 'paid' || user.role === 'admin') {
+  // Don't show banner for admin users or active paid users
+  if (user.role === 'admin' || (user.role === 'paid' && access.has_access)) {
+    return null;
+  }
+
+  // Don't show banner for beta users who still have access
+  if (user.role === 'beta' && access.has_access) {
     return null;
   }
 

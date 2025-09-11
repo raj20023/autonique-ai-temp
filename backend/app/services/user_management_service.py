@@ -27,18 +27,21 @@ class UserManagementService:
             beta_count = self.db.query(User).filter(User.is_beta_user == True).count()
 
             if beta_count < 20:
-                # Make them a beta user
+                # Make them a beta user with 1-year trial
                 user.role = "beta"
                 user.is_beta_user = True
                 user.beta_user_number = beta_count + 1
-                logger.info(f"Set beta user #{user.beta_user_number}: {name}")
+                user.trial_start_date = datetime.utcnow()
+                user.trial_end_date = datetime.utcnow() + timedelta(days=365)  # 1 year
+                user.trial_days_remaining = 365
+                logger.info(f"Set beta user #{user.beta_user_number}: {name} (1 year trial)")
             else:
-                # Start free trial
-                user.role = "free_trial"
+                # Start normal user with 14-day trial
+                user.role = "normal"
                 user.trial_start_date = datetime.utcnow()
                 user.trial_end_date = datetime.utcnow() + timedelta(days=14)
                 user.trial_days_remaining = 14
-                logger.info(f"Set trial user: {name} (14 days trial)")
+                logger.info(f"Set normal user: {name} (14 days trial)")
 
         # Update last login and profile picture
         user.last_login = datetime.utcnow()
@@ -65,48 +68,111 @@ class UserManagementService:
             beta_count = self.db.query(User).filter(User.is_beta_user == True).count()
 
             if beta_count < 20:
-                # Make them a beta user
+                # Make them a beta user with 1-year trial
                 user.role = "beta"
                 user.is_beta_user = True
                 user.beta_user_number = beta_count + 1
-                logger.info(f"Set beta user #{user.beta_user_number}: {user.name}")
+                user.trial_start_date = datetime.utcnow()
+                user.trial_end_date = datetime.utcnow() + timedelta(days=365)  # 1 year
+                user.trial_days_remaining = 365
+                logger.info(f"Set beta user #{user.beta_user_number}: {user.name} (1 year trial)")
             else:
-                # Start free trial
-                user.role = "free_trial"
+                # Start normal user with 14-day trial
+                user.role = "normal"
                 user.trial_start_date = datetime.utcnow()
                 user.trial_end_date = datetime.utcnow() + timedelta(days=14)
                 user.trial_days_remaining = 14
-                logger.info(f"Set trial user: {user.name} (14 days trial)")
+                logger.info(f"Set normal user: {user.name} (14 days trial)")
 
             self.db.commit()
 
+        # Admin - unlimited access to everything
         if user.role == "admin":
-            return {"has_access": True, "reason": "Admin access", "unlimited": True}
+            return {"has_access": True, "reason": "Admin access", "unlimited": True, "role": "admin"}
 
+        # Beta user - 1 year free trial
         if user.role == "beta":
-            return {"has_access": True, "reason": "Beta user access", "unlimited": True}
-
-        if user.role == "paid" and user.subscription_status == "active":
-            return {"has_access": True, "reason": "Paid subscription", "unlimited": False}
-
-        if user.role == "free_trial":
             if user.is_trial_expired():
                 return {
-                    "has_access": False, 
-                    "reason": "Trial expired",
+                    "has_access": False,
+                    "reason": "Beta trial expired",
                     "trial_expired": True,
-                    "days_remaining": 0
+                    "days_remaining": 0,
+                    "role": "beta"
                 }
             else:
                 return {
-                    "has_access": True, 
+                    "has_access": True,
+                    "reason": "Beta user access",
+                    "trial_active": True,
+                    "days_remaining": user.days_remaining_in_trial(),
+                    "unlimited": True,
+                    "role": "beta"
+                }
+
+        # Paid user - full access
+        if user.role == "paid" and user.subscription_status == "active":
+            return {"has_access": True, "reason": "Paid subscription", "unlimited": False, "role": "paid"}
+
+        # Normal user (previously free_trial)
+        if user.role == "normal" or user.role == "free_trial":  # Support both old and new naming
+            if user.is_trial_expired():
+                return {
+                    "has_access": False,
+                    "reason": "Trial expired",
+                    "trial_expired": True,
+                    "days_remaining": 0,
+                    "limited_access": True,  # They get limited functionality
+                    "role": "normal"
+                }
+            else:
+                return {
+                    "has_access": True,
                     "reason": "Free trial",
                     "trial_active": True,
-                    "days_remaining": user.days_remaining_in_trial()
+                    "days_remaining": user.days_remaining_in_trial(),
+                    "role": "normal"
                 }
-        
-        return {"has_access": False, "reason": "No valid subscription"}
-    
+
+        return {"has_access": False, "reason": "No valid subscription", "role": user.role or "unknown"}
+
+    def get_limited_access_features(self, user_id: int) -> dict:
+        """Get what features expired trial users can access"""
+        user = self.db.query(User).filter(User.id == user_id).first()
+        if not user:
+            return {"can_access": []}
+
+        # Limited functionality for expired normal users
+        if user.role in ["normal", "free_trial"] and user.is_trial_expired():
+            return {
+                "can_access": [
+                    "view_dashboard",      # Can see dashboard but limited
+                    "view_faqs",          # Can view existing FAQs but not create new ones
+                    "view_messages",      # Can see message history but no auto-reply
+                    "view_stats",         # Can see basic stats
+                    "profile_settings"    # Can update profile
+                ],
+                "cannot_access": [
+                    "create_faqs",        # Cannot create new FAQs
+                    "auto_reply",         # No auto-reply functionality
+                    "advanced_analytics", # No advanced features
+                    "bulk_operations",    # No bulk operations
+                    "api_access"          # No API access
+                ],
+                "limits": {
+                    "max_faqs": 0,        # Cannot create new FAQs
+                    "max_messages_per_day": 0,  # No auto-replies
+                    "dashboard_access": "read_only"
+                }
+            }
+
+        # Full access for active users
+        return {
+            "can_access": ["all"],
+            "cannot_access": [],
+            "limits": {}
+        }
+
     def upgrade_to_paid(self, user_id: int) -> bool:
         """Upgrade user to paid subscription"""
         user = self.db.query(User).filter(User.id == user_id).first()

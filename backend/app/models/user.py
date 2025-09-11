@@ -24,7 +24,7 @@ class User(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # User Management fields (added by migration)
-    role = Column(String, default="free_trial")  # Using String instead of Enum for flexibility
+    role = Column(String, default="normal")  # admin, beta, normal, paid
     is_beta_user = Column(Boolean, default=False)
     beta_user_number = Column(Integer, nullable=True)
     trial_start_date = Column(DateTime, nullable=True)
@@ -58,13 +58,17 @@ class User(Base):
         """Check if user can access premium features"""
         if self.role == "admin":
             return True
-        if self.role == "beta":
+        if self.role == "beta" and not self.is_trial_expired():
             return True
         if self.role == "paid" and self.subscription_status == "active":
             return True
-        if self.role == "free_trial" and not self.is_trial_expired():
+        if self.role in ["normal", "free_trial"] and not self.is_trial_expired():
             return True
         return False
+
+    def has_limited_access(self):
+        """Check if user has limited access (expired trial but can still use some features)"""
+        return self.role in ["normal", "free_trial"] and self.is_trial_expired()
 
     def __repr__(self):
         return f"<User(id={self.id}, name='{self.name}', fb_user_id='{self.fb_user_id}')>"

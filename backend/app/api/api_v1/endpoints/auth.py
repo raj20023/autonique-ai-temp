@@ -218,7 +218,7 @@ async def facebook_callback(
             "user_id": str(user.id),
             "name": user.name,
             "email": user.email,
-            "user_role": managed_user.role if managed_user else "free_trial",
+            "user_role": managed_user.role if managed_user else "normal",
             "is_beta_user": managed_user.is_beta_user if managed_user else False,
             "beta_user_number": managed_user.beta_user_number if managed_user else None,
             "access_info": access_info,

@@ -734,9 +734,10 @@ export default function AdvancedAdminDashboard() {
                                     user.role === 'admin' ? 'bg-purple-100 text-purple-800' :
                                     user.role === 'paid' ? 'bg-green-100 text-green-800' :
                                     user.role === 'beta' ? 'bg-blue-100 text-blue-800' :
+                                    user.role === 'normal' ? 'bg-yellow-100 text-yellow-800' :
                                     'bg-gray-100 text-gray-800'
                                   }`}>
-                                    {user.role?.charAt(0).toUpperCase() + user.role?.slice(1)}
+                                    {user.role === 'normal' ? 'Normal' : user.role?.charAt(0).toUpperCase() + user.role?.slice(1)}
                                   </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
@@ -753,7 +754,7 @@ export default function AdvancedAdminDashboard() {
                                       onChange={(e) => changeUserRole(user.id, e.target.value)}
                                       className="text-xs border border-gray-300 rounded px-2 py-1 bg-white text-gray-900"
                                     >
-                                      <option value="trial">Trial</option>
+                                      <option value="normal">Normal</option>
                                       <option value="beta">Beta</option>
                                       <option value="paid">Paid</option>
                                       <option value="admin">Admin</option>

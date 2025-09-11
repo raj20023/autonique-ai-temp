@@ -16,6 +16,7 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { isAuthenticated } from '@/utils/auth';
 import SubscriptionBanner from '@/components/SubscriptionBanner';
+import LimitedAccessBanner from '@/components/LimitedAccessBanner';
 import AutoMascot, { AutoLoader } from '@/components/ui/AutoMascot';
 import { useAutoExpressions } from '@/contexts/AutoContext';
 
@@ -94,6 +95,7 @@ export default function DashboardPage() {
       </Head>
 
       <SubscriptionBanner />
+      <LimitedAccessBanner />
 
       <DashboardLayout title="Dashboard">
         {/* Gradient Background */}
