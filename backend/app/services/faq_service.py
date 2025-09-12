@@ -249,13 +249,15 @@ class FAQService:
                     user_message, faq_match.answer, faq_match.question
                 )
 
-            # If no FAQ match found, return a polite "not found" message
-            logger.info(f"❌ No FAQ match found for user {user_id}, returning 'not found' message")
-            return "I couldn't find an answer to your question in our FAQs. Please wait for our team to get back to you, or feel free to ask something else!"
+            # If no FAQ match found, generate a smart contextual response
+            logger.info(f"❌ No FAQ match found for user {user_id}, generating smart fallback")
+            return await self.gemini_service.langchain.generate_smart_fallback(user_message)
 
         except Exception as e:
             logger.error(f"Error finding smart response: {e}")
-            return "I'm having trouble processing your request right now. Please wait for our team to assist you."
+            return "Thank you for your message! Our team will get back to you soon."
+
+
 
     async def improve_faq_from_interactions(self, db: Session, user_id: int) -> List[Dict]:
         """Analyze user interactions to suggest FAQ improvements"""

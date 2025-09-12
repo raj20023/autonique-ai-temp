@@ -150,15 +150,4 @@ class GeminiService:
         """Extract user intent from message using Gemini"""
         return await self.langchain.extract_intent(text)
 
-    async def generate_smart_response(self, user_message: str, context: Dict = None) -> str:
-        """Generate a smart response without FAQ matching using context"""
-        context_info = ""
-        if context:
-            context_info = f"""
-            Additional context:
-            - User sentiment: {context.get('sentiment', {}).get('overall', 'neutral')}
-            - Intent: {context.get('intent', 'unknown')}
-            - Previous interactions: {len(context.get('history', []))} recent messages
-            """
 
-        return await self.langchain.generate_smart_response(user_message, context_info)

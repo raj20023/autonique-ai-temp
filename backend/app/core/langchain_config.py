@@ -44,7 +44,8 @@ class LangChainManager:
         # Customer service response prompt
         self.response_prompt = PromptTemplate(
             input_variables=["user_message", "faq_answer"],
-            template="""You are a helpful customer service assistant for an Instagram business.
+            template="""You are a helpful customer service assistant for this Instagram business.
+
             Personalize the following FAQ answer to respond naturally to the user's message.
             Keep it friendly, conversational, and professional.
 
@@ -57,35 +58,48 @@ class LangChainManager:
         # Response with relevance check prompt
         self.relevance_response_prompt = PromptTemplate(
             input_variables=["user_message", "faq_answer", "faq_question"],
-            template="""You are a helpful customer service assistant for an Instagram business.
+            template="""You are a helpful customer service assistant for this Instagram business.
 
-            A user asked: "{user_message}"
+            A user said: "{user_message}"
 
             We found this FAQ that might be relevant:
             FAQ Question: "{faq_question}"
             FAQ Answer: "{faq_answer}"
 
             INSTRUCTIONS:
-            1. If the FAQ is relevant to the user's question, provide a personalized, friendly response based on the FAQ answer.
-            2. If the FAQ is NOT relevant to what the user is asking, respond EXACTLY with: "I couldn't find an answer to your question in our FAQs. Please wait for our team to get back to you, or feel free to ask something else!"
+            1. If the FAQ is relevant to the user's message, provide a personalized, friendly response based on the FAQ answer.
+            2. If the FAQ is NOT relevant, respond naturally to their message:
+               - For greetings (hi, hello, hey): Greet them back warmly and ask how you can help
+               - For questions: Let them know you'll connect them with the team
+               - For complaints: Be empathetic and offer to help resolve the issue
+               - For compliments: Thank them and offer continued assistance
+               - For general messages: Respond appropriately and offer help
 
-            Be strict about relevance - only use the FAQ if it actually answers the user's question.
+            Be natural and conversational. Don't use the same response for everything.
+
+            Response:"""
+        )
+
+        # Smart fallback prompt for when no FAQ matches
+        self.smart_fallback_prompt = PromptTemplate(
+            input_variables=["user_message"],
+            template="""You are a helpful customer service assistant for this Instagram business.
+
+            A user said: "{user_message}"
+
+            Since we don't have a specific FAQ for this, respond naturally and helpfully:
+            - For greetings (hi, hello, hey): Greet them back warmly and ask how you can help
+            - For questions: Acknowledge their question and let them know the team will help
+            - For complaints: Be empathetic and offer to resolve the issue
+            - For compliments: Thank them genuinely
+            - For casual messages: Respond naturally and offer assistance
+
+            Keep it friendly, natural, and helpful. Don't sound robotic.
 
             Response:"""
         )
         
-        # Smart response prompt (no FAQ match)
-        self.smart_response_prompt = PromptTemplate(
-            input_variables=["user_message", "context"],
-            template="""You are a helpful customer service assistant for an Instagram business.
-            Respond to the user's message in a friendly and professional manner.
-            
-            {context}
-            
-            User message: {user_message}
-            
-            Provide a helpful response:"""
-        )
+
         
         # Sentiment analysis prompt
         self.sentiment_prompt = PromptTemplate(
@@ -171,8 +185,8 @@ JSON:"""
         # Response with relevance check chain
         self.relevance_response_chain = self.relevance_response_prompt | self.llm
 
-        # Smart response chain
-        self.smart_response_chain = self.smart_response_prompt | self.llm
+        # Smart fallback chain
+        self.smart_fallback_chain = self.smart_fallback_prompt | self.llm
 
         # Sentiment analysis chain
         self.sentiment_chain = self.sentiment_prompt | self.llm
@@ -222,19 +236,18 @@ JSON:"""
             return response.content.strip() if hasattr(response, 'content') else str(response).strip()
         except Exception as e:
             logger.error(f"Error generating response with relevance check: {e}")
-            return "I couldn't find an answer to your question in our FAQs. Please wait for our team to get back to you, or feel free to ask something else!"
-    
-    async def generate_smart_response(self, user_message: str, context: str = "") -> str:
-        """Generate smart response without FAQ"""
+            return "Thank you for your message! Our team will get back to you soon. Feel free to ask any other questions!"
+
+    async def generate_smart_fallback(self, user_message: str) -> str:
+        """Generate smart fallback response when no FAQ matches"""
         try:
-            response = await self.smart_response_chain.ainvoke({
-                "user_message": user_message,
-                "context": context
+            response = await self.smart_fallback_chain.ainvoke({
+                "user_message": user_message
             })
             return response.content.strip() if hasattr(response, 'content') else str(response).strip()
         except Exception as e:
-            logger.error(f"Error generating smart response: {e}")
-            return "Thank you for your message. We'll get back to you soon!"
+            logger.error(f"Error generating smart fallback: {e}")
+            return "Hello! How can I help you today?"
     
     async def analyze_sentiment(self, text: str) -> Dict:
         """Analyze sentiment of text"""

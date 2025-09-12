@@ -179,4 +179,39 @@ async def test_faq_match(
             "message": "No matching FAQ found"
         }
 
+@router.post("/test-smart-response")
+async def test_smart_response(
+    message: str,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """Test the complete smart response system including dynamic fallbacks"""
+    faq_service = FAQService()
+
+    try:
+        # Test the complete smart response flow
+        response = await faq_service.find_smart_response(db, current_user.id, message)
+
+        # Also get context analysis for debugging
+        context = await faq_service.analyze_message_context(db, current_user.id, message)
+
+        return {
+            "success": True,
+            "user_message": message,
+            "ai_response": response,
+            "context_analysis": {
+                "sentiment": context.get('sentiment', {}),
+                "intent": context.get('intent', 'unknown'),
+                "message_length": context.get('message_length', 0),
+                "has_question_marks": context.get('has_question_marks', False),
+                "has_exclamation": context.get('has_exclamation', False)
+            }
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "user_message": message
+        }
+
 
