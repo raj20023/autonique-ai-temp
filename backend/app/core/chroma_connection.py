@@ -5,6 +5,7 @@ ChromaDB connection and collection management for FAQ vector search
 import chromadb
 from chromadb.api import ClientAPI
 from chromadb.api.models.Collection import Collection
+from chromadb.utils import embedding_functions
 from fastapi import Depends
 import logging
 from typing import Optional
@@ -33,42 +34,48 @@ def get_chroma_client() -> ClientAPI:
     return _client
 
 def get_chroma_collection(client: ClientAPI = Depends(get_chroma_client)) -> Collection:
-    """Get or create ChromaDB collection for FAQs with cosine similarity"""
+    """Get or create ChromaDB collection for FAQs with OpenAI embeddings"""
     global _collection
     if _collection is None:
         try:
+            # Use OpenAI embedding function to prevent local model download
+            openai_ef = embedding_functions.OpenAIEmbeddingFunction(
+                api_key=settings.OPENAI_API_KEY,
+                model_name="text-embedding-3-small"
+            )
+
             _collection = client.get_or_create_collection(
                 name="faq_embeddings",
+                embedding_function=openai_ef,
                 metadata={
-                    "description": "FAQ question and answer embeddings for similarity search",
-                    "version": "1.0"
-                },
-                configuration={
-                    "hnsw": {
-                        "space": "cosine"  # Use cosine similarity
-                    }
+                    "description": "FAQ question and answer embeddings using OpenAI",
+                    "version": "2.0",
+                    "embedding_model": "text-embedding-3-small"
                 }
             )
-            logger.info("✅ ChromaDB collection 'faq_embeddings' ready with cosine similarity")
+            logger.info("✅ ChromaDB collection 'faq_embeddings' ready with OpenAI embeddings")
         except Exception as e:
             logger.error(f"❌ Failed to get ChromaDB collection: {e}")
             raise
     return _collection
 
 def get_chroma_collection_direct() -> Collection:
-    """Get ChromaDB collection without FastAPI dependency injection with cosine similarity"""
+    """Get ChromaDB collection without FastAPI dependency injection with OpenAI embeddings"""
     client = get_chroma_client()
     try:
+        # Use OpenAI embedding function to prevent local model download
+        openai_ef = embedding_functions.OpenAIEmbeddingFunction(
+            api_key=settings.OPENAI_API_KEY,
+            model_name="text-embedding-3-small"
+        )
+
         collection = client.get_or_create_collection(
             name="faq_embeddings",
+            embedding_function=openai_ef,
             metadata={
-                "description": "FAQ question and answer embeddings for similarity search",
-                "version": "1.0"
-            },
-            configuration={
-                "hnsw": {
-                    "space": "cosine"  # Use cosine similarity
-                }
+                "description": "FAQ question and answer embeddings using OpenAI",
+                "version": "2.0",
+                "embedding_model": "text-embedding-3-small"
             }
         )
         return collection
