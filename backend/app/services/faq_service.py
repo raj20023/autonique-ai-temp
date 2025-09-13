@@ -214,13 +214,13 @@ class FAQService:
             if faq_match:
                 # Let LLM decide if FAQ is relevant and generate appropriate response
                 return await self.openai_service.generate_response(
-                    f"User question: {user_message}\nFAQ answer: {faq_match.answer}",
-                    user_message
+                    user_message,
+                    faq_match.answer
                 )
 
             # If no FAQ match found, generate a smart contextual response
             logger.info(f"❌ No FAQ match found for user {user_id}, generating smart fallback")
-            return await self.openai_service.generate_response("No FAQ found", user_message)
+            return await self.openai_service.generate_response(user_message, "No FAQ found")
 
         except Exception as e:
             logger.error(f"Error finding smart response: {e}")

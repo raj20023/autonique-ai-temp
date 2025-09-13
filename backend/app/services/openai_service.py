@@ -126,13 +126,13 @@ class OpenAIService:
             return cached_response
 
         try:
-            # Generate new response
-            response = await self.langchain.generate_response(context, user_message, business_context)
-            
+            # Generate new response using LangChain (only takes 2 parameters)
+            response = await self.langchain.generate_response(user_message, context)
+
             # Cache the result
             cache_response(cache_key, response)
             logger.debug(f"Cached new response: {cache_key}")
-            
+
             return response
         except Exception as e:
             logger.error(f"❌ Error generating response: {e}")
