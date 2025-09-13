@@ -111,9 +111,50 @@ class FAQService:
 
         except Exception as e:
             logger.error(f"❌ Error finding matching FAQ via ChromaDB: {e}")
+            # Fallback to PostgreSQL vector search
+            logger.info("🔄 Falling back to PostgreSQL vector search...")
+            return await self._find_matching_faq_fallback(db, user_id, user_message)
+
+
+
+    async def _find_matching_faq_fallback(self, db: Session, user_id: int, user_message: str) -> Optional[FAQMatch]:
+        """Fallback method using PostgreSQL embeddings"""
+        try:
+            # Get user's FAQs
+            faqs = db.query(FAQ).filter(
+                FAQ.user_id == user_id,
+                FAQ.is_active == True
+            ).all()
+
+            if not faqs:
+                return None
+
+            # Generate embedding for user message
+            message_embedding = await self.openai_service.get_embedding(user_message)
+
+            # Prepare FAQ data for matching
+            faq_embeddings = []
+            for faq in faqs:
+                if faq.embedding_vector:
+                    faq_embeddings.append({
+                        "id": faq.id,
+                        "question": faq.question,
+                        "answer": faq.answer,
+                        "embedding": faq.embedding_vector,
+                        "similarity_threshold": faq.similarity_threshold
+                    })
+
+            # Find best match
+            best_match = self.openai_service.find_best_match(message_embedding, faq_embeddings)
+
+            if best_match:
+                return FAQMatch(**best_match)
+
             return None
 
-
+        except Exception as e:
+            logger.error(f"Error in fallback FAQ matching: {e}")
+            return None
 
     async def update_faq_embedding(self, db: Session, faq_id: int) -> bool:
         """Update embedding for an existing FAQ"""
