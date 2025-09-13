@@ -4,7 +4,7 @@ import logging
 
 from app.models.faq import FAQ
 from app.models.message import Message
-from app.services.gemini_service import GeminiService
+from app.services.openai_service import OpenAIService
 from app.services.chroma_faq_service import ChromaFAQService
 from app.schemas.faq import FAQMatch
 
@@ -12,14 +12,14 @@ logger = logging.getLogger(__name__)
 
 class FAQService:
     def __init__(self):
-        self.gemini_service = GeminiService()
+        self.openai_service = OpenAIService()
         self.chroma_service = ChromaFAQService()
 
     async def create_faq_with_embedding(self, db: Session, user_id: int, question: str, answer: str, similarity_threshold: float = 0.8) -> FAQ:
         """Create a new FAQ with embedding"""
         try:
             # Generate embedding for the question (for PostgreSQL compatibility)
-            embedding = await self.gemini_service.get_embedding(question)
+            embedding = await self.openai_service.get_embedding(question)
 
             # Create FAQ record in PostgreSQL
             faq = FAQ(
@@ -60,7 +60,7 @@ class FAQService:
         try:
             # Extract questions for batch embedding
             questions = [faq["question"] for faq in faq_data]
-            embeddings = await self.gemini_service.get_embeddings_batch(questions)
+            embeddings = await self.openai_service.get_embeddings_batch(questions)
             
             # Create FAQ records
             faqs = []
@@ -111,48 +111,9 @@ class FAQService:
 
         except Exception as e:
             logger.error(f"❌ Error finding matching FAQ via ChromaDB: {e}")
-            # Fallback to old method if ChromaDB fails
-            logger.info("🔄 Falling back to PostgreSQL vector search...")
-            return await self._find_matching_faq_fallback(db, user_id, user_message)
-
-    async def _find_matching_faq_fallback(self, db: Session, user_id: int, user_message: str) -> Optional[FAQMatch]:
-        """Fallback method using PostgreSQL embeddings"""
-        try:
-            # Get user's FAQs
-            faqs = db.query(FAQ).filter(
-                FAQ.user_id == user_id,
-                FAQ.is_active == True
-            ).all()
-
-            if not faqs:
-                return None
-
-            # Generate embedding for user message
-            message_embedding = await self.gemini_service.get_embedding(user_message)
-
-            # Prepare FAQ data for matching
-            faq_embeddings = []
-            for faq in faqs:
-                if faq.embedding_vector:
-                    faq_embeddings.append({
-                        "id": faq.id,
-                        "question": faq.question,
-                        "answer": faq.answer,
-                        "embedding": faq.embedding_vector,
-                        "similarity_threshold": faq.similarity_threshold
-                    })
-
-            # Find best match
-            best_match = self.gemini_service.find_best_match(message_embedding, faq_embeddings)
-
-            if best_match:
-                return FAQMatch(**best_match)
-
             return None
 
-        except Exception as e:
-            logger.error(f"Error in fallback FAQ matching: {e}")
-            return None
+
 
     async def update_faq_embedding(self, db: Session, faq_id: int) -> bool:
         """Update embedding for an existing FAQ"""
@@ -162,7 +123,7 @@ class FAQService:
                 return False
             
             # Generate new embedding
-            embedding = await self.gemini_service.get_embedding(faq.question)
+            embedding = await self.openai_service.get_embedding(faq.question)
             faq.embedding_vector = embedding
             
             db.commit()
@@ -198,7 +159,7 @@ class FAQService:
         try:
             # Get sentiment analysis (with fallback)
             try:
-                sentiment = await self.gemini_service.analyze_sentiment(user_message)
+                sentiment = await self.openai_service.analyze_sentiment(user_message)
                 logger.debug(f"Sentiment analysis successful: {sentiment}")
             except Exception as e:
                 logger.warning(f"Sentiment analysis failed, using default: {e}")
@@ -211,7 +172,7 @@ class FAQService:
 
             # Extract intent (with fallback)
             try:
-                intent = await self.gemini_service.extract_intent(user_message)
+                intent = await self.openai_service.extract_intent(user_message)
                 logger.debug(f"Intent extraction successful: {intent}")
             except Exception as e:
                 logger.warning(f"Intent extraction failed, using default: {e}")
@@ -252,13 +213,14 @@ class FAQService:
 
             if faq_match:
                 # Let LLM decide if FAQ is relevant and generate appropriate response
-                return await self.gemini_service.generate_response_with_relevance_check(
-                    user_message, faq_match.answer, faq_match.question
+                return await self.openai_service.generate_response(
+                    f"User question: {user_message}\nFAQ answer: {faq_match.answer}",
+                    user_message
                 )
 
             # If no FAQ match found, generate a smart contextual response
             logger.info(f"❌ No FAQ match found for user {user_id}, generating smart fallback")
-            return await self.gemini_service.langchain.generate_smart_fallback(user_message)
+            return await self.openai_service.generate_response("No FAQ found", user_message)
 
         except Exception as e:
             logger.error(f"Error finding smart response: {e}")
@@ -281,7 +243,7 @@ class FAQService:
 
             # Group similar messages
             message_texts = [msg.message_text for msg in unmatched_messages]
-            embeddings = await self.gemini_service.get_embeddings_batch(message_texts)
+            embeddings = await self.openai_service.get_embeddings_batch(message_texts)
 
             # Simple clustering to find common themes
             suggestions = []
@@ -299,7 +261,7 @@ class FAQService:
                     if j in processed or i == j:
                         continue
 
-                    similarity = self.gemini_service.calculate_similarity(
+                    similarity = self.openai_service.calculate_similarity(
                         embeddings[i], embeddings[j]
                     )
 
@@ -328,7 +290,7 @@ class FAQService:
     async def _generate_faq_suggestion(self, similar_messages: List[str]) -> Optional[Dict]:
         """Generate FAQ suggestion from similar messages"""
         try:
-            return await self.gemini_service.langchain.suggest_faq(similar_messages)
+            return await self.openai_service.langchain.suggest_faq(similar_messages)
         except Exception as e:
             logger.error(f"Error generating FAQ suggestion: {e}")
             return None

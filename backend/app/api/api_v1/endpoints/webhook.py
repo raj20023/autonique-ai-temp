@@ -19,92 +19,11 @@ from app.core.security import decrypt_token, encrypt_token
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-@router.get("/test-faq")
-async def test_faq_service():
-    """Test endpoint to check if FAQ service is working (API quota safe)"""
-    try:
-        logger.info("🧪 Testing FAQ service (without API calls)...")
 
-        # Test basic FAQ service initialization
-        faq_service = FAQService()
-        logger.info("✅ FAQ service initialized successfully")
 
-        # Test Gemini service initialization (without API call)
-        gemini_service = faq_service.gemini_service
-        logger.info("✅ Gemini service accessed successfully")
 
-        # Return success without making API calls
-        return {
-            "status": "success",
-            "message": "FAQ service is working correctly (API calls disabled to preserve quota)",
-            "note": "Use /webhook/test-faq-with-api to test with actual API calls"
-        }
 
-    except Exception as e:
-        logger.error(f"❌ FAQ service test failed: {e}")
-        import traceback
-        logger.error(f"Full traceback: {traceback.format_exc()}")
-        return {
-            "status": "error",
-            "message": str(e),
-            "type": type(e).__name__
-        }
 
-@router.get("/test-sentiment")
-async def test_sentiment_analysis():
-    """Test endpoint to check sentiment analysis (API quota safe)"""
-    try:
-        logger.info("🧪 Testing sentiment analysis (without API calls)...")
-
-        # Test sentiment analysis initialization
-        faq_service = FAQService()
-        gemini_service = faq_service.gemini_service
-
-        return {
-            "status": "success",
-            "message": "Sentiment analysis service initialized correctly (API calls disabled to preserve quota)",
-            "note": "Use /webhook/test-sentiment-with-api to test with actual API calls"
-        }
-
-    except Exception as e:
-        logger.error(f"❌ Sentiment analysis test failed: {e}")
-        import traceback
-        logger.error(f"Full traceback: {traceback.format_exc()}")
-        return {
-            "status": "error",
-            "message": str(e),
-            "type": type(e).__name__
-        }
-
-@router.get("/test-chroma")
-async def test_chroma_connection():
-    """Test ChromaDB connection"""
-    try:
-        logger.info("🧪 Testing ChromaDB connection...")
-
-        from app.core.chroma_connection import test_chroma_connection
-        success = test_chroma_connection()
-
-        if success:
-            return {
-                "status": "success",
-                "message": "ChromaDB connection working correctly"
-            }
-        else:
-            return {
-                "status": "error",
-                "message": "ChromaDB connection failed"
-            }
-
-    except Exception as e:
-        logger.error(f"❌ ChromaDB test failed: {e}")
-        import traceback
-        logger.error(f"Full traceback: {traceback.format_exc()}")
-        return {
-            "status": "error",
-            "message": str(e),
-            "type": type(e).__name__
-        }
 
 @router.post("/migrate-faqs")
 async def migrate_faqs_to_chroma(db: Session = Depends(get_db)):
@@ -133,144 +52,11 @@ async def migrate_faqs_to_chroma(db: Session = Depends(get_db)):
             "type": type(e).__name__
         }
 
-@router.get("/test-faq-with-api")
-async def test_faq_service_with_api():
-    """Test endpoint with actual API calls (USE CAREFULLY - CONSUMES QUOTA)"""
-    try:
-        logger.warning("⚠️ Testing FAQ service WITH API CALLS - This will consume quota!")
 
-        # Test basic FAQ service initialization
-        faq_service = FAQService()
-        logger.info("✅ FAQ service initialized successfully")
 
-        # Test Gemini service
-        gemini_service = faq_service.gemini_service
-        logger.info("✅ Gemini service accessed successfully")
 
-        # Test a simple embedding generation
-        test_text = "Hello, how are you?"
-        embedding = await gemini_service.get_embedding(test_text)
-        logger.info(f"✅ Embedding generated successfully, length: {len(embedding)}")
 
-        return {
-            "status": "success",
-            "message": "FAQ service is working correctly with API calls",
-            "embedding_length": len(embedding),
-            "warning": "This endpoint consumes API quota"
-        }
 
-    except Exception as e:
-        logger.error(f"❌ FAQ service test failed: {e}")
-        import traceback
-        logger.error(f"Full traceback: {traceback.format_exc()}")
-        return {
-            "status": "error",
-            "message": str(e),
-            "type": type(e).__name__
-        }
-
-@router.get("/test-chroma-search")
-async def test_chroma_search():
-    """Test ChromaDB search functionality with question+answer embeddings"""
-    try:
-        logger.info("🔍 Testing ChromaDB search functionality...")
-
-        from app.services.chroma_faq_service import ChromaFAQService
-        chroma_service = ChromaFAQService()
-
-        # Test queries that should match both questions and answers
-        test_queries = [
-            "What are your business hours?",  # Should match question
-            "Monday to Friday",  # Should match answer content
-            "How can I contact you?",  # Should match question
-            "email support",  # Should match answer content
-            "pricing information"  # Should match various content
-        ]
-
-        results = {}
-
-        for query in test_queries:
-            logger.info(f"🔍 Testing query: '{query}'")
-
-            # Search for user 2 (has business hours FAQ)
-            matches = await chroma_service.search_faqs(user_id=2, query=query, n_results=3)
-
-            results[query] = {
-                "matches_found": len(matches),
-                "top_matches": [
-                    {
-                        "question": match["question"][:100] + "..." if len(match["question"]) > 100 else match["question"],
-                        "answer": match["answer"][:100] + "..." if len(match["answer"]) > 100 else match["answer"],
-                        "similarity_score": round(match["similarity_score"], 3)
-                    }
-                    for match in matches[:2]  # Top 2 matches
-                ]
-            }
-
-            logger.info(f"✅ Found {len(matches)} matches for '{query}'")
-
-        return {
-            "status": "success",
-            "message": "ChromaDB search test completed",
-            "test_results": results,
-            "summary": {
-                "total_queries_tested": len(test_queries),
-                "queries_with_matches": sum(1 for r in results.values() if r["matches_found"] > 0)
-            }
-        }
-
-    except Exception as e:
-        logger.error(f"❌ ChromaDB search test failed: {e}")
-        import traceback
-        logger.error(f"Full traceback: {traceback.format_exc()}")
-        return {
-            "status": "error",
-            "message": str(e),
-            "type": type(e).__name__
-        }
-
-@router.get("/test-faq-integration")
-async def test_faq_integration(db: Session = Depends(get_db)):
-    """Test end-to-end FAQ integration with ChromaDB"""
-    logger.info("🔍 Testing end-to-end FAQ integration...")
-
-    faq_service = FAQService()
-
-    # Test queries for user 2 (has business hours FAQ)
-    test_queries = [
-        "What are your business hours?",
-        "When are you open?",
-        "What time do you close?"
-    ]
-
-    results = {}
-    for query in test_queries:
-        logger.info(f"🔍 Testing query: '{query}' for user 2")
-        try:
-            # Use the main FAQ service (which uses ChromaDB)
-            faq_match = await faq_service.find_matching_faq(db, user_id=2, user_message=query)
-
-            if faq_match:
-                results[query] = {
-                    "found": True,
-                    "question": faq_match.question,
-                    "answer": faq_match.answer,
-                    "similarity_score": faq_match.similarity_score
-                }
-                logger.info(f"✅ Found FAQ match for '{query}': {faq_match.question}")
-            else:
-                results[query] = {"found": False}
-                logger.info(f"❌ No FAQ match found for '{query}'")
-
-        except Exception as e:
-            logger.error(f"❌ Error testing query '{query}': {e}")
-            results[query] = {"error": str(e)}
-
-    return {
-        "status": "success",
-        "message": "End-to-end FAQ integration test completed",
-        "results": results
-    }
 
 @router.post("/subscribe-webhook/{page_id}")
 async def subscribe_webhook_to_page(page_id: str):

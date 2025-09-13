@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 
 from app.models.faq import FAQ
 from app.models.message import Message
-from app.services.gemini_service import GeminiService
+from app.services.openai_service import OpenAIService
 from app.core.chroma_connection import get_chroma_collection_direct
 from app.schemas.faq import FAQMatch
 
@@ -20,7 +20,7 @@ class ChromaFAQService:
     """Enhanced FAQ service with ChromaDB vector search"""
     
     def __init__(self):
-        self.gemini_service = GeminiService()
+        self.openai_service = OpenAIService()
         self.collection = None
         
     def _get_collection(self):

@@ -55,79 +55,9 @@ async def create_faq(
         logger.error(f"Unexpected error creating FAQ: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@router.post("/simple", response_model=FAQResponse)
-async def create_simple_faq(
-    faq: FAQCreate,
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_db)
-):
-    """Create a new FAQ without embeddings (fallback when API quota exceeded)"""
-    try:
-        # Create FAQ record without embedding
-        new_faq = FAQ(
-            user_id=current_user.id,
-            question=faq.question,
-            answer=faq.answer,
-            embedding_vector=None,  # No embedding for now
-            similarity_threshold=faq.similarity_threshold
-        )
 
-        db.add(new_faq)
-        db.commit()
-        db.refresh(new_faq)
 
-        logger.info(f"✅ Created simple FAQ (no embedding) for user {current_user.id}: {faq.question[:50]}...")
-        return new_faq
 
-    except Exception as e:
-        logger.error(f"Error creating simple FAQ: {e}")
-        db.rollback()
-        raise HTTPException(status_code=500, detail="Failed to create FAQ")
-
-@router.post("/generate-embeddings")
-async def generate_missing_embeddings(
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_db)
-):
-    """Generate embeddings for FAQs that don't have them (when API quota is available)"""
-    try:
-        faq_service = FAQService()
-
-        # Find FAQs without embeddings
-        faqs_without_embeddings = db.query(FAQ).filter(
-            FAQ.user_id == current_user.id,
-            FAQ.embedding_vector.is_(None),
-            FAQ.is_active == True
-        ).all()
-
-        if not faqs_without_embeddings:
-            return {"message": "All FAQs already have embeddings", "updated_count": 0}
-
-        updated_count = 0
-        failed_count = 0
-
-        for faq in faqs_without_embeddings:
-            try:
-                success = await faq_service.update_faq_embedding(db, faq.id)
-                if success:
-                    updated_count += 1
-                else:
-                    failed_count += 1
-            except Exception as e:
-                logger.error(f"Failed to generate embedding for FAQ {faq.id}: {e}")
-                failed_count += 1
-                # Continue with other FAQs
-
-        return {
-            "message": f"Generated embeddings for {updated_count} FAQs",
-            "updated_count": updated_count,
-            "failed_count": failed_count,
-            "total_processed": len(faqs_without_embeddings)
-        }
-
-    except Exception as e:
-        logger.error(f"Error generating missing embeddings: {e}")
-        raise HTTPException(status_code=500, detail="Failed to generate embeddings")
 
 @router.post("/bulk", response_model=List[FAQResponse])
 async def create_faqs_bulk(
@@ -247,45 +177,8 @@ def delete_faq(
     
     return {"message": "FAQ deleted successfully"}
 
-@router.post("/test-match")
-async def test_faq_match(
-    message: str,
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_db)
-):
-    """Test FAQ matching for a message (API quota safe - uses cached/fallback embeddings)"""
-    faq_service = FAQService()
 
-    # Use fallback matching to avoid consuming API quota
-    match = await faq_service.find_matching_faq_fallback(db, current_user.id, message)
 
-    if match:
-        return {
-            "match_found": True,
-            "faq": match,
-            "message": "FAQ match found (using fallback matching to preserve quota)",
-            "note": "This uses cached embeddings or fallback matching to avoid API calls"
-        }
-    else:
-        return {
-            "match_found": False,
-            "message": "No matching FAQ found (using fallback matching to preserve quota)",
-            "note": "This uses cached embeddings or fallback matching to avoid API calls"
-        }
 
-@router.post("/test-smart-response")
-async def test_smart_response(
-    message: str,
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_db)
-):
-    """Test the complete smart response system (DISABLED to preserve API quota)"""
-    return {
-        "success": False,
-        "message": "Smart response testing is disabled to preserve API quota",
-        "user_message": message,
-        "note": "This endpoint has been disabled to prevent accidental API quota consumption. Use /faqs/test-smart-response-with-api if you need to test with actual API calls.",
-        "suggestion": "Try creating actual FAQs and testing through the webhook system instead"
-    }
 
 

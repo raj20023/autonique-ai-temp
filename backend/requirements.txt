@@ -19,10 +19,10 @@ python-multipart
 requests
 
 # AI - Complete LangChain dependencies
-google-generativeai
+openai
 langchain
 langchain-core
-langchain-google-genai
+langchain-openai
 langchain-community
 
 # ML/Math dependencies

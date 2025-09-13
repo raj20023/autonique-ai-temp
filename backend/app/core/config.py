@@ -20,8 +20,8 @@ class Settings(BaseSettings):
     FACEBOOK_APP_SECRET: str
     FACEBOOK_GRAPH_API_VERSION: str = "v23.0"
     
-    # Google Gemini
-    GOOGLE_API_KEY: str
+    # OpenAI
+    OPENAI_API_KEY: str
 
     # ChromaDB
     CHROMA_API_KEY: str

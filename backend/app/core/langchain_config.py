@@ -2,7 +2,7 @@
 LangChain configuration and utilities for InstaReply
 """
 
-from langchain_google_genai import GoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain_core.runnables import RunnableSequence
 from langchain_core.runnables.history import RunnableWithMessageHistory
@@ -20,16 +20,16 @@ class LangChainManager:
     """Centralized LangChain configuration and chain management"""
     
     def __init__(self):
-        self.llm = GoogleGenerativeAI(
-            model="gemini-2.0-flash-exp",
-            google_api_key=settings.GOOGLE_API_KEY,
+        self.llm = ChatOpenAI(
+            model="gpt-4o-mini",
+            openai_api_key=settings.OPENAI_API_KEY,
             temperature=0.7,
-            max_output_tokens=1024
+            max_tokens=1024
         )
-        
-        self.embeddings = GoogleGenerativeAIEmbeddings(
-            model="models/embedding-001",
-            google_api_key=settings.GOOGLE_API_KEY
+
+        self.embeddings = OpenAIEmbeddings(
+            model="text-embedding-3-small",
+            openai_api_key=settings.OPENAI_API_KEY
         )
         
         # Initialize prompt templates

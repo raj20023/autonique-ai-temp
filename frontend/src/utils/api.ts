@@ -78,18 +78,8 @@ export const faqApi = {
   getFAQ: (faqId: number): Promise<AxiosResponse<FAQ>> =>
     api.get(`/faqs/${faqId}`),
   
-  createFAQ: async (data: FAQCreateData): Promise<AxiosResponse<FAQ>> => {
-    try {
-      return await api.post('/faqs/', data);
-    } catch (error: any) {
-      // If quota exceeded, try the simple endpoint as fallback
-      if (error.response?.status === 429 && error.response?.data?.error === 'API_QUOTA_EXCEEDED') {
-        console.warn('🚫 API quota exceeded, using simple FAQ creation...');
-        return await api.post('/faqs/simple', data);
-      }
-      throw error;
-    }
-  },
+  createFAQ: (data: FAQCreateData): Promise<AxiosResponse<FAQ>> =>
+    api.post('/faqs/', data),
   
   createFAQsBulk: (faqs: FAQCreateData[]): Promise<AxiosResponse<FAQ[]>> =>
     api.post('/faqs/bulk', { faqs }),
