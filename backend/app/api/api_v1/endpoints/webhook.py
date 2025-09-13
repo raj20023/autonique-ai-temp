@@ -21,27 +21,23 @@ logger = logging.getLogger(__name__)
 
 @router.get("/test-faq")
 async def test_faq_service():
-    """Test endpoint to check if FAQ service is working"""
+    """Test endpoint to check if FAQ service is working (API quota safe)"""
     try:
-        logger.info("🧪 Testing FAQ service...")
+        logger.info("🧪 Testing FAQ service (without API calls)...")
 
         # Test basic FAQ service initialization
         faq_service = FAQService()
         logger.info("✅ FAQ service initialized successfully")
 
-        # Test Gemini service
+        # Test Gemini service initialization (without API call)
         gemini_service = faq_service.gemini_service
         logger.info("✅ Gemini service accessed successfully")
 
-        # Test a simple embedding generation
-        test_text = "Hello, how are you?"
-        embedding = await gemini_service.get_embedding(test_text)
-        logger.info(f"✅ Embedding generated successfully, length: {len(embedding)}")
-
+        # Return success without making API calls
         return {
             "status": "success",
-            "message": "FAQ service is working correctly",
-            "embedding_length": len(embedding)
+            "message": "FAQ service is working correctly (API calls disabled to preserve quota)",
+            "note": "Use /webhook/test-faq-with-api to test with actual API calls"
         }
 
     except Exception as e:
@@ -56,23 +52,18 @@ async def test_faq_service():
 
 @router.get("/test-sentiment")
 async def test_sentiment_analysis():
-    """Test endpoint to check sentiment analysis"""
+    """Test endpoint to check sentiment analysis (API quota safe)"""
     try:
-        logger.info("🧪 Testing sentiment analysis...")
+        logger.info("🧪 Testing sentiment analysis (without API calls)...")
 
-        # Test sentiment analysis
+        # Test sentiment analysis initialization
         faq_service = FAQService()
         gemini_service = faq_service.gemini_service
 
-        test_text = "I love this product! It's amazing!"
-        sentiment = await gemini_service.analyze_sentiment(test_text)
-        logger.info(f"✅ Sentiment analysis successful: {sentiment}")
-
         return {
             "status": "success",
-            "message": "Sentiment analysis working correctly",
-            "test_text": test_text,
-            "sentiment": sentiment
+            "message": "Sentiment analysis service initialized correctly (API calls disabled to preserve quota)",
+            "note": "Use /webhook/test-sentiment-with-api to test with actual API calls"
         }
 
     except Exception as e:
@@ -134,6 +125,42 @@ async def migrate_faqs_to_chroma(db: Session = Depends(get_db)):
 
     except Exception as e:
         logger.error(f"❌ FAQ migration failed: {e}")
+        import traceback
+        logger.error(f"Full traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": str(e),
+            "type": type(e).__name__
+        }
+
+@router.get("/test-faq-with-api")
+async def test_faq_service_with_api():
+    """Test endpoint with actual API calls (USE CAREFULLY - CONSUMES QUOTA)"""
+    try:
+        logger.warning("⚠️ Testing FAQ service WITH API CALLS - This will consume quota!")
+
+        # Test basic FAQ service initialization
+        faq_service = FAQService()
+        logger.info("✅ FAQ service initialized successfully")
+
+        # Test Gemini service
+        gemini_service = faq_service.gemini_service
+        logger.info("✅ Gemini service accessed successfully")
+
+        # Test a simple embedding generation
+        test_text = "Hello, how are you?"
+        embedding = await gemini_service.get_embedding(test_text)
+        logger.info(f"✅ Embedding generated successfully, length: {len(embedding)}")
+
+        return {
+            "status": "success",
+            "message": "FAQ service is working correctly with API calls",
+            "embedding_length": len(embedding),
+            "warning": "This endpoint consumes API quota"
+        }
+
+    except Exception as e:
+        logger.error(f"❌ FAQ service test failed: {e}")
         import traceback
         logger.error(f"Full traceback: {traceback.format_exc()}")
         return {

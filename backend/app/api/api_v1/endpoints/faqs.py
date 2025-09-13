@@ -253,20 +253,24 @@ async def test_faq_match(
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
-    """Test FAQ matching for a message"""
+    """Test FAQ matching for a message (API quota safe - uses cached/fallback embeddings)"""
     faq_service = FAQService()
-    match = await faq_service.find_matching_faq(db, current_user.id, message)
+
+    # Use fallback matching to avoid consuming API quota
+    match = await faq_service.find_matching_faq_fallback(db, current_user.id, message)
 
     if match:
         return {
             "match_found": True,
             "faq": match,
-            "message": "FAQ match found"
+            "message": "FAQ match found (using fallback matching to preserve quota)",
+            "note": "This uses cached embeddings or fallback matching to avoid API calls"
         }
     else:
         return {
             "match_found": False,
-            "message": "No matching FAQ found"
+            "message": "No matching FAQ found (using fallback matching to preserve quota)",
+            "note": "This uses cached embeddings or fallback matching to avoid API calls"
         }
 
 @router.post("/test-smart-response")
@@ -275,33 +279,13 @@ async def test_smart_response(
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
-    """Test the complete smart response system including dynamic fallbacks"""
-    faq_service = FAQService()
-
-    try:
-        # Test the complete smart response flow
-        response = await faq_service.find_smart_response(db, current_user.id, message)
-
-        # Also get context analysis for debugging
-        context = await faq_service.analyze_message_context(db, current_user.id, message)
-
-        return {
-            "success": True,
-            "user_message": message,
-            "ai_response": response,
-            "context_analysis": {
-                "sentiment": context.get('sentiment', {}),
-                "intent": context.get('intent', 'unknown'),
-                "message_length": context.get('message_length', 0),
-                "has_question_marks": context.get('has_question_marks', False),
-                "has_exclamation": context.get('has_exclamation', False)
-            }
-        }
-    except Exception as e:
-        return {
-            "success": False,
-            "error": str(e),
-            "user_message": message
-        }
+    """Test the complete smart response system (DISABLED to preserve API quota)"""
+    return {
+        "success": False,
+        "message": "Smart response testing is disabled to preserve API quota",
+        "user_message": message,
+        "note": "This endpoint has been disabled to prevent accidental API quota consumption. Use /faqs/test-smart-response-with-api if you need to test with actual API calls.",
+        "suggestion": "Try creating actual FAQs and testing through the webhook system instead"
+    }
 
 
