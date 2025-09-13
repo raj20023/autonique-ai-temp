@@ -44,16 +44,32 @@ def get_chroma_collection(client: ClientAPI = Depends(get_chroma_client)) -> Col
                 model_name="text-embedding-3-small"
             )
 
-            _collection = client.get_or_create_collection(
-                name="faq_embeddings",
-                embedding_function=openai_ef,
-                metadata={
-                    "description": "FAQ question and answer embeddings using OpenAI",
-                    "version": "2.0",
-                    "embedding_model": "text-embedding-3-small"
-                }
-            )
-            logger.info("✅ ChromaDB collection 'faq_embeddings' ready with OpenAI embeddings")
+            # Try to get existing collection first
+            try:
+                _collection = client.get_collection("faq_embeddings")
+                # Check if it has the right embedding function
+                if hasattr(_collection, '_embedding_function') and _collection._embedding_function is not None:
+                    # Collection exists with different embedding function, delete and recreate
+                    logger.info("🔄 Deleting existing collection with incompatible embedding function")
+                    client.delete_collection("faq_embeddings")
+                    _collection = None
+            except Exception:
+                # Collection doesn't exist, that's fine
+                pass
+
+            if _collection is None:
+                _collection = client.create_collection(
+                    name="faq_embeddings",
+                    embedding_function=openai_ef,
+                    metadata={
+                        "description": "FAQ question and answer embeddings using OpenAI",
+                        "version": "2.0",
+                        "embedding_model": "text-embedding-3-small"
+                    }
+                )
+                logger.info("✅ ChromaDB collection 'faq_embeddings' created with OpenAI embeddings")
+            else:
+                logger.info("✅ ChromaDB collection 'faq_embeddings' ready with OpenAI embeddings")
         except Exception as e:
             logger.error(f"❌ Failed to get ChromaDB collection: {e}")
             raise
@@ -69,15 +85,31 @@ def get_chroma_collection_direct() -> Collection:
             model_name="text-embedding-3-small"
         )
 
-        collection = client.get_or_create_collection(
-            name="faq_embeddings",
-            embedding_function=openai_ef,
-            metadata={
-                "description": "FAQ question and answer embeddings using OpenAI",
-                "version": "2.0",
-                "embedding_model": "text-embedding-3-small"
-            }
-        )
+        # Try to get existing collection first
+        try:
+            collection = client.get_collection("faq_embeddings")
+            # Check if it has the right embedding function
+            if hasattr(collection, '_embedding_function') and collection._embedding_function is not None:
+                # Collection exists with different embedding function, delete and recreate
+                logger.info("🔄 Deleting existing collection with incompatible embedding function")
+                client.delete_collection("faq_embeddings")
+                collection = None
+        except Exception:
+            # Collection doesn't exist, that's fine
+            collection = None
+
+        if collection is None:
+            collection = client.create_collection(
+                name="faq_embeddings",
+                embedding_function=openai_ef,
+                metadata={
+                    "description": "FAQ question and answer embeddings using OpenAI",
+                    "version": "2.0",
+                    "embedding_model": "text-embedding-3-small"
+                }
+            )
+            logger.info("✅ ChromaDB collection 'faq_embeddings' created with OpenAI embeddings")
+
         return collection
     except Exception as e:
         logger.error(f"❌ Failed to get ChromaDB collection directly: {e}")
