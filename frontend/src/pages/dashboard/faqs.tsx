@@ -44,7 +44,8 @@ export default function FAQsPage() {
         setShowAddForm(false);
       },
       onError: (error: any) => {
-        toast.error(error.response?.data?.detail || 'Failed to add FAQ');
+        const errorData = error.response?.data;
+        toast.error(errorData?.detail || errorData?.message || 'Failed to add FAQ');
         showError(); // Show error Auto
       }
     }

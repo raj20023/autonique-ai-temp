@@ -34,10 +34,100 @@ async def create_faq(
     db: Session = Depends(get_db)
 ):
     """Create a new FAQ"""
-    faq_service = FAQService()
-    return await faq_service.create_faq_with_embedding(
-        db, current_user.id, faq.question, faq.answer, faq.similarity_threshold
-    )
+    try:
+        faq_service = FAQService()
+        return await faq_service.create_faq_with_embedding(
+            db, current_user.id, faq.question, faq.answer, faq.similarity_threshold
+        )
+    except ValueError as e:
+        if "quota exceeded" in str(e).lower():
+            raise HTTPException(
+                status_code=429,
+                detail={
+                    "error": "API_QUOTA_EXCEEDED",
+                    "message": "Google Gemini API quota exceeded. Please try again later or upgrade your API plan.",
+                    "suggestion": "You can still use the platform, but FAQ creation requires API access. Consider upgrading your Gemini API plan for unlimited usage."
+                }
+            )
+        else:
+            raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Unexpected error creating FAQ: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@router.post("/simple", response_model=FAQResponse)
+async def create_simple_faq(
+    faq: FAQCreate,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """Create a new FAQ without embeddings (fallback when API quota exceeded)"""
+    try:
+        # Create FAQ record without embedding
+        new_faq = FAQ(
+            user_id=current_user.id,
+            question=faq.question,
+            answer=faq.answer,
+            embedding_vector=None,  # No embedding for now
+            similarity_threshold=faq.similarity_threshold
+        )
+
+        db.add(new_faq)
+        db.commit()
+        db.refresh(new_faq)
+
+        logger.info(f"✅ Created simple FAQ (no embedding) for user {current_user.id}: {faq.question[:50]}...")
+        return new_faq
+
+    except Exception as e:
+        logger.error(f"Error creating simple FAQ: {e}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Failed to create FAQ")
+
+@router.post("/generate-embeddings")
+async def generate_missing_embeddings(
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """Generate embeddings for FAQs that don't have them (when API quota is available)"""
+    try:
+        faq_service = FAQService()
+
+        # Find FAQs without embeddings
+        faqs_without_embeddings = db.query(FAQ).filter(
+            FAQ.user_id == current_user.id,
+            FAQ.embedding_vector.is_(None),
+            FAQ.is_active == True
+        ).all()
+
+        if not faqs_without_embeddings:
+            return {"message": "All FAQs already have embeddings", "updated_count": 0}
+
+        updated_count = 0
+        failed_count = 0
+
+        for faq in faqs_without_embeddings:
+            try:
+                success = await faq_service.update_faq_embedding(db, faq.id)
+                if success:
+                    updated_count += 1
+                else:
+                    failed_count += 1
+            except Exception as e:
+                logger.error(f"Failed to generate embedding for FAQ {faq.id}: {e}")
+                failed_count += 1
+                # Continue with other FAQs
+
+        return {
+            "message": f"Generated embeddings for {updated_count} FAQs",
+            "updated_count": updated_count,
+            "failed_count": failed_count,
+            "total_processed": len(faqs_without_embeddings)
+        }
+
+    except Exception as e:
+        logger.error(f"Error generating missing embeddings: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate embeddings")
 
 @router.post("/bulk", response_model=List[FAQResponse])
 async def create_faqs_bulk(

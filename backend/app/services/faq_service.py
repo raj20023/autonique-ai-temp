@@ -39,14 +39,21 @@ class FAQService:
                 await self.chroma_service.add_faq_to_chroma(user_id, faq)
                 logger.info(f"✅ Created FAQ in both PostgreSQL and ChromaDB: {question[:50]}...")
             except Exception as chroma_error:
-                logger.error(f"⚠️ FAQ created in PostgreSQL but failed to add to ChromaDB: {chroma_error}")
+                logger.warning(f"⚠️ FAQ created in PostgreSQL but failed to add to ChromaDB: {chroma_error}")
+                # Don't fail the entire operation if ChromaDB fails
 
             return faq
-            
+
         except Exception as e:
-            logger.error(f"Error creating FAQ with embedding: {e}")
-            db.rollback()
-            raise
+            error_str = str(e).lower()
+            if "429" in error_str or "quota" in error_str or "rate limit" in error_str:
+                logger.error(f"🚫 Gemini API quota exceeded. FAQ creation failed. Please try again later or upgrade your API plan.")
+                db.rollback()
+                raise ValueError("API quota exceeded. Please try again later or check your Gemini API billing.")
+            else:
+                logger.error(f"Error creating FAQ with embedding: {e}")
+                db.rollback()
+                raise
 
     async def bulk_create_faqs_with_embeddings(self, db: Session, user_id: int, faq_data: List[Dict]) -> List[FAQ]:
         """Create multiple FAQs with embeddings in batch"""
