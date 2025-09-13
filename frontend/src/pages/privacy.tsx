@@ -7,7 +7,7 @@ export default function PrivacyPage() {
     <>
       <Head>
         <title>Privacy Policy - AutoniqueAI</title>
-        <link rel="icon" href="/logos/favicon_auto.svg" type="image/svg+xml" />
+        <link rel="icon" href="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/favicon_auto.svg" type="image/svg+xml" />
       </Head>
 
       <div className="min-h-screen bg-gray-50 py-12">

@@ -46,7 +46,7 @@ export default function LoginPage() {
       <Head>
         <title>Connect Instagram Business - AutoniqueAI</title>
         <meta name="description" content="Connect your Instagram Business account to start automating your DMs with AI-powered responses" />
-        <link rel="icon" href="/logos/favicon_auto.svg" type="image/svg+xml" />
+        <link rel="icon" href="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/favicon_auto.svg" type="image/svg+xml" />
       </Head>
 
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
@@ -94,7 +94,7 @@ export default function LoginPage() {
                       {/* Logo Container */}
                       <div className="relative backdrop-blur-xl bg-white/10 rounded-3xl p-6 shadow-2xl border border-white/20">
                         <img
-                          src="/logos/favicon_auto.svg"
+                          src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/favicon_auto.svg"
                           alt="AutoniqueAI"
                           className="h-16 w-16 mx-auto filter drop-shadow-2xl"
                           onError={(e) => {
@@ -124,7 +124,7 @@ export default function LoginPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6, duration: 0.8 }}
                   >
-                    <h1 className="text-4xl md:text-5xl font-black mb-6 leading-tight">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-black mb-6 leading-tight">
                       <span className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
                         Connect Your
                       </span>
@@ -133,7 +133,7 @@ export default function LoginPage() {
                         Instagram Empire
                       </span>
                     </h1>
-                    <p className="text-xl text-white/80 leading-relaxed max-w-md mx-auto">
+                    <p className="text-lg sm:text-xl text-white/80 leading-relaxed max-w-md mx-auto px-4 sm:px-0">
                       Securely link your Instagram Business to our <span className="text-transparent bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text font-bold">Neural AI Network</span> and revolutionize customer engagement
                     </p>
                   </motion.div>
@@ -234,15 +234,15 @@ export default function LoginPage() {
 
                     <button
                       onClick={handleFacebookLogin}
-                      className="relative w-full bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 hover:from-purple-600 hover:via-pink-600 hover:to-cyan-600 text-white font-black text-xl py-6 rounded-3xl transition-all duration-300 shadow-2xl flex items-center justify-center space-x-4 border-2 border-white/20 group-hover:border-white/40"
+                      className="relative w-full bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 hover:from-purple-600 hover:via-pink-600 hover:to-cyan-600 text-white font-black text-lg sm:text-xl py-5 sm:py-6 rounded-3xl transition-all duration-300 shadow-2xl flex items-center justify-center space-x-3 sm:space-x-4 border-2 border-white/20 group-hover:border-white/40"
                     >
-                      <Instagram className="h-8 w-8" />
+                      <Instagram className="h-6 w-6 sm:h-8 sm:w-8" />
                       <span>Launch Instagram Empire</span>
                       <motion.div
                         animate={{ x: [0, 5, 0] }}
                         transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                       >
-                        <ArrowRight className="h-7 w-7" />
+                        <ArrowRight className="h-6 w-6 sm:h-7 sm:w-7" />
                       </motion.div>
                     </button>
                   </motion.div>

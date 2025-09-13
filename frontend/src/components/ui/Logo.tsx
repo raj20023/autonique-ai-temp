@@ -63,17 +63,17 @@ export default function Logo({
 
     switch (variant) {
       case 'icon':
-        return '/logos/favicon_auto.svg';
+        return 'https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/favicon_auto.svg';
       case 'full':
         return themeToUse === 'dark'
-          ? '/logos/full_dark_background.svg'
-          : '/logos/full_white_background.svg';
+          ? 'https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/full_dark_background.svg'
+          : 'https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/full_white_background.svg';
       case 'name':
         return themeToUse === 'dark'
-          ? '/logos/header_dark_background.svg'
-          : '/logos/header_white_background.svg';
+          ? 'https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/header_dark_background.svg'
+          : 'https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/header_white_background.svg';
       default:
-        return '/logos/favicon_auto.svg';
+        return 'https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/favicon_auto.svg';
     }
   };
 

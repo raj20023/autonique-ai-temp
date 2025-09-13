@@ -158,7 +158,7 @@ export default function LiveMonitor() {
       <Head>
         <title>Live Monitor - AutoniqueAI</title>
         <meta name="description" content="Real-time monitoring of Instagram message automation" />
-        <link rel="icon" href="/logos/favicon_auto.svg" type="image/svg+xml" />
+        <link rel="icon" href="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/favicon_auto.svg" type="image/svg+xml" />
       </Head>
 
       <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-orange-50/30 to-orange-100/50 relative overflow-hidden">
@@ -202,7 +202,7 @@ export default function LiveMonitor() {
                     <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-orange-600/20 rounded-2xl blur-xl scale-110"></div>
                     <div className="relative bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-lg border border-white/50">
                       <img
-                        src="/logos/favicon_auto.svg"
+                        src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/favicon_auto.svg"
                         alt="AutoniqueAI"
                         className="h-8 w-8"
                         onError={(e) => {

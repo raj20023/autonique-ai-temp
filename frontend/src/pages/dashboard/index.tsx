@@ -91,7 +91,7 @@ export default function DashboardPage() {
       <Head>
         <title>Dashboard - AutoniqueAI</title>
         <meta name="description" content="Manage your Instagram auto-reply system" />
-        <link rel="icon" href="/logos/favicon_auto.svg" type="image/svg+xml" />
+        <link rel="icon" href="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/favicon_auto.svg" type="image/svg+xml" />
       </Head>
 
       <SubscriptionBanner />
@@ -114,18 +114,18 @@ export default function DashboardPage() {
               transition={{ duration: 0.6 }}
               className="backdrop-blur-xl bg-white/10 rounded-2xl border border-white/20 shadow-2xl p-8"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
+                <div className="flex items-center space-x-4 sm:space-x-6">
                   <AutoMascot
                     expression="happy"
-                    size="xl"
+                    size="lg"
                     animated={true}
                   />
                   <div>
-                    <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow-lg">
                       Welcome back, {user?.name}! 👋
                     </h1>
-                    <p className="text-lg text-white/80 drop-shadow-md">
+                    <p className="text-base sm:text-lg text-white/80 drop-shadow-md">
                       Auto is ready to help manage your Instagram automation
                     </p>
                   </div>

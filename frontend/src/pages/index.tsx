@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Zap,
   Shield,
@@ -12,6 +12,7 @@ import {
   CheckCircle,
   Brain,
   Menu,
+  X,
   Star,
   Sparkles,
   Play,
@@ -82,6 +83,7 @@ const benefits = [
 
 export default function HomePage() {
   const router = useRouter();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated()) {
@@ -99,8 +101,8 @@ export default function HomePage() {
         <title>AutoniqueAI - AI-Powered Instagram Customer Service Automation</title>
         <meta name="description" content="Transform your Instagram customer service with AutoniqueAI. Save 10+ hours weekly while providing instant, intelligent responses." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/logos/favicon_auto.svg" type="image/svg+xml" />
-        <link rel="alternate icon" href="/logos/favicon_auto.svg" type="image/svg+xml" />
+        <link rel="icon" href="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/favicon_auto.svg" type="image/svg+xml" />
+        <link rel="alternate icon" href="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/favicon_auto.svg" type="image/svg+xml" />
       </Head>
 
       <div
@@ -126,11 +128,11 @@ export default function HomePage() {
                 transition={{ duration: 0.2 }}
               >
                 <img
-                  src="/logos/header_dark_background.svg"
+                  src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/header_dark_background.svg"
                   alt="AutoniqueAI"
                   className="h-10 w-auto filter drop-shadow-lg"
                   onError={(e) => {
-                    e.currentTarget.src = "/logos/favicon_auto.svg";
+                    e.currentTarget.src = "https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/favicon_auto.svg";
                     e.currentTarget.className = "h-10 w-10 filter drop-shadow-lg";
                   }}
                 />
@@ -184,12 +186,119 @@ export default function HomePage() {
                 className="md:hidden p-2 text-white/90 hover:text-white transition-colors"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
                 <Menu className="h-6 w-6" />
               </motion.button>
             </div>
           </nav>
         </motion.header>
+
+        {/* Mobile Menu Overlay */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 md:hidden"
+            >
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/80 backdrop-blur-sm"
+                onClick={() => setMobileMenuOpen(false)}
+              />
+
+              {/* Menu Panel */}
+              <motion.div
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                className="fixed right-0 top-0 h-full w-80 max-w-[85vw] backdrop-blur-xl bg-white/10 border-l border-white/20 shadow-2xl"
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between p-6 border-b border-white/20">
+                  <img
+                    src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/header_dark_background.svg"
+                    alt="AutoniqueAI"
+                    className="h-8 w-auto filter drop-shadow-lg"
+                    onError={(e) => {
+                      e.currentTarget.src = "https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/favicon_auto.svg";
+                      e.currentTarget.className = "h-8 w-8 filter drop-shadow-lg";
+                    }}
+                  />
+                  <motion.button
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="p-2 text-white/90 hover:text-white transition-colors rounded-lg hover:bg-white/10"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    <X className="h-6 w-6" />
+                  </motion.button>
+                </div>
+
+                {/* Navigation Links */}
+                <nav className="p-6 space-y-4">
+                  {[
+                    { href: "#features", label: "Features" },
+                    { href: "/demo", label: "Demo" },
+                    { href: "#benefits", label: "Benefits" },
+                    { href: "#pricing", label: "Pricing" }
+                  ].map((item, index) => (
+                    <motion.div
+                      key={item.href}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      <Link
+                        href={item.href}
+                        className="block text-white/90 hover:text-white transition-all duration-300 font-medium text-lg py-3 px-4 rounded-xl hover:bg-white/10"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {item.label}
+                      </Link>
+                    </motion.div>
+                  ))}
+                </nav>
+
+                {/* Action Buttons */}
+                <div className="p-6 space-y-4 border-t border-white/20">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                  >
+                    <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)}>
+                      <Button className="w-full bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-semibold border border-white/30 backdrop-blur-xl transition-all duration-300">
+                        Login
+                      </Button>
+                    </Link>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <Button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        handleGetStarted();
+                      }}
+                      className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300"
+                    >
+                      Start Free Trial
+                    </Button>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Hero Section */}
         <section className="relative py-32 lg:py-48">
@@ -228,7 +337,7 @@ export default function HomePage() {
                 className="mb-8"
               >
                 <motion.h1
-                  className="text-5xl lg:text-8xl font-black mb-6 leading-tight"
+                  className="text-4xl sm:text-5xl lg:text-8xl font-black mb-6 leading-tight"
                   initial={{ opacity: 0, y: 50 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 1, delay: 0.6 }}
@@ -260,7 +369,7 @@ export default function HomePage() {
                 className="mb-16"
               >
                 <motion.p
-                  className="text-xl lg:text-2xl text-white/80 mb-4 max-w-4xl mx-auto leading-relaxed drop-shadow-lg"
+                  className="text-lg sm:text-xl lg:text-2xl text-white/80 mb-4 max-w-4xl mx-auto leading-relaxed drop-shadow-lg px-4 sm:px-0"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 1, delay: 0.8 }}
@@ -285,12 +394,12 @@ export default function HomePage() {
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl blur-xl opacity-75 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <Button
                       onClick={handleGetStarted}
-                      className="relative bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-10 py-5 rounded-2xl font-bold text-lg shadow-2xl border border-white/20 min-w-[280px] h-[70px] flex items-center justify-center"
+                      className="relative bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 sm:px-10 py-4 sm:py-5 rounded-2xl font-bold text-base sm:text-lg shadow-2xl border border-white/20 min-w-[240px] sm:min-w-[280px] h-[60px] sm:h-[70px] flex items-center justify-center"
                     >
-                      <div className="flex items-center justify-center space-x-3">
-                        <Instagram className="h-6 w-6 flex-shrink-0" />
+                      <div className="flex items-center justify-center space-x-2 sm:space-x-3">
+                        <Instagram className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
                         <span className="whitespace-nowrap">Start AI Revolution</span>
-                        <Sparkles className="h-5 w-5 flex-shrink-0" />
+                        <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
                       </div>
                     </Button>
                   </motion.div>
@@ -305,10 +414,10 @@ export default function HomePage() {
                     <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
                     <Link href="/demo">
                       <Button
-                        className="relative backdrop-blur-xl bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-2xl font-bold text-lg border border-white/30 shadow-2xl min-w-[280px] h-[70px] flex items-center justify-center"
+                        className="relative backdrop-blur-xl bg-white/10 hover:bg-white/20 text-white px-6 sm:px-10 py-4 sm:py-5 rounded-2xl font-bold text-base sm:text-lg border border-white/30 shadow-2xl min-w-[240px] sm:min-w-[280px] h-[60px] sm:h-[70px] flex items-center justify-center"
                       >
-                        <div className="flex items-center justify-center space-x-3">
-                          <Play className="h-6 w-6 flex-shrink-0" />
+                        <div className="flex items-center justify-center space-x-2 sm:space-x-3">
+                          <Play className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
                           <span className="whitespace-nowrap">Watch Demo</span>
                         </div>
                       </Button>
@@ -395,7 +504,7 @@ export default function HomePage() {
               className="text-center mb-20"
             >
               <motion.h2
-                className="text-5xl lg:text-7xl font-black mb-8"
+                className="text-4xl sm:text-5xl lg:text-7xl font-black mb-8"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1 }}
@@ -492,7 +601,7 @@ export default function HomePage() {
                 viewport={{ once: true }}
               >
                 <motion.h2
-                  className="text-5xl lg:text-6xl font-black mb-8"
+                  className="text-4xl sm:text-5xl lg:text-6xl font-black mb-8"
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 1, delay: 0.2 }}
@@ -639,7 +748,7 @@ export default function HomePage() {
 
           <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center relative z-10">
             <motion.h2
-              className="text-6xl lg:text-8xl font-black mb-8"
+              className="text-4xl sm:text-6xl lg:text-8xl font-black mb-8"
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 1 }}
@@ -679,12 +788,12 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl blur-2xl opacity-75 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <Button
                   onClick={handleGetStarted}
-                  className="relative bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-12 py-6 rounded-3xl font-black text-xl shadow-2xl border-2 border-white/20 min-w-[320px] h-[80px] flex items-center justify-center"
+                  className="relative bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 sm:px-12 py-5 sm:py-6 rounded-3xl font-black text-lg sm:text-xl shadow-2xl border-2 border-white/20 min-w-[280px] sm:min-w-[320px] h-[70px] sm:h-[80px] flex items-center justify-center"
                 >
-                  <div className="flex items-center justify-center space-x-4">
-                    <Instagram className="h-8 w-8 flex-shrink-0" />
+                  <div className="flex items-center justify-center space-x-3 sm:space-x-4">
+                    <Instagram className="h-6 w-6 sm:h-8 sm:w-8 flex-shrink-0" />
                     <span className="whitespace-nowrap">Launch AI Empire</span>
-                    <ArrowRight className="h-8 w-8 flex-shrink-0" />
+                    <ArrowRight className="h-6 w-6 sm:h-8 sm:w-8 flex-shrink-0" />
                   </div>
                 </Button>
               </motion.div>
@@ -752,11 +861,11 @@ export default function HomePage() {
                   transition={{ duration: 0.3 }}
                 >
                   <img
-                    src="/logos/header_dark_background.svg"
+                    src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/header_dark_background.svg"
                     alt="AutoniqueAI"
                     className="h-12 w-auto filter drop-shadow-lg"
                     onError={(e) => {
-                      e.currentTarget.src = "/logos/favicon_auto.svg";
+                      e.currentTarget.src = "https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/favicon_auto.svg";
                       e.currentTarget.className = "h-12 w-12 filter drop-shadow-lg";
                     }}
                   />

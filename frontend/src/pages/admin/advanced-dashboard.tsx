@@ -295,7 +295,7 @@ export default function AdvancedAdminDashboard() {
         >
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm"></div>
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
               <motion.div
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -307,13 +307,13 @@ export default function AdvancedAdminDashboard() {
                     transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                     className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl"
                   >
-                    <Command className="h-8 w-8 text-white" />
+                    <Command className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                   </motion.div>
                   <div>
-                    <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                    <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                       AI Command Center
                     </h1>
-                    <p className="text-blue-200 mt-1">
+                    <p className="text-blue-200 mt-1 text-sm sm:text-base">
                       Next-generation admin dashboard with AI insights
                     </p>
                   </div>
@@ -450,14 +450,14 @@ export default function AdvancedAdminDashboard() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
+                  className={`flex items-center space-x-2 px-4 sm:px-6 py-3 rounded-xl font-medium transition-all duration-300 flex-shrink-0 ${
                     activeTab === tab.id
                       ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
                       : 'text-gray-300 hover:text-white hover:bg-white/10'
                   }`}
                 >
-                  <tab.icon className="h-5 w-5" />
-                  <span className="whitespace-nowrap">{tab.label}</span>
+                  <tab.icon className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="whitespace-nowrap text-sm sm:text-base">{tab.label}</span>
                 </motion.button>
               ))}
             </div>

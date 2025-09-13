@@ -104,7 +104,7 @@ export default function CallbackPage() {
       <Head>
         <title>Connecting Account - AutoniqueAI</title>
         <meta name="description" content="Connecting your Instagram Business account..." />
-        <link rel="icon" href="/logos/favicon_auto.svg" type="image/svg+xml" />
+        <link rel="icon" href="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/favicon_auto.svg" type="image/svg+xml" />
       </Head>
 
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
@@ -212,7 +212,7 @@ export default function CallbackPage() {
                       }}
                     >
                       <img
-                        src="/logos/favicon_auto.svg"
+                        src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/favicon_auto.svg"
                         alt="AutoniqueAI"
                         className="h-20 w-20 mx-auto filter drop-shadow-2xl"
                         onError={(e) => {

@@ -112,7 +112,7 @@ export default function FAQsPage() {
     <>
       <Head>
         <title>FAQs - AutoniqueAI</title>
-        <link rel="icon" href="/logos/favicon_auto.svg" type="image/svg+xml" />
+        <link rel="icon" href="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/favicon_auto.svg" type="image/svg+xml" />
       </Head>
       
       <DashboardLayout title="FAQ Management">
@@ -149,17 +149,17 @@ export default function FAQsPage() {
 
           <div className="relative z-10 space-y-6">
             {/* Header */}
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
               <div className="flex items-center space-x-4">
                 <AutoFAQ />
                 <div>
-                  <h1 className="text-2xl font-bold text-white drop-shadow-lg">FAQ Management</h1>
-                  <p className="text-white/80 drop-shadow-md">Auto is ready to help manage your automated responses</p>
+                  <h1 className="text-xl sm:text-2xl font-bold text-white drop-shadow-lg">FAQ Management</h1>
+                  <p className="text-sm sm:text-base text-white/80 drop-shadow-md">Auto is ready to help manage your automated responses</p>
                 </div>
               </div>
               <button
                 onClick={() => setShowAddForm(true)}
-                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 w-full sm:w-auto justify-center sm:justify-start"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Add FAQ

@@ -135,11 +135,11 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                   whileHover={{ scale: 1.02 }}
                 >
                   <img
-                    src="/logos/header_dark_background.svg"
+                    src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/header_dark_background.svg"
                     alt="AutoniqueAI"
                     className="h-8 w-auto"
                     onError={(e) => {
-                      e.currentTarget.src = "/logos/favicon_auto.svg";
+                      e.currentTarget.src = "https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/favicon_auto.svg";
                       e.currentTarget.className = "h-8 w-8";
                     }}
                   />
@@ -214,11 +214,11 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
               transition={{ duration: 0.2 }}
             >
               <img
-                src="/logos/header_white_background.svg"
+                src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/header_white_background.svg"
                 alt="AutoniqueAI"
                 className="h-8 w-auto"
                 onError={(e) => {
-                  e.currentTarget.src = "/logos/favicon_auto.svg";
+                  e.currentTarget.src = "https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/favicon_auto.svg";
                   e.currentTarget.className = "h-8 w-8";
                 }}
               />

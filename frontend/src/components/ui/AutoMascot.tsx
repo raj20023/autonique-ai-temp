@@ -32,7 +32,7 @@ const sizeClasses = {
 };
 
 const getAutoSrc = (expression: AutoExpression): string => {
-  return `/auto/${expression}_auto.svg`;
+  return `https://autonique-ai.s3.ap-northeast-3.amazonaws.com/auto/${expression}_auto.svg`;
 };
 
 const getAnimationProps = (expression: AutoExpression, animated: boolean) => {
