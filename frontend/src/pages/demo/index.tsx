@@ -18,6 +18,16 @@ const DemoPage = () => {
       views: '1.2K',
       category: 'Complete Demo',
       thumbnail: `https://img.youtube.com/vi/qxhFyY_hGF8/maxresdefault.jpg`
+    },
+    {
+      id: 'mobile-demo',
+      title: 'AutoniqueAI Mobile View',
+      description: 'See how AutoniqueAI looks and works perfectly on mobile devices with responsive design',
+      youtubeId: 'f7gC1Qog-Dc',
+      duration: '1:00',
+      views: 'New',
+      category: 'Mobile Demo',
+      thumbnail: `https://img.youtube.com/vi/f7gC1Qog-Dc/maxresdefault.jpg`
     }
   ];
 

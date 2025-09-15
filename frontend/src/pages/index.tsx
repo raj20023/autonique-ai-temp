@@ -685,7 +685,7 @@ export default function HomePage() {
                     </h3>
 
                     <p className="text-white/80 mb-8 text-lg leading-relaxed">
-                      Watch AutoniqueAI seamlessly handle customer inquiries with <span className="text-cyan-400 font-bold">99.7% accuracy</span> and <span className="text-emerald-400 font-bold">sub-second response times</span>
+                      Watch AutoniqueAI seamlessly handle customer inquiries with <span className="text-cyan-400 font-bold">99.7% accuracy</span> and <span className="text-emerald-400 font-bold">sub-second response times</span>. See both desktop and <span className="text-purple-400 font-bold">mobile views</span> in action.
                     </p>
 
                     <motion.div
@@ -900,7 +900,7 @@ export default function HomePage() {
                 <ul className="space-y-3">
                   <li><a href="mailto:support@autonique.in" className="text-white/60 hover:text-white transition-colors">Contact Support</a></li>
                   <li><Link href="/demo" className="text-white/60 hover:text-white transition-colors">Documentation</Link></li>
-                  <li><a href="https://youtu.be/qxhFyY_hGF8" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-colors">Video Tutorials</a></li>
+                  <li><Link href="/demo" className="text-white/60 hover:text-white transition-colors">Video Tutorials</Link></li>
                   <li><span className="text-white/60">24/7 AI Support</span></li>
                 </ul>
               </div>
