@@ -248,6 +248,16 @@ JSON:"""
         except Exception as e:
             logger.error(f"Error generating smart fallback: {e}")
             return "Hello! How can I help you today?"
+
+    async def generate_response_with_messages(self, messages: List) -> str:
+        """Generate response using LangChain message format with conversation history"""
+        try:
+            # Use the LLM directly with messages
+            response = await self.llm.ainvoke(messages)
+            return response.content.strip() if hasattr(response, 'content') else str(response).strip()
+        except Exception as e:
+            logger.error(f"Error generating response with messages: {e}")
+            return "Thank you for your message! Our team will get back to you soon."
     
     async def analyze_sentiment(self, text: str) -> Dict:
         """Analyze sentiment of text"""

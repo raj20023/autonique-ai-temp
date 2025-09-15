@@ -6,6 +6,7 @@ import hashlib
 
 from app.core.langchain_config import langchain_manager
 from app.core.cache import cache_embedding, get_cached_embedding, cache_response, get_cached_response
+from langchain.schema import HumanMessage, AIMessage, SystemMessage
 
 logger = logging.getLogger(__name__)
 
@@ -126,51 +127,34 @@ class OpenAIService:
             return cached_response
 
     async def generate_response_with_history(self, user_message: str, faq_context: str, conversation_history: List[Dict[str, str]]) -> str:
-        """Generate AI response with conversation history for continuity"""
+        """Generate AI response using LangChain's message format with conversation history"""
         try:
-            # Create conversation context
-            history_context = ""
-            if conversation_history:
-                history_context = "\n\nPrevious conversation:\n"
-                for entry in conversation_history[-5:]:  # Last 5 entries
-                    role = "Customer" if entry["role"] == "customer" else "You"
-                    history_context += f"{role}: {entry['message']}\n"
-                history_context += "\n"
+            # Build messages array in LangChain format
+            messages = [
+                SystemMessage(content="""You are a helpful customer service assistant for an Instagram business.
+                Maintain conversational continuity and acknowledge previous context when relevant.
+                Be friendly, professional, and concise.""")
+            ]
 
-            # Create enhanced prompt with conversation history
+            # Add conversation history in proper LangChain format
+            for entry in conversation_history[-5:]:  # Last 5 exchanges
+                if entry["role"] == "customer":
+                    messages.append(HumanMessage(content=entry["message"]))
+                else:  # assistant
+                    messages.append(AIMessage(content=entry["message"]))
+
+            # Add current user message with context
             if faq_context != "No FAQ found":
-                prompt = f"""You are a helpful customer service assistant for an Instagram business.
-
-{history_context}Current customer message: "{user_message}"
-
-Based on this FAQ information: "{faq_context}"
-
-Please provide a natural, conversational response that:
-1. Acknowledges the conversation history if relevant
-2. Directly addresses their current question
-3. Uses the FAQ information when appropriate
-4. Maintains a friendly, professional tone
-5. Feels like a continuation of the conversation, not a robotic response
-
-Keep the response concise and helpful."""
+                current_message = f"{user_message}\n\n[Context: {faq_context}]"
             else:
-                prompt = f"""You are a helpful customer service assistant for an Instagram business.
+                current_message = user_message
 
-{history_context}Current customer message: "{user_message}"
+            messages.append(HumanMessage(content=current_message))
 
-Since no specific FAQ matches this question, please provide a helpful response that:
-1. Acknowledges the conversation history if relevant
-2. Addresses their message naturally
-3. Offers to help or asks for clarification if needed
-4. Maintains conversation continuity
-5. Suggests they wait for a human representative if the query is complex
+            # Generate response using LangChain with message history
+            response = await self.langchain_manager.generate_response_with_messages(messages)
 
-Keep the response natural and conversational."""
-
-            # Generate response using OpenAI
-            response = await self.langchain_manager.generate_response(user_message, prompt)
-
-            logger.info(f"✅ Generated contextual response with conversation history")
+            logger.info(f"✅ Generated contextual response with conversation history using LangChain messages")
             return response
 
         except Exception as e:
