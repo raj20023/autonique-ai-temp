@@ -171,7 +171,7 @@ Keep the response natural and conversational."""
             messages.append(HumanMessage(content=user_message))
 
             # Generate response using LangChain with message history
-            response = await self.langchain_manager.generate_response_with_messages(messages)
+            response = await self.langchain.generate_response_with_messages(messages)
 
             logger.info(f"✅ Generated contextual response with conversation history using LangChain messages")
             return response
