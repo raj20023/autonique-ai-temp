@@ -27,14 +27,14 @@ class UserManagementService:
             beta_count = self.db.query(User).filter(User.is_beta_user == True).count()
 
             if beta_count < 20:
-                # Make them a beta user with 1-year trial
+                # Make them a beta user with 60-day trial
                 user.role = "beta"
                 user.is_beta_user = True
                 user.beta_user_number = beta_count + 1
                 user.trial_start_date = datetime.utcnow()
-                user.trial_end_date = datetime.utcnow() + timedelta(days=365)  # 1 year
-                user.trial_days_remaining = 365
-                logger.info(f"Set beta user #{user.beta_user_number}: {name} (1 year trial)")
+                user.trial_end_date = datetime.utcnow() + timedelta(days=60)  # 60 days
+                user.trial_days_remaining = 60
+                logger.info(f"Set beta user #{user.beta_user_number}: {name} (60 days trial)")
             else:
                 # Start normal user with 14-day trial
                 user.role = "normal"
@@ -68,14 +68,14 @@ class UserManagementService:
             beta_count = self.db.query(User).filter(User.is_beta_user == True).count()
 
             if beta_count < 20:
-                # Make them a beta user with 1-year trial
+                # Make them a beta user with 60-day trial
                 user.role = "beta"
                 user.is_beta_user = True
                 user.beta_user_number = beta_count + 1
                 user.trial_start_date = datetime.utcnow()
-                user.trial_end_date = datetime.utcnow() + timedelta(days=365)  # 1 year
-                user.trial_days_remaining = 365
-                logger.info(f"Set beta user #{user.beta_user_number}: {user.name} (1 year trial)")
+                user.trial_end_date = datetime.utcnow() + timedelta(days=60)  # 60 days
+                user.trial_days_remaining = 60
+                logger.info(f"Set beta user #{user.beta_user_number}: {user.name} (60 days trial)")
             else:
                 # Start normal user with 14-day trial
                 user.role = "normal"
@@ -90,7 +90,7 @@ class UserManagementService:
         if user.role == "admin":
             return {"has_access": True, "reason": "Admin access", "unlimited": True, "role": "admin"}
 
-        # Beta user - 1 year free trial
+        # Beta user - 60 days free trial
         if user.role == "beta":
             if user.is_trial_expired():
                 return {

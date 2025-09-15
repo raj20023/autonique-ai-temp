@@ -118,12 +118,65 @@ class OpenAIService:
         """Generate AI response using OpenAI with caching"""
         # Create cache key from context and message
         cache_key = f"response:{hashlib.md5(f'{context}:{user_message}'.encode()).hexdigest()}"
-        
+
         # Try to get from cache first
         cached_response = get_cached_response(cache_key)
         if cached_response:
             logger.debug(f"Cache hit for response: {cache_key}")
             return cached_response
+
+    async def generate_response_with_history(self, user_message: str, faq_context: str, conversation_history: List[Dict[str, str]]) -> str:
+        """Generate AI response with conversation history for continuity"""
+        try:
+            # Create conversation context
+            history_context = ""
+            if conversation_history:
+                history_context = "\n\nPrevious conversation:\n"
+                for entry in conversation_history[-5:]:  # Last 5 entries
+                    role = "Customer" if entry["role"] == "customer" else "You"
+                    history_context += f"{role}: {entry['message']}\n"
+                history_context += "\n"
+
+            # Create enhanced prompt with conversation history
+            if faq_context != "No FAQ found":
+                prompt = f"""You are a helpful customer service assistant for an Instagram business.
+
+{history_context}Current customer message: "{user_message}"
+
+Based on this FAQ information: "{faq_context}"
+
+Please provide a natural, conversational response that:
+1. Acknowledges the conversation history if relevant
+2. Directly addresses their current question
+3. Uses the FAQ information when appropriate
+4. Maintains a friendly, professional tone
+5. Feels like a continuation of the conversation, not a robotic response
+
+Keep the response concise and helpful."""
+            else:
+                prompt = f"""You are a helpful customer service assistant for an Instagram business.
+
+{history_context}Current customer message: "{user_message}"
+
+Since no specific FAQ matches this question, please provide a helpful response that:
+1. Acknowledges the conversation history if relevant
+2. Addresses their message naturally
+3. Offers to help or asks for clarification if needed
+4. Maintains conversation continuity
+5. Suggests they wait for a human representative if the query is complex
+
+Keep the response natural and conversational."""
+
+            # Generate response using OpenAI
+            response = await self.langchain_manager.generate_response(user_message, prompt)
+
+            logger.info(f"✅ Generated contextual response with conversation history")
+            return response
+
+        except Exception as e:
+            logger.error(f"Error generating response with history: {e}")
+            # Fallback to basic response
+            return await self.generate_response(user_message, faq_context)
 
         try:
             # Generate new response using LangChain (only takes 2 parameters)

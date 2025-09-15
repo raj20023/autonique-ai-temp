@@ -235,7 +235,7 @@ async def get_admin_settings(
     settings = {
         "beta_users_limit": "20",
         "trial_days_normal": "14",
-        "trial_days_beta": "365",
+        "trial_days_beta": "60",
         "monthly_message_limit_trial": "1000",
         "monthly_message_limit_paid": "10000",
         "app_maintenance_mode": "false",

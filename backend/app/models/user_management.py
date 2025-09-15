@@ -68,8 +68,8 @@ DEFAULT_ADMIN_SETTINGS = [
     },
     {
         "key": "trial_days_beta",
-        "value": "365",
-        "description": "Number of free trial days for beta users (1 year)"
+        "value": "60",
+        "description": "Number of free trial days for beta users (60 days)"
     },
     {
         "key": "monthly_message_limit_trial",

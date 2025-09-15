@@ -205,26 +205,66 @@ class FAQService:
                 "has_exclamation": "!" in user_message
             }
 
-    async def find_smart_response(self, db: Session, user_id: int, user_message: str) -> Optional[str]:
-        """Find response using FAQ matching with LLM relevance check"""
+    async def find_smart_response(self, db: Session, user_id: int, user_message: str, ig_user_id: str) -> Optional[str]:
+        """Find response using FAQ matching with LLM relevance check and conversation history"""
         try:
+            # Get conversation history (last 5 messages from this specific Instagram user)
+            conversation_history = self._get_conversation_history(db, user_id, ig_user_id)
+
             # First try FAQ matching (without strict threshold)
             faq_match = await self.find_matching_faq(db, user_id, user_message)
 
             if faq_match:
-                # Let LLM decide if FAQ is relevant and generate appropriate response
-                return await self.openai_service.generate_response(
+                # Let LLM decide if FAQ is relevant and generate appropriate response with context
+                return await self.openai_service.generate_response_with_history(
                     user_message,
-                    faq_match.answer
+                    faq_match.answer,
+                    conversation_history
                 )
 
-            # If no FAQ match found, generate a smart contextual response
-            logger.info(f"❌ No FAQ match found for user {user_id}, generating smart fallback")
-            return await self.openai_service.generate_response(user_message, "No FAQ found")
+            # If no FAQ match found, generate a smart contextual response with history
+            logger.info(f"❌ No FAQ match found for user {user_id}, generating smart fallback with conversation context")
+            return await self.openai_service.generate_response_with_history(
+                user_message,
+                "No FAQ found",
+                conversation_history
+            )
 
         except Exception as e:
             logger.error(f"Error finding smart response: {e}")
             return "Thank you for your message! Our team will get back to you soon."
+
+    def _get_conversation_history(self, db: Session, user_id: int, ig_user_id: str) -> List[Dict[str, str]]:
+        """Get last 5 conversations from this specific Instagram user"""
+        try:
+            # Get last 5 messages from this specific Instagram user (both incoming and outgoing)
+            recent_messages = db.query(Message).filter(
+                Message.user_id == user_id,
+                Message.ig_user_id == ig_user_id
+            ).order_by(Message.created_at.desc()).limit(5).all()
+
+            # Convert to conversation format (reverse to get chronological order)
+            conversation = []
+            for msg in reversed(recent_messages):
+                if msg.is_incoming:
+                    conversation.append({
+                        "role": "customer",
+                        "message": msg.message_text,
+                        "timestamp": msg.created_at.isoformat()
+                    })
+                if msg.response_text and msg.auto_replied:
+                    conversation.append({
+                        "role": "assistant",
+                        "message": msg.response_text,
+                        "timestamp": msg.reply_sent_at.isoformat() if msg.reply_sent_at else msg.created_at.isoformat()
+                    })
+
+            logger.info(f"📜 Retrieved {len(conversation)} conversation entries for IG user {ig_user_id}")
+            return conversation
+
+        except Exception as e:
+            logger.error(f"Error getting conversation history: {e}")
+            return []
 
 
 

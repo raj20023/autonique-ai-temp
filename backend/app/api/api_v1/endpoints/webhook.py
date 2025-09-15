@@ -473,7 +473,7 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
             faq_service = FAQService()
             logger.info(f"✅ FAQService initialized successfully")
 
-            response_text = await faq_service.find_smart_response(db, user.id, message_text)
+            response_text = await faq_service.find_smart_response(db, user.id, message_text, sender_id)
             logger.info(f"🎯 Smart response generated: '{response_text}'")
         except Exception as e:
             logger.error(f"❌ Error generating smart response: {e}")
