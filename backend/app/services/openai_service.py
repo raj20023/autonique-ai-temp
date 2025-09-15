@@ -130,26 +130,45 @@ class OpenAIService:
         """Generate AI response using LangChain's message format with conversation history"""
         try:
             # Build messages array in LangChain format
-            messages = [
-                SystemMessage(content="""You are a helpful customer service assistant for an Instagram business.
-                Maintain conversational continuity and acknowledge previous context when relevant.
-                Be friendly, professional, and concise.""")
-            ]
+            messages = []
 
-            # Add conversation history in proper LangChain format
+            # Add system message with detailed prompt
+            if faq_context != "No FAQ found":
+                system_prompt = f"""You are a helpful customer service assistant for an Instagram business.
+
+Based on this FAQ information: "{faq_context}"
+
+Please provide a natural, conversational response that:
+1. Acknowledges the conversation history if relevant
+2. Directly addresses their current question
+3. Uses the FAQ information when appropriate
+4. Maintains a friendly, professional tone
+5. Feels like a continuation of the conversation, not a robotic response
+
+Keep the response concise and helpful."""
+            else:
+                system_prompt = f"""You are a helpful customer service assistant for an Instagram business.
+
+Since no specific FAQ matches this question, please provide a helpful response that:
+1. Acknowledges the conversation history if relevant
+2. Addresses their message naturally
+3. Offers to help or asks for clarification if needed
+4. Maintains conversation continuity
+5. Suggests they wait for a human representative if the query is complex
+
+Keep the response natural and conversational."""
+
+            messages.append(SystemMessage(content=system_prompt))
+
+            # Add conversation history in proper LangChain format (OpenAI handles the context)
             for entry in conversation_history[-5:]:  # Last 5 exchanges
                 if entry["role"] == "customer":
                     messages.append(HumanMessage(content=entry["message"]))
                 else:  # assistant
                     messages.append(AIMessage(content=entry["message"]))
 
-            # Add current user message with context
-            if faq_context != "No FAQ found":
-                current_message = f"{user_message}\n\n[Context: {faq_context}]"
-            else:
-                current_message = user_message
-
-            messages.append(HumanMessage(content=current_message))
+            # Add current user message (no need to include context in message, it's in system prompt)
+            messages.append(HumanMessage(content=user_message))
 
             # Generate response using LangChain with message history
             response = await self.langchain_manager.generate_response_with_messages(messages)
