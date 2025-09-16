@@ -6,6 +6,7 @@ import Head from 'next/head';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AutoProvider } from '@/contexts/AutoContext';
+import AppWrapper from '@/components/AppWrapper';
 
 import '@/styles/globals.css';
 
@@ -35,7 +36,9 @@ export default function App({ Component, pageProps }: AppProps) {
       <ThemeProvider>
         <AutoProvider>
           <QueryClientProvider client={queryClient}>
-            <Component {...pageProps} />
+            <AppWrapper>
+              <Component {...pageProps} />
+            </AppWrapper>
             <Toaster
             position="top-right"
             toastOptions={{

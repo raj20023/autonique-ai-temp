@@ -126,15 +126,17 @@ class OpenAIService:
             logger.debug(f"Cache hit for response: {cache_key}")
             return cached_response
 
-    async def generate_response_with_history(self, user_message: str, faq_context: str, conversation_history: List[Dict[str, str]]) -> str:
+    async def generate_response_with_history(self, user_message: str, faq_context: str, conversation_history: List[Dict[str, str]], business_context: str = "") -> str:
         """Generate AI response using LangChain's message format with conversation history"""
         try:
             # Build messages array in LangChain format
             messages = []
 
-            # Add system message with detailed prompt
+            # Add system message with detailed prompt including business context
+            business_info = f"\n\nBusiness Information:\n{business_context}" if business_context else ""
+
             if faq_context != "No FAQ found":
-                system_prompt = f"""You are a helpful customer service assistant for an Instagram business.
+                system_prompt = f"""You are a helpful customer service assistant for an Instagram business.{business_info}
 
 Based on this FAQ information: "{faq_context}"
 
@@ -142,21 +144,23 @@ Please provide a natural, conversational response that:
 1. Acknowledges the conversation history if relevant
 2. Directly addresses their current question
 3. Uses the FAQ information when appropriate
-4. Maintains a friendly, professional tone
-5. Feels like a continuation of the conversation, not a robotic response
+4. Incorporates business personality and tone if provided
+5. Maintains a friendly, professional tone consistent with the brand
+6. Feels like a continuation of the conversation, not a robotic response
 
 Keep the response concise and helpful."""
             else:
-                system_prompt = f"""You are a helpful customer service assistant for an Instagram business.
+                system_prompt = f"""You are a helpful customer service assistant for an Instagram business.{business_info}
 
 Since no specific FAQ matches this question, please provide a helpful response that:
 1. Acknowledges the conversation history if relevant
-2. Addresses their message naturally
+2. Addresses their message naturally using business context
 3. Offers to help or asks for clarification if needed
 4. Maintains conversation continuity
-5. Suggests they wait for a human representative if the query is complex
+5. Uses the business personality and communication style if provided
+6. Suggests they wait for a human representative if the query is complex
 
-Keep the response natural and conversational."""
+Keep the response natural and conversational, reflecting the business brand."""
 
             messages.append(SystemMessage(content=system_prompt))
 

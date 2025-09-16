@@ -12,7 +12,8 @@ import {
   RefreshCw,
   Download,
   Check,
-  AlertTriangle
+  AlertTriangle,
+  Building2
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { isAuthenticated } from '@/utils/auth';
@@ -120,6 +121,7 @@ export default function SettingsPage() {
 
   const tabs = [
     { id: 'account', name: 'Account', icon: User, description: 'Manage your account information' },
+    { id: 'business', name: 'Business Profile', icon: Building2, description: 'Business information and AI personality' },
     { id: 'instagram', name: 'Instagram', icon: Instagram, description: 'Connected Instagram accounts' },
     { id: 'notifications', name: 'Notifications', icon: Bell, description: 'Notification preferences' },
     { id: 'privacy', name: 'Privacy', icon: Shield, description: 'Privacy and security settings' }
@@ -313,6 +315,66 @@ export default function SettingsPage() {
                           </div>
                         </motion.div>
                       )}
+                    </CardContent>
+                  </Card>
+                </AnimatedContainer>
+              )}
+
+              {/* Business Profile Tab */}
+              {activeTab === 'business' && (
+                <AnimatedContainer animation="slideUp" className="space-y-6">
+                  <Card variant="glass">
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2 text-white">
+                        <Building2 className="h-5 w-5 text-purple-400" />
+                        <span>Business Profile</span>
+                      </CardTitle>
+                      <CardDescription className="text-white/70">
+                        Customize your AI assistant's personality and responses to match your brand
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+                        <div className="flex items-center space-x-3 mb-4">
+                          <Building2 className="h-8 w-8 text-purple-400" />
+                          <div>
+                            <h3 className="text-lg font-semibold text-white">Business Information</h3>
+                            <p className="text-white/70 text-sm">Help your AI understand your business better</p>
+                          </div>
+                        </div>
+                        <Button
+                          onClick={() => {
+                            // This will trigger the onboarding flow
+                            window.location.reload();
+                          }}
+                          variant="outline"
+                          className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20"
+                        >
+                          Update Business Profile
+                        </Button>
+                      </div>
+
+                      <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+                        <h4 className="text-white font-medium mb-3">What this helps with:</h4>
+                        <ul className="space-y-2 text-white/70 text-sm">
+                          <li className="flex items-center space-x-2">
+                            <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
+                            <span>Personalized AI responses that match your brand voice</span>
+                          </li>
+                          <li className="flex items-center space-x-2">
+                            <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
+                            <span>Better customer service with business context</span>
+                          </li>
+                          <li className="flex items-center space-x-2">
+                            <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
+                            <span>Automatic mention of business hours and offers</span>
+                          </li>
+                          <li className="flex items-center space-x-2">
+                            <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
+                            <span>Consistent communication tone across all messages</span>
+                          </li>
+                        </ul>
+                      </div>
                     </CardContent>
                   </Card>
                 </AnimatedContainer>

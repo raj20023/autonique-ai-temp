@@ -211,6 +211,9 @@ class FAQService:
             # Get conversation history (last 5 messages from this specific Instagram user)
             conversation_history = self._get_conversation_history(db, user_id, ig_user_id)
 
+            # Get business context for personalized responses
+            business_context = self._get_business_context(db, user_id)
+
             # First try FAQ matching (without strict threshold)
             faq_match = await self.find_matching_faq(db, user_id, user_message)
 
@@ -219,7 +222,8 @@ class FAQService:
                 return await self.openai_service.generate_response_with_history(
                     user_message,
                     faq_match.answer,
-                    conversation_history
+                    conversation_history,
+                    business_context
                 )
 
             # If no FAQ match found, generate a smart contextual response with history
@@ -227,7 +231,8 @@ class FAQService:
             return await self.openai_service.generate_response_with_history(
                 user_message,
                 "No FAQ found",
-                conversation_history
+                conversation_history,
+                business_context
             )
 
         except Exception as e:
@@ -265,6 +270,28 @@ class FAQService:
         except Exception as e:
             logger.error(f"Error getting conversation history: {e}")
             return []
+
+    def _get_business_context(self, db: Session, user_id: int) -> str:
+        """Get business context for personalized AI responses"""
+        try:
+            from app.models.business_profile import BusinessProfile
+
+            profile = db.query(BusinessProfile).filter(
+                BusinessProfile.user_id == user_id,
+                BusinessProfile.is_completed == True
+            ).first()
+
+            if profile:
+                context = profile.to_prompt_context()
+                logger.info(f"🏢 Retrieved business context for user {user_id}")
+                return context
+            else:
+                logger.info(f"🏢 No business context found for user {user_id}")
+                return ""
+
+        except Exception as e:
+            logger.error(f"Error getting business context: {e}")
+            return ""
 
 
 

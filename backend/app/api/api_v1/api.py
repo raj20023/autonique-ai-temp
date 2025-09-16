@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Query, Header
 import logging
 
-from app.api.api_v1.endpoints import auth, users, faqs, webhook, pages, system, live_messages, user_management
+from app.api.api_v1.endpoints import auth, users, faqs, webhook, pages, system, live_messages, user_management, business_profile
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +16,7 @@ api_router.include_router(system.router, prefix="/system", tags=["system"])
 
 api_router.include_router(live_messages.router, prefix="/live", tags=["live-monitoring"])
 api_router.include_router(user_management.router, prefix="/user-management", tags=["user-management"])
+api_router.include_router(business_profile.router, prefix="/business", tags=["business-profile"])
 
 # Add webhook routes at root level for Facebook compatibility
 from app.api.api_v1.endpoints.webhook import verify_webhook, handle_webhook
