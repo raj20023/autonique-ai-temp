@@ -46,7 +46,6 @@ export const useBusinessOnboarding = () => {
       // But respect the skip flag
       const hasSkipped = localStorage.getItem('onboarding_skipped');
       if (!hasSkipped) {
-        console.log('🎯 Setting showOnboarding to true based on status');
         setShowOnboarding(true);
       }
     }
@@ -63,11 +62,9 @@ export const useBusinessOnboarding = () => {
   };
 
   const forceShowOnboarding = () => {
-    console.log('🚀 forceShowOnboarding called');
     setShowOnboarding(true);
     // Clear any skip flags
     localStorage.removeItem('onboarding_skipped');
-    console.log('✅ showOnboarding set to true, current state:', showOnboarding);
   };
 
   return {

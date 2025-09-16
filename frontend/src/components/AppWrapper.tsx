@@ -23,9 +23,8 @@ const AppWrapper: React.FC<AppWrapperProps> = ({ children }) => {
   useEffect(() => {
     setIsClient(true);
 
-    // Debug event listener
+    // Event listener for manual onboarding trigger
     const handleShowOnboarding = () => {
-      console.log('🔧 Debug event received, forcing onboarding');
       forceShowOnboarding();
     };
 
@@ -44,15 +43,8 @@ const AppWrapper: React.FC<AppWrapperProps> = ({ children }) => {
     !excludedPaths.includes(router.pathname) &&
     !router.pathname.startsWith('/auth');
 
-  // Debug logging
-  console.log('🔍 AppWrapper Debug:', {
-    isClient,
-    showOnboarding,
-    isAuthenticated: isClient ? isAuthenticated() : false,
-    currentPath: router.pathname,
-    isExcluded: excludedPaths.includes(router.pathname),
-    shouldShowOnboarding
-  });
+  // Only show onboarding when all conditions are met
+  // (removed debug logging for production)
 
   return (
     <>

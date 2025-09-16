@@ -17,9 +17,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { isAuthenticated } from '@/utils/auth';
-import { userApi, pagesApi } from '@/utils/api';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { useBusinessOnboarding } from '@/hooks/useBusinessOnboarding';
+import { pagesApi } from '@/utils/api';
+import { useQuery } from 'react-query';
 import { buildFacebookOAuthUrl, getRedirectUri } from '@/config/facebook';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import Button from '@/components/ui/Button';
@@ -33,8 +32,7 @@ export default function SettingsPage() {
   const { user, logout, updateUser, deleteUser, isUpdatingUser, isDeletingUser } = useAuth();
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState('account');
-  const { showSuccess, showError } = useAutoExpressions();
-  const { forceShowOnboarding } = useBusinessOnboarding();
+  const { showSuccess } = useAutoExpressions();
   const [isOpeningOnboarding, setIsOpeningOnboarding] = useState(false);
 
   // Form states
@@ -344,39 +342,25 @@ export default function SettingsPage() {
                             <p className="text-white/70 text-sm">Help your AI understand your business better</p>
                           </div>
                         </div>
-                        <div className="space-y-3">
-                          <Button
-                            onClick={() => {
-                              setIsOpeningOnboarding(true);
-                              // Small delay to show loading state
-                              setTimeout(() => {
-                                forceShowOnboarding();
-                                setIsOpeningOnboarding(false);
-                                showSuccess();
-                                toast.success('Opening business profile form...');
-                              }, 100);
-                            }}
-                            variant="outline"
-                            className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20"
-                            disabled={isOpeningOnboarding}
-                          >
-                            {isOpeningOnboarding ? 'Opening...' : 'Update Business Profile'}
-                          </Button>
-
-                          {/* Debug button - remove in production */}
-                          <Button
-                            onClick={() => {
-                              console.log('🔧 Debug: Forcing onboarding to show');
-                              // Directly import and show the component
+                        <Button
+                          onClick={() => {
+                            setIsOpeningOnboarding(true);
+                            // Small delay to show loading state
+                            setTimeout(() => {
+                              // Use custom event to trigger onboarding
                               const event = new CustomEvent('showOnboarding');
                               window.dispatchEvent(event);
-                            }}
-                            variant="outline"
-                            className="w-full bg-red-500/20 border-red-400/20 text-red-300 hover:bg-red-500/30 text-xs"
-                          >
-                            🔧 Debug: Force Show Onboarding
-                          </Button>
-                        </div>
+                              setIsOpeningOnboarding(false);
+                              showSuccess();
+                              toast.success('Opening business profile form...');
+                            }, 100);
+                          }}
+                          variant="outline"
+                          className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20"
+                          disabled={isOpeningOnboarding}
+                        >
+                          {isOpeningOnboarding ? 'Opening...' : 'Update Business Profile'}
+                        </Button>
                       </div>
 
                       <div className="bg-white/10 rounded-xl p-6 border border-white/20">
