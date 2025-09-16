@@ -19,6 +19,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { isAuthenticated } from '@/utils/auth';
 import { userApi, pagesApi } from '@/utils/api';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useBusinessOnboarding } from '@/hooks/useBusinessOnboarding';
 import { buildFacebookOAuthUrl, getRedirectUri } from '@/config/facebook';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import Button from '@/components/ui/Button';
@@ -30,10 +31,11 @@ import { useAutoExpressions } from '@/contexts/AutoContext';
 export default function SettingsPage() {
   const router = useRouter();
   const { user, logout, updateUser, deleteUser, isUpdatingUser, isDeletingUser } = useAuth();
-  const queryClient = useQueryClient();
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState('account');
   const { showSuccess, showError } = useAutoExpressions();
+  const { forceShowOnboarding } = useBusinessOnboarding();
+  const [isOpeningOnboarding, setIsOpeningOnboarding] = useState(false);
 
   // Form states
   const [accountForm, setAccountForm] = useState({
@@ -344,13 +346,20 @@ export default function SettingsPage() {
                         </div>
                         <Button
                           onClick={() => {
-                            // This will trigger the onboarding flow
-                            window.location.reload();
+                            setIsOpeningOnboarding(true);
+                            // Small delay to show loading state
+                            setTimeout(() => {
+                              forceShowOnboarding();
+                              setIsOpeningOnboarding(false);
+                              showSuccess();
+                              toast.success('Opening business profile form...');
+                            }, 100);
                           }}
                           variant="outline"
                           className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20"
+                          disabled={isOpeningOnboarding}
                         >
-                          Update Business Profile
+                          {isOpeningOnboarding ? 'Opening...' : 'Update Business Profile'}
                         </Button>
                       </div>
 

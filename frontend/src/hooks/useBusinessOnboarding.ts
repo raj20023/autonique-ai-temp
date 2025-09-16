@@ -37,7 +37,11 @@ export const useBusinessOnboarding = () => {
   useEffect(() => {
     if (onboardingStatus && !onboardingStatus.completed && isAuthenticated()) {
       // Show onboarding if user is authenticated and hasn't completed it
-      setShowOnboarding(true);
+      // But respect the skip flag
+      const hasSkipped = localStorage.getItem('onboarding_skipped');
+      if (!hasSkipped) {
+        setShowOnboarding(true);
+      }
     }
   }, [onboardingStatus]);
 
@@ -53,6 +57,8 @@ export const useBusinessOnboarding = () => {
 
   const forceShowOnboarding = () => {
     setShowOnboarding(true);
+    // Clear any skip flags
+    localStorage.removeItem('onboarding_skipped');
   };
 
   return {
