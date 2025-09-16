@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Building2, 
-  Sparkles, 
-  MessageCircle, 
-  Clock, 
-  Users, 
-  ArrowRight, 
+import {
+  Building2,
+  Sparkles,
+  MessageCircle,
+  Clock,
+  Users,
+  ArrowRight,
   ArrowLeft,
   CheckCircle,
   Rocket,
   Heart,
   Zap
 } from 'lucide-react';
+import { businessApi, type BusinessProfile } from '@/services/businessApi';
+import { toast } from 'react-hot-toast';
 
 interface OnboardingData {
   // Step 1: Business Basics
@@ -51,6 +53,8 @@ interface BusinessOnboardingProps {
 
 const BusinessOnboarding: React.FC<BusinessOnboardingProps> = ({ onComplete, onSkip }) => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [formData, setFormData] = useState<OnboardingData>({
     business_name: '',
     business_type: '',
@@ -71,6 +75,50 @@ const BusinessOnboarding: React.FC<BusinessOnboardingProps> = ({ onComplete, onS
     special_offers: '',
     mention_business_name: true
   });
+
+  // Fetch existing business profile data on component mount
+  useEffect(() => {
+    const fetchExistingProfile = async () => {
+      try {
+        setIsLoading(true);
+        const existingProfile = await businessApi.getProfile();
+
+        if (existingProfile) {
+          // Pre-fill form with existing data
+          setFormData({
+            business_name: existingProfile.business_name || '',
+            business_type: existingProfile.business_type || '',
+            industry: existingProfile.industry || '',
+            business_description: existingProfile.business_description || '',
+            brand_personality: existingProfile.brand_personality || '',
+            target_audience: existingProfile.target_audience || '',
+            communication_tone: existingProfile.communication_tone || '',
+            response_style: existingProfile.response_style || '',
+            greeting_style: existingProfile.greeting_style || '',
+            closing_style: existingProfile.closing_style || '',
+            use_emojis: existingProfile.use_emojis ?? true,
+            business_hours: existingProfile.business_hours || '',
+            location: existingProfile.location || '',
+            website: existingProfile.website || '',
+            typical_customer_questions: existingProfile.typical_customer_questions || '',
+            common_issues: existingProfile.common_issues || '',
+            special_offers: existingProfile.special_offers || '',
+            mention_business_name: existingProfile.mention_business_name ?? true
+          });
+
+          setIsUpdating(true);
+          toast.success('Loaded your existing business profile for editing');
+        }
+      } catch (error) {
+        console.error('Error fetching business profile:', error);
+        // Don't show error toast for new users who don't have a profile yet
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchExistingProfile();
+  }, []);
 
   const totalSteps = 5;
 
@@ -125,8 +173,15 @@ const BusinessOnboarding: React.FC<BusinessOnboardingProps> = ({ onComplete, onS
           >
             <div className="text-center mb-8">
               <Building2 className="h-16 w-16 text-purple-500 mx-auto mb-4" />
-              <h2 className="text-3xl font-bold text-white mb-2">Tell us about your business! 🏢</h2>
-              <p className="text-white/70">Let's start with the basics so we can personalize your AI assistant</p>
+              <h2 className="text-3xl font-bold text-white mb-2">
+                {isUpdating ? 'Update your business profile! ✏️' : 'Tell us about your business! 🏢'}
+              </h2>
+              <p className="text-white/70">
+                {isUpdating
+                  ? 'Make any changes to your business information below'
+                  : 'Let\'s start with the basics so we can personalize your AI assistant'
+                }
+              </p>
             </div>
 
             <div className="space-y-4">
@@ -403,6 +458,25 @@ const BusinessOnboarding: React.FC<BusinessOnboardingProps> = ({ onComplete, onS
     }
   };
 
+  // Show loading state while fetching existing profile
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 z-50 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 max-w-md w-full border border-white/20 text-center"
+        >
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+            <h3 className="text-xl font-semibold text-white">Loading your business profile...</h3>
+            <p className="text-white/70">We're checking if you have existing information to pre-fill</p>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 z-50 flex items-center justify-center p-4">
       <motion.div
@@ -455,7 +529,12 @@ const BusinessOnboarding: React.FC<BusinessOnboardingProps> = ({ onComplete, onS
             onClick={nextStep}
             className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all"
           >
-            <span>{currentStep === totalSteps ? 'Complete Setup' : 'Continue'}</span>
+            <span>
+              {currentStep === totalSteps
+                ? (isUpdating ? 'Update Profile' : 'Complete Setup')
+                : 'Continue'
+              }
+            </span>
             {currentStep === totalSteps ? (
               <Rocket className="h-5 w-5" />
             ) : (
