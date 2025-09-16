@@ -50,6 +50,7 @@ interface BusinessOnboardingProps {
 }
 
 const BusinessOnboarding: React.FC<BusinessOnboardingProps> = ({ onComplete, onSkip }) => {
+  console.log('🎯 BusinessOnboarding component rendered');
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<OnboardingData>({
     business_name: '',

@@ -6,13 +6,19 @@ import { isAuthenticated } from '../utils/auth';
 export const useBusinessOnboarding = () => {
   const queryClient = useQueryClient();
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  // Set client-side flag
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Get onboarding status
   const { data: onboardingStatus, isLoading: statusLoading } = useQuery<OnboardingStatus>(
     'onboarding-status',
     () => businessApi.getOnboardingStatus(),
     {
-      enabled: isAuthenticated(),
+      enabled: isClient && isAuthenticated(),
       retry: false,
       staleTime: 5 * 60 * 1000, // 5 minutes
     }
@@ -35,15 +41,16 @@ export const useBusinessOnboarding = () => {
 
   // Check if onboarding should be shown
   useEffect(() => {
-    if (onboardingStatus && !onboardingStatus.completed && isAuthenticated()) {
+    if (isClient && onboardingStatus && !onboardingStatus.completed && isAuthenticated()) {
       // Show onboarding if user is authenticated and hasn't completed it
       // But respect the skip flag
       const hasSkipped = localStorage.getItem('onboarding_skipped');
       if (!hasSkipped) {
+        console.log('🎯 Setting showOnboarding to true based on status');
         setShowOnboarding(true);
       }
     }
-  }, [onboardingStatus]);
+  }, [isClient, onboardingStatus]);
 
   const completeOnboarding = (data: OnboardingFormData) => {
     completeOnboardingMutation.mutate(data);
@@ -56,9 +63,11 @@ export const useBusinessOnboarding = () => {
   };
 
   const forceShowOnboarding = () => {
+    console.log('🚀 forceShowOnboarding called');
     setShowOnboarding(true);
     // Clear any skip flags
     localStorage.removeItem('onboarding_skipped');
+    console.log('✅ showOnboarding set to true, current state:', showOnboarding);
   };
 
   return {

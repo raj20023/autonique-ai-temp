@@ -1,7 +1,7 @@
 """Add business profile table
 
-Revision ID: add_business_profile
-Revises: 
+Revision ID: 9a8b7c6d5e4f
+Revises: 04988d620017
 Create Date: 2024-01-15 10:00:00.000000
 
 """
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = 'add_business_profile'
-down_revision = None  # Update this with the latest revision ID
+revision = '9a8b7c6d5e4f'
+down_revision = '04988d620017'
 branch_labels = None
 depends_on = None
 
