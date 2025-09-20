@@ -43,13 +43,24 @@ const SubscriptionDashboard: React.FC = () => {
     );
   }
 
-  if (!currentSubscription) {
+  const plan = getCurrentPlan();
+  const isActive = isSubscriptionActive();
+  const usagePercentage = getUsagePercentage();
+  const daysRemaining = getDaysRemaining();
+
+  // Show "No Active Subscription" if no subscription exists OR if subscription is inactive/cancelled
+  if (!currentSubscription || !isActive) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="text-center py-8">
           <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No Active Subscription</h3>
-          <p className="text-gray-600 mb-4">Subscribe to a plan to start using AutoniqueAI</p>
+          <p className="text-gray-600 mb-4">
+            {!currentSubscription
+              ? "Subscribe to a plan to start using AutoniqueAI"
+              : "Your subscription has been cancelled. Subscribe to a new plan to continue using AutoniqueAI"
+            }
+          </p>
           <a
             href="/pricing"
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -62,10 +73,7 @@ const SubscriptionDashboard: React.FC = () => {
     );
   }
 
-  const plan = getCurrentPlan();
-  const isActive = isSubscriptionActive();
-  const usagePercentage = getUsagePercentage();
-  const daysRemaining = getDaysRemaining();
+
 
   const getStatusColor = () => {
     if (!isActive) return 'text-red-600 bg-red-100';
