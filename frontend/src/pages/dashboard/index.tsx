@@ -25,7 +25,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 // API function to get user statistics
 const getUserStats = async () => {
   const token = localStorage.getItem('access_token');
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.autonique.in';
+  const API_URL = 'https://api.autonique.in';
 
   const response = await fetch(`${API_URL}/api/v1/users/stats`, {
     headers: {

@@ -39,7 +39,7 @@ export default function SetupGuidePage() {
 
   const fetchSetupGuide = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/setup-guide`);
+      const response = await fetch('https://api.autonique.in/api/v1/auth/setup-guide');
       const data = await response.json();
       setSetupGuide(data);
     } catch (error) {

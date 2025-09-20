@@ -93,12 +93,12 @@ export default function PricingPage() {
 
   const fetchUserProfile = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user-management/profile`, {
+      const response = await fetch('https://api.autonique.in/api/v1/user-management/profile', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         }
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setProfile(data);
@@ -121,10 +121,10 @@ export default function PricingPage() {
       }
 
       console.log('Creating order for plan:', planId);
-      console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
+      console.log('API URL:', 'https://api.autonique.in');
 
       // Create Razorpay order
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/subscription/create-order`, {
+      const response = await fetch('https://api.autonique.in/api/v1/subscription/create-order', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -165,7 +165,7 @@ export default function PricingPage() {
         handler: async function (response: any) {
           // Verify payment
           try {
-            const verifyResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/subscription/verify-payment`, {
+            const verifyResponse = await fetch('https://api.autonique.in/api/v1/subscription/verify-payment', {
               method: 'POST',
               headers: {
                 'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
