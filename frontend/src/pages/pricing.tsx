@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import Script from 'next/script';
 import { motion } from 'framer-motion';
 import { 
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 import { BetaUserBadge, AccessStatusIndicator } from '@/components/SubscriptionBanner';
 import { useSubscription } from '@/hooks/useSubscription';
+import PublicLayout from '@/components/layout/PublicLayout';
 
 interface UserProfile {
   user: {
@@ -274,7 +276,7 @@ export default function PricingPage() {
         strategy="lazyOnload"
       />
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <PublicLayout>
         <div className="max-w-7xl mx-auto px-4 py-12">
           {/* Header */}
           <motion.div
@@ -282,16 +284,16 @@ export default function PricingPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-16"
           >
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="text-4xl font-bold text-white mb-4">
               Choose Your Plan
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-white/70 max-w-2xl mx-auto">
               Start with our free trial or join our exclusive beta program
             </p>
             
             {profile && (
               <div className="mt-6 flex items-center justify-center space-x-4">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-white/60">
                   Welcome back, <span className="font-semibold">{profile.user.name}</span>
                 </div>
                 {profile.user.is_beta_user && (
@@ -315,13 +317,13 @@ export default function PricingPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className={`relative bg-white rounded-2xl shadow-lg p-8 ${
-                    plan.popular ? 'ring-2 ring-blue-500' : ''
+                  className={`relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg p-8 ${
+                    plan.popular ? 'ring-2 ring-purple-500' : ''
                   } ${!plan.available ? 'opacity-60' : ''}`}
                 >
                   {plan.popular && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <div className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center">
+                      <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center">
                         <Star className="h-4 w-4 mr-1" />
                         Most Popular
                       </div>
@@ -333,23 +335,23 @@ export default function PricingPage() {
                       <Icon className={`h-8 w-8 text-${plan.color}-600`} />
                     </div>
                     
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    <h3 className="text-2xl font-bold text-white mb-2">
                       {plan.name}
                     </h3>
-                    
+
                     <div className="mb-2">
-                      <span className="text-4xl font-bold text-gray-900">
+                      <span className="text-4xl font-bold text-white">
                         {plan.price}
                       </span>
                       {plan.period && (
-                        <span className="text-gray-600">{plan.period}</span>
+                        <span className="text-white/60">{plan.period}</span>
                       )}
                     </div>
-                    
-                    <p className="text-gray-600">{plan.description}</p>
+
+                    <p className="text-white/70">{plan.description}</p>
                     
                     {plan.trialDays !== undefined && (
-                      <div className="mt-2 text-sm text-blue-600 font-medium">
+                      <div className="mt-2 text-sm text-purple-400 font-medium">
                         {plan.trialDays} days remaining
                       </div>
                     )}
@@ -359,43 +361,43 @@ export default function PricingPage() {
                     {plan.features.map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-start">
                         <Check className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
-                        <span className="text-gray-700">{feature}</span>
+                        <span className="text-white/80">{feature}</span>
                       </li>
                     ))}
                   </ul>
 
                   <div className="text-center">
                     {isCurrentPlan ? (
-                      <div className="w-full py-3 px-4 bg-gray-100 text-gray-600 rounded-lg font-medium">
+                      <div className="w-full py-3 px-4 bg-white/10 text-white/80 rounded-lg font-medium border border-white/20">
                         Current Plan
                       </div>
                     ) : plan.isTrial ? (
-                      <div className="w-full py-3 px-4 bg-blue-100 text-blue-600 rounded-lg font-medium">
+                      <div className="w-full py-3 px-4 bg-blue-500/20 text-blue-300 rounded-lg font-medium border border-blue-500/30">
                         {plan.trialDays ? `${plan.trialDays} days remaining` : 'Active Trial'}
                       </div>
                     ) : plan.isBeta ? (
-                      <div className="w-full py-3 px-4 bg-purple-100 text-purple-600 rounded-lg font-medium">
+                      <div className="w-full py-3 px-4 bg-purple-500/20 text-purple-300 rounded-lg font-medium border border-purple-500/30">
                         {plan.available ? 'Beta Access' : 'Not Available'}
                       </div>
                     ) : canUpgrade && plan.id ? (
                       <button
                         onClick={() => handleUpgrade(plan.id)}
-                        className={`w-full py-3 px-4 text-white rounded-lg font-medium transition-colors ${
+                        className={`w-full py-3 px-4 text-white rounded-lg font-medium transition-all duration-300 ${
                           plan.popular
-                            ? 'bg-green-600 hover:bg-green-700'
-                            : 'bg-blue-600 hover:bg-blue-700'
+                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-lg shadow-purple-500/25'
+                            : 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-lg shadow-blue-500/25'
                         }`}
                       >
                         {plan.popular ? 'Choose Popular' : 'Subscribe Now'}
                       </button>
                     ) : !plan.available ? (
-                      <div className="w-full py-3 px-4 bg-gray-100 text-gray-500 rounded-lg font-medium">
+                      <div className="w-full py-3 px-4 bg-white/5 text-white/40 rounded-lg font-medium border border-white/10">
                         Not Available
                       </div>
                     ) : (
                       <button
                         disabled
-                        className="w-full py-3 px-4 bg-gray-100 text-gray-500 rounded-lg font-medium cursor-not-allowed"
+                        className="w-full py-3 px-4 bg-white/5 text-white/40 rounded-lg font-medium cursor-not-allowed border border-white/10"
                       >
                         Contact Support
                       </button>
@@ -450,17 +452,56 @@ export default function PricingPage() {
             </div>
           </motion.div>
 
+          {/* Call to Action */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="text-center bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 mb-8"
+          >
+            <h2 className="text-2xl font-bold text-white mb-4">
+              Ready to Transform Your Instagram Business?
+            </h2>
+            <p className="text-white/70 mb-6 max-w-2xl mx-auto">
+              Join thousands of businesses already using AutoniqueAI to automate their Instagram customer service and boost sales.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Link href="/auth/login">
+                  <button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300">
+                    Start Free Trial
+                  </button>
+                </Link>
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Link href="/demo">
+                  <button className="bg-white/10 hover:bg-white/20 text-white px-8 py-3 rounded-full font-semibold border border-white/30 backdrop-blur-xl transition-all duration-300">
+                    View Demo
+                  </button>
+                </Link>
+              </motion.div>
+            </div>
+          </motion.div>
+
           {/* Back to Dashboard */}
-          <div className="text-center mt-8">
-            <a
-              href="/dashboard"
-              className="text-blue-600 hover:text-blue-800 transition-colors"
-            >
-              ← Back to Dashboard
-            </a>
-          </div>
+          {profile && (
+            <div className="text-center">
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center text-white/70 hover:text-white transition-colors"
+              >
+                ← Back to Dashboard
+              </Link>
+            </div>
+          )}
         </div>
-      </div>
+      </PublicLayout>
     </>
   );
 }

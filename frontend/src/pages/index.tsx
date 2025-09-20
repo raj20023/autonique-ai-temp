@@ -151,7 +151,7 @@ export default function HomePage() {
                   Benefits
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-cyan-400 group-hover:w-full transition-all duration-300"></span>
                 </Link>
-                <Link href="#pricing" className="text-white/90 hover:text-white transition-all duration-300 font-medium relative group">
+                <Link href="/pricing" className="text-white/90 hover:text-white transition-all duration-300 font-medium relative group">
                   Pricing
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-emerald-400 to-teal-400 group-hover:w-full transition-all duration-300"></span>
                 </Link>
@@ -247,7 +247,7 @@ export default function HomePage() {
                     { href: "#features", label: "Features" },
                     { href: "/demo", label: "Demo" },
                     { href: "#benefits", label: "Benefits" },
-                    { href: "#pricing", label: "Pricing" }
+                    { href: "/pricing", label: "Pricing" }
                   ].map((item, index) => (
                     <motion.div
                       key={item.href}
