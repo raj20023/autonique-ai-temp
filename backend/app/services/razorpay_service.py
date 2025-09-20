@@ -148,7 +148,7 @@ class RazorpayService:
             if existing_subscription:
                 # Update existing subscription
                 existing_subscription.plan_id = plan_id
-                existing_subscription.status = SubscriptionStatus.ACTIVE
+                existing_subscription.status = "active"  # Use string directly
                 existing_subscription.start_date = datetime.utcnow()
                 existing_subscription.end_date = datetime.utcnow() + timedelta(days=30)  # 1 month
                 existing_subscription.next_billing_date = datetime.utcnow() + timedelta(days=30)
@@ -159,7 +159,7 @@ class RazorpayService:
                 subscription = Subscription(
                     user_id=user_id,
                     plan_id=plan_id,
-                    status=SubscriptionStatus.ACTIVE,
+                    status="active",  # Use string directly
                     start_date=datetime.utcnow(),
                     end_date=datetime.utcnow() + timedelta(days=30),  # 1 month
                     next_billing_date=datetime.utcnow() + timedelta(days=30)
@@ -176,7 +176,7 @@ class RazorpayService:
                 razorpay_signature=verification_data.razorpay_signature,
                 amount=payment_details["amount"] / 100,  # Convert from paise to rupees
                 currency=payment_details["currency"],
-                status=PaymentStatus.COMPLETED,
+                status="completed",  # Use string directly to avoid enum conversion issues
                 payment_method=payment_details.get("method"),
                 billing_start=subscription.start_date,
                 billing_end=subscription.end_date,
@@ -212,7 +212,7 @@ class RazorpayService:
         try:
             subscription = db.query(Subscription).filter(
                 Subscription.user_id == user_id,
-                Subscription.status == SubscriptionStatus.ACTIVE
+                Subscription.status == "active"  # Use string directly
             ).first()
             
             if not subscription:
@@ -220,7 +220,7 @@ class RazorpayService:
                 return False
             
             # Update subscription status
-            subscription.status = SubscriptionStatus.CANCELLED
+            subscription.status = "cancelled"  # Use string directly
             subscription.cancelled_at = datetime.utcnow()
             subscription.cancellation_reason = reason
             

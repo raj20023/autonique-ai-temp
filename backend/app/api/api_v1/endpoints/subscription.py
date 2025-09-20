@@ -54,7 +54,7 @@ async def create_subscription_order(
         # Check if user already has an active subscription
         existing_subscription = db.query(Subscription).filter(
             Subscription.user_id == current_user.id,
-            Subscription.status == SubscriptionStatus.ACTIVE
+            Subscription.status == "active"  # Use string directly
         ).first()
         
         if existing_subscription:
@@ -123,7 +123,7 @@ async def upgrade_subscription(
         # Get current subscription
         current_subscription = db.query(Subscription).filter(
             Subscription.user_id == current_user.id,
-            Subscription.status == SubscriptionStatus.ACTIVE
+            Subscription.status == "active"  # Use string directly
         ).first()
         
         if not current_subscription:
@@ -212,7 +212,7 @@ async def get_usage_stats(
     """Get current usage statistics"""
     subscription = db.query(Subscription).filter(
         Subscription.user_id == current_user.id,
-        Subscription.status == SubscriptionStatus.ACTIVE
+        Subscription.status == "active"  # Use string directly
     ).first()
     
     if not subscription:
