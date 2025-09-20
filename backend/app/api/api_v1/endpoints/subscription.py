@@ -164,7 +164,7 @@ async def upgrade_subscription(
             "currency": order_data["order"]["currency"],
             "current_plan": current_subscription.plan.name,
             "new_plan": new_plan.name,
-            "razorpay_key": "rzp_live_RJqmheBoVjM38M"
+            "razorpay_key": settings.RAZORPAY_KEY_ID  # Use the configured key (test or live)
         }
         
     except Exception as e:

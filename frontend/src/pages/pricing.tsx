@@ -123,14 +123,28 @@ export default function PricingPage() {
       console.log('Creating order for plan:', planId);
       console.log('API URL:', 'https://api.autonique.in');
 
+      // Check if user has existing subscription to determine endpoint
+      const currentPlan = getCurrentPlan();
+      const isUpgrade = currentPlan && currentPlan.id !== planId;
+
+      const endpoint = isUpgrade
+        ? 'https://api.autonique.in/api/v1/subscription/upgrade'
+        : 'https://api.autonique.in/api/v1/subscription/create-order';
+
+      const requestBody = isUpgrade
+        ? { new_plan_id: planId }
+        : { plan_id: planId };
+
+      console.log('Using endpoint:', endpoint, 'for', isUpgrade ? 'upgrade' : 'new subscription');
+
       // Create Razorpay order
-      const response = await fetch('https://api.autonique.in/api/v1/subscription/create-order', {
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ plan_id: planId })
+        body: JSON.stringify(requestBody)
       });
 
       console.log('Response status:', response.status);
@@ -160,7 +174,7 @@ export default function PricingPage() {
         amount: orderData.amount,
         currency: orderData.currency,
         name: 'AutoniqueAI',
-        description: `Subscription to ${orderData.plan_name}`,
+        description: `Subscription to ${orderData.plan_name || orderData.new_plan}`,
         order_id: orderData.order_id,
         handler: async function (response: any) {
           // Verify payment
