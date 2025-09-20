@@ -34,7 +34,7 @@ def init_plans():
         plans = [
             Plan(
                 name="Starter",
-                plan_type=PlanType.STARTER,
+                plan_type=PlanType.starter,
                 price=499.0,
                 currency="INR",
                 monthly_messages=200,
@@ -48,7 +48,7 @@ def init_plans():
             ),
             Plan(
                 name="Growth",
-                plan_type=PlanType.GROWTH,
+                plan_type=PlanType.growth,
                 price=999.0,
                 currency="INR",
                 monthly_messages=1000,
@@ -62,7 +62,7 @@ def init_plans():
             ),
             Plan(
                 name="Pro",
-                plan_type=PlanType.PRO,
+                plan_type=PlanType.pro,
                 price=2999.0,
                 currency="INR",
                 monthly_messages=5000,

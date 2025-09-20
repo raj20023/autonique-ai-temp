@@ -57,7 +57,7 @@ interface UserProfile {
 export default function PricingPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const { currentSubscription, getCurrentPlan } = useSubscription();
+  const { currentSubscription, getCurrentPlan, plans: apiPlans, plansLoading } = useSubscription();
 
   useEffect(() => {
     fetchUserProfile();
@@ -84,19 +84,44 @@ export default function PricingPage() {
 
   const handleUpgrade = async (planId: number) => {
     try {
+      // Check if user is authenticated
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        alert('Please login first to subscribe to a plan');
+        window.location.href = '/auth/login';
+        return;
+      }
+
+      console.log('Creating order for plan:', planId);
+      console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
+
       // Create Razorpay order
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/subscription/create-order`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ plan_id: planId })
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response content-type:', response.headers.get('content-type'));
+
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || 'Failed to create order');
+        const responseText = await response.text();
+        console.error('Error response:', responseText);
+
+        // Try to parse as JSON, fallback to text
+        let errorMessage = 'Failed to create order';
+        try {
+          const errorJson = JSON.parse(responseText);
+          errorMessage = errorJson.detail || errorJson.message || errorMessage;
+        } catch {
+          errorMessage = responseText || errorMessage;
+        }
+
+        throw new Error(`${errorMessage} (Status: ${response.status})`);
       }
 
       const orderData = await response.json();
@@ -154,32 +179,23 @@ export default function PricingPage() {
     }
   };
 
-  const plans = [
-    {
-      id: 1,
-      name: "Starter",
-      price: "₹499",
-      period: "/month",
-      description: "Perfect for small businesses starting out",
+  // Plan UI configuration
+  const planConfig = {
+    starter: {
+      icon: MessageCircle,
+      color: "blue",
       features: [
         "Up to 200 auto-replies/month",
         "1 Instagram account",
         "Basic FAQ setup",
         "AI-powered responses",
         "Email support"
-      ],
-      icon: MessageCircle,
-      color: "blue",
-      available: true,
-      current: profile?.user.role === 'paid' && getCurrentPlan()?.plan_type === 'starter',
-      planType: 'starter'
+      ]
     },
-    {
-      id: 2,
-      name: "Growth",
-      price: "₹999",
-      period: "/month",
-      description: "Most popular - ideal for growing businesses",
+    growth: {
+      icon: BarChart3,
+      color: "green",
+      popular: true,
       features: [
         "Up to 1,000 auto-replies/month",
         "1 Instagram account",
@@ -187,20 +203,11 @@ export default function PricingPage() {
         "Response rate tracking",
         "Time to first response metrics",
         "Priority support"
-      ],
-      icon: BarChart3,
-      color: "green",
-      available: true,
-      current: profile?.user.role === 'paid' && getCurrentPlan()?.plan_type === 'growth',
-      popular: true,
-      planType: 'growth'
+      ]
     },
-    {
-      id: 3,
-      name: "Pro",
-      price: "₹2,999",
-      period: "/month",
-      description: "For agencies and serious sellers",
+    pro: {
+      icon: Crown,
+      color: "purple",
       features: [
         "Up to 5,000 auto-replies/month",
         "Up to 3 Instagram accounts",
@@ -209,13 +216,22 @@ export default function PricingPage() {
         "Multi-brand management",
         "Dedicated support",
         "Custom integrations"
-      ],
-      icon: Crown,
-      color: "purple",
-      available: true,
-      current: profile?.user.role === 'paid' && getCurrentPlan()?.plan_type === 'pro',
-      planType: 'pro'
-    },
+      ]
+    }
+  };
+
+  // Combine API data with UI configuration
+  const paidPlans = apiPlans?.map(apiPlan => ({
+    ...apiPlan,
+    ...planConfig[apiPlan.plan_type as keyof typeof planConfig],
+    price: `₹${apiPlan.price.toLocaleString()}`,
+    period: "/month",
+    available: true,
+    current: profile?.user.role === 'paid' && getCurrentPlan()?.plan_type === apiPlan.plan_type,
+  })) || [];
+
+  // Add special plans
+  const specialPlans = [
     {
       name: "Free Trial",
       price: "Free",
@@ -255,11 +271,15 @@ export default function PricingPage() {
     }
   ];
 
-  if (loading) {
+  const plans = [...paidPlans, ...specialPlans];
+
+  if (loading || plansLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
+      <PublicLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+        </div>
+      </PublicLayout>
     );
   }
 

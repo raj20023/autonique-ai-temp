@@ -6,9 +6,9 @@ import enum
 from app.core.database import Base
 
 class PlanType(str, enum.Enum):
-    STARTER = "starter"
-    GROWTH = "growth"
-    PRO = "pro"
+    starter = "starter"
+    growth = "growth"
+    pro = "pro"
 
 class SubscriptionStatus(str, enum.Enum):
     ACTIVE = "active"
