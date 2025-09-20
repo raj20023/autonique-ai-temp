@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from app.core.database import Base
 
 class User(Base):
@@ -48,13 +48,13 @@ class User(Base):
         """Check if trial period has expired"""
         if not self.trial_end_date:
             return False
-        return datetime.utcnow() > self.trial_end_date
+        return datetime.now(timezone.utc) > self.trial_end_date
 
     def days_remaining_in_trial(self):
         """Get remaining days in trial"""
         if not self.trial_end_date:
             return 0
-        remaining = self.trial_end_date - datetime.utcnow()
+        remaining = self.trial_end_date - datetime.now(timezone.utc)
         return max(0, remaining.days)
 
     def can_access_features(self):

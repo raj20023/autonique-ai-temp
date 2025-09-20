@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional, List
 import logging
 
@@ -31,20 +31,20 @@ class UserManagementService:
                 user.role = "beta"
                 user.is_beta_user = True
                 user.beta_user_number = beta_count + 1
-                user.trial_start_date = datetime.utcnow()
-                user.trial_end_date = datetime.utcnow() + timedelta(days=60)  # 60 days
+                user.trial_start_date = datetime.now(timezone.utc)
+                user.trial_end_date = datetime.now(timezone.utc) + timedelta(days=60)  # 60 days
                 user.trial_days_remaining = 60
                 logger.info(f"Set beta user #{user.beta_user_number}: {name} (60 days trial)")
             else:
                 # Start normal user with 14-day trial
                 user.role = "normal"
-                user.trial_start_date = datetime.utcnow()
-                user.trial_end_date = datetime.utcnow() + timedelta(days=14)
+                user.trial_start_date = datetime.now(timezone.utc)
+                user.trial_end_date = datetime.now(timezone.utc) + timedelta(days=14)
                 user.trial_days_remaining = 14
                 logger.info(f"Set normal user: {name} (14 days trial)")
 
         # Update last login and profile picture
-        user.last_login = datetime.utcnow()
+        user.last_login = datetime.now(timezone.utc)
         if profile_picture:
             user.profile_picture = profile_picture
 
@@ -72,15 +72,15 @@ class UserManagementService:
                 user.role = "beta"
                 user.is_beta_user = True
                 user.beta_user_number = beta_count + 1
-                user.trial_start_date = datetime.utcnow()
-                user.trial_end_date = datetime.utcnow() + timedelta(days=60)  # 60 days
+                user.trial_start_date = datetime.now(timezone.utc)
+                user.trial_end_date = datetime.now(timezone.utc) + timedelta(days=60)  # 60 days
                 user.trial_days_remaining = 60
                 logger.info(f"Set beta user #{user.beta_user_number}: {user.name} (60 days trial)")
             else:
                 # Start normal user with 14-day trial
                 user.role = "normal"
-                user.trial_start_date = datetime.utcnow()
-                user.trial_end_date = datetime.utcnow() + timedelta(days=14)
+                user.trial_start_date = datetime.now(timezone.utc)
+                user.trial_end_date = datetime.now(timezone.utc) + timedelta(days=14)
                 user.trial_days_remaining = 14
                 logger.info(f"Set normal user: {user.name} (14 days trial)")
 
@@ -210,9 +210,9 @@ class UserManagementService:
 
         user.role = "paid"
         user.subscription_status = "active"
-        user.subscription_start_date = datetime.utcnow()
+        user.subscription_start_date = datetime.now(timezone.utc)
         # Set to 1 year from now (adjust as needed)
-        user.subscription_end_date = datetime.utcnow() + timedelta(days=365)
+        user.subscription_end_date = datetime.now(timezone.utc) + timedelta(days=365)
 
         self.db.commit()
         logger.info(f"User {user.name} upgraded to paid subscription")

@@ -3,7 +3,7 @@ import hmac
 import hashlib
 import logging
 from typing import Dict, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -149,10 +149,10 @@ class RazorpayService:
                 # Update existing subscription
                 existing_subscription.plan_id = plan_id
                 existing_subscription.status = "active"  # Use string directly
-                existing_subscription.start_date = datetime.utcnow()
-                existing_subscription.end_date = datetime.utcnow() + timedelta(days=30)  # 1 month
-                existing_subscription.next_billing_date = datetime.utcnow() + timedelta(days=30)
-                existing_subscription.updated_at = datetime.utcnow()
+                existing_subscription.start_date = datetime.now(timezone.utc)
+                existing_subscription.end_date = datetime.now(timezone.utc) + timedelta(days=30)  # 1 month
+                existing_subscription.next_billing_date = datetime.now(timezone.utc) + timedelta(days=30)
+                existing_subscription.updated_at = datetime.now(timezone.utc)
                 subscription = existing_subscription
             else:
                 # Create new subscription
@@ -160,9 +160,9 @@ class RazorpayService:
                     user_id=user_id,
                     plan_id=plan_id,
                     status="active",  # Use string directly
-                    start_date=datetime.utcnow(),
-                    end_date=datetime.utcnow() + timedelta(days=30),  # 1 month
-                    next_billing_date=datetime.utcnow() + timedelta(days=30)
+                    start_date=datetime.now(timezone.utc),
+                    end_date=datetime.now(timezone.utc) + timedelta(days=30),  # 1 month
+                    next_billing_date=datetime.now(timezone.utc) + timedelta(days=30)
                 )
                 db.add(subscription)
                 db.flush()  # Get subscription ID
@@ -180,7 +180,7 @@ class RazorpayService:
                 payment_method=payment_details.get("method"),
                 billing_start=subscription.start_date,
                 billing_end=subscription.end_date,
-                paid_at=datetime.utcnow()
+                paid_at=datetime.now(timezone.utc)
             )
             db.add(payment_record)
             
@@ -221,7 +221,7 @@ class RazorpayService:
             
             # Update subscription status
             subscription.status = "cancelled"  # Use string directly
-            subscription.cancelled_at = datetime.utcnow()
+            subscription.cancelled_at = datetime.now(timezone.utc)
             subscription.cancellation_reason = reason
             
             # Update user role back to normal

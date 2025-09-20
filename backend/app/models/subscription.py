@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Float, Boolean, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import enum
 from app.core.database import Base
 
@@ -86,7 +86,7 @@ class Subscription(Base):
         """Check if subscription is currently active"""
         if self.status != SubscriptionStatus.ACTIVE:
             return False
-        if self.end_date and datetime.utcnow() > self.end_date:
+        if self.end_date and datetime.now(timezone.utc) > self.end_date:
             return False
         return True
 
@@ -94,7 +94,7 @@ class Subscription(Base):
         """Get remaining days in subscription"""
         if not self.end_date:
             return 0
-        remaining = self.end_date - datetime.utcnow()
+        remaining = self.end_date - datetime.now(timezone.utc)
         return max(0, remaining.days)
 
     def can_send_messages(self):
@@ -104,7 +104,7 @@ class Subscription(Base):
     def reset_monthly_usage(self):
         """Reset monthly usage counter"""
         self.messages_used_this_month = 0
-        self.last_usage_reset = datetime.utcnow()
+        self.last_usage_reset = datetime.now(timezone.utc)
 
 class Payment(Base):
     __tablename__ = "payments"
