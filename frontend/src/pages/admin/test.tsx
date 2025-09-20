@@ -25,8 +25,8 @@ export default function AdminTest() {
 
       addResult(`🔍 Token length: ${token.length} characters`);
 
-      // Temporarily use local backend for testing the enum fix
-      const API_URL = 'http://localhost:8000';
+      // Use production API URL
+      const API_URL = 'https://api.autonique.in';
       addResult(`🌐 API URL: ${API_URL}`);
 
       const headers = { 'Authorization': `Bearer ${token}` };

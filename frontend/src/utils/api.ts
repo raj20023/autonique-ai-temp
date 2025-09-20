@@ -1,8 +1,8 @@
 import axios, { AxiosResponse } from 'axios';
 import { AuthToken, User, Page, FAQ, FAQCreateData, FAQUpdateData } from '@/types';
 
-// Temporarily use local backend for testing the enum fix
-const API_BASE_URL = 'http://localhost:8000';
+// Use production API URL
+const API_BASE_URL = 'https://api.autonique.in';
 
 // Create axios instance
 const api = axios.create({

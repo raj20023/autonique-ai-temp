@@ -71,7 +71,7 @@ export default function PricingPage() {
     const testAPI = async () => {
       try {
         console.log('Testing direct API call...');
-        const url = 'http://localhost:8000/api/v1/subscription/plans';
+        const url = 'https://api.autonique.in/api/v1/subscription/plans';
         console.log('Full URL:', url);
         const response = await fetch(url);
         console.log('Response status:', response.status);
@@ -93,7 +93,7 @@ export default function PricingPage() {
 
   const fetchUserProfile = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/v1/user-management/profile', {
+      const response = await fetch('https://api.autonique.in/api/v1/user-management/profile', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         }
@@ -121,10 +121,10 @@ export default function PricingPage() {
       }
 
       console.log('Creating order for plan:', planId);
-      console.log('API URL:', 'http://localhost:8000');
+      console.log('API URL:', 'https://api.autonique.in');
 
       // Create Razorpay order
-      const response = await fetch('http://localhost:8000/api/v1/subscription/create-order', {
+      const response = await fetch('https://api.autonique.in/api/v1/subscription/create-order', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -165,7 +165,7 @@ export default function PricingPage() {
         handler: async function (response: any) {
           // Verify payment
           try {
-            const verifyResponse = await fetch('http://localhost:8000/api/v1/subscription/verify-payment', {
+            const verifyResponse = await fetch('https://api.autonique.in/api/v1/subscription/verify-payment', {
               method: 'POST',
               headers: {
                 'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -255,7 +255,7 @@ export default function PricingPage() {
   // Force API call on client side with hardcoded production URL
   if (typeof window !== 'undefined' && !apiCalled) {
     setApiCalled(true);
-    fetch('http://localhost:8000/api/v1/subscription/plans')
+    fetch('https://api.autonique.in/api/v1/subscription/plans')
       .then(response => response.json())
       .then(data => {
         console.log('Forced API response:', data);
