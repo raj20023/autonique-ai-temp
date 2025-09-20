@@ -110,9 +110,38 @@ class UserManagementService:
                     "role": "beta"
                 }
 
-        # Paid user - full access
-        if user.role == "paid" and user.subscription_status == "active":
-            return {"has_access": True, "reason": "Paid subscription", "unlimited": False, "role": "paid"}
+        # Paid user - check subscription status
+        if user.role == "paid":
+            # Check if user has active subscription
+            from app.models.subscription import Subscription, SubscriptionStatus
+            subscription = self.db.query(Subscription).filter(
+                Subscription.user_id == user.id,
+                Subscription.status == SubscriptionStatus.ACTIVE
+            ).first()
+
+            if subscription and subscription.is_active():
+                return {
+                    "has_access": True,
+                    "reason": "Paid subscription",
+                    "unlimited": False,
+                    "role": "paid",
+                    "plan_type": subscription.plan.plan_type.value,
+                    "messages_limit": subscription.plan.monthly_messages,
+                    "messages_used": subscription.messages_used_this_month,
+                    "days_remaining": subscription.days_remaining()
+                }
+            else:
+                # Subscription expired or cancelled, downgrade to normal
+                user.role = "normal"
+                user.subscription_status = "expired"
+                self.db.commit()
+                return {
+                    "has_access": False,
+                    "reason": "Subscription expired",
+                    "trial_expired": True,
+                    "days_remaining": 0,
+                    "role": "normal"
+                }
 
         # Normal user (previously free_trial)
         if user.role == "normal" or user.role == "free_trial":  # Support both old and new naming

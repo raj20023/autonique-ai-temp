@@ -13,7 +13,8 @@ import {
   Download,
   Check,
   AlertTriangle,
-  Building2
+  Building2,
+  CreditCard
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { isAuthenticated } from '@/utils/auth';
@@ -26,6 +27,7 @@ import Card, { CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import AnimatedContainer from '@/components/ui/AnimatedContainer';
 import AutoMascot from '@/components/ui/AutoMascot';
 import { useAutoExpressions } from '@/contexts/AutoContext';
+import SubscriptionDashboard from '@/components/SubscriptionDashboard';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -122,6 +124,7 @@ export default function SettingsPage() {
   const tabs = [
     { id: 'account', name: 'Account', icon: User, description: 'Manage your account information' },
     { id: 'business', name: 'Business Profile', icon: Building2, description: 'Business information and AI personality' },
+    { id: 'subscription', name: 'Subscription', icon: CreditCard, description: 'Manage your subscription and billing' },
     { id: 'instagram', name: 'Instagram', icon: Instagram, description: 'Connected Instagram accounts' },
     { id: 'notifications', name: 'Notifications', icon: Bell, description: 'Notification preferences' },
     { id: 'privacy', name: 'Privacy', icon: Shield, description: 'Privacy and security settings' }
@@ -386,6 +389,13 @@ export default function SettingsPage() {
                       </div>
                     </CardContent>
                   </Card>
+                </AnimatedContainer>
+              )}
+
+              {/* Subscription Tab */}
+              {activeTab === 'subscription' && (
+                <AnimatedContainer animation="slideUp">
+                  <SubscriptionDashboard />
                 </AnimatedContainer>
               )}
 

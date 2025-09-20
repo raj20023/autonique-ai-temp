@@ -37,6 +37,9 @@ pydantic[email]
 pydantic-settings
 python-dotenv
 
+# Payment Gateway
+razorpay==1.4.2
+
 # Additional dependencies that might be needed
 typing-extensions
 email-validator

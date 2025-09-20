@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
+import Script from 'next/script';
 import { motion } from 'framer-motion';
 import { 
   Check, 
@@ -59,28 +60,159 @@ export default function PricingPage() {
     }
   };
 
-  const handleUpgrade = async () => {
+  const handleUpgrade = async (planId: number) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user-management/upgrade-to-paid`, {
+      // Create Razorpay order
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/subscription/create-order`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        }
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ plan_id: planId })
       });
-      
-      if (response.ok) {
-        alert('Successfully upgraded to paid plan!');
-        window.location.href = '/dashboard';
-      } else {
-        alert('Failed to upgrade. Please try again.');
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to create order');
       }
+
+      const orderData = await response.json();
+
+      // Initialize Razorpay
+      const options = {
+        key: orderData.razorpay_key,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'AutoniqueAI',
+        description: `Subscription to ${orderData.plan_name}`,
+        order_id: orderData.order_id,
+        handler: async function (response: any) {
+          // Verify payment
+          try {
+            const verifyResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/subscription/verify-payment`, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+              })
+            });
+
+            if (verifyResponse.ok) {
+              alert('Payment successful! Your subscription is now active.');
+              window.location.href = '/dashboard';
+            } else {
+              alert('Payment verification failed. Please contact support.');
+            }
+          } catch (error) {
+            console.error('Payment verification failed:', error);
+            alert('Payment verification failed. Please contact support.');
+          }
+        },
+        prefill: {
+          name: profile?.user.name || '',
+          email: profile?.user.email || ''
+        },
+        theme: {
+          color: '#3B82F6'
+        }
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+
     } catch (error) {
       console.error('Upgrade failed:', error);
-      alert('Failed to upgrade. Please try again.');
+      alert(`Failed to initiate payment: ${error.message}`);
     }
   };
 
   const plans = [
+    {
+      id: 1,
+      name: "Starter",
+      price: "₹499",
+      period: "/month",
+      description: "Perfect for small businesses starting out",
+      features: [
+        "Up to 200 auto-replies/month",
+        "1 Instagram account",
+        "Basic FAQ setup",
+        "AI-powered responses",
+        "Email support"
+      ],
+      icon: MessageCircle,
+      color: "blue",
+      available: true,
+      current: profile?.user.role === 'paid' && profile?.subscription?.plan_type === 'starter',
+      planType: 'starter'
+    },
+    {
+      id: 2,
+      name: "Growth",
+      price: "₹999",
+      period: "/month",
+      description: "Most popular - ideal for growing businesses",
+      features: [
+        "Up to 1,000 auto-replies/month",
+        "1 Instagram account",
+        "FAQ setup + basic analytics",
+        "Response rate tracking",
+        "Time to first response metrics",
+        "Priority support"
+      ],
+      icon: BarChart3,
+      color: "green",
+      available: true,
+      current: profile?.user.role === 'paid' && profile?.subscription?.plan_type === 'growth',
+      popular: true,
+      planType: 'growth'
+    },
+    {
+      id: 3,
+      name: "Pro",
+      price: "₹2,999",
+      period: "/month",
+      description: "For agencies and serious sellers",
+      features: [
+        "Up to 5,000 auto-replies/month",
+        "Up to 3 Instagram accounts",
+        "Advanced analytics & insights",
+        "Team handoff features",
+        "Multi-brand management",
+        "Dedicated support",
+        "Custom integrations"
+      ],
+      icon: Crown,
+      color: "purple",
+      available: true,
+      current: profile?.user.role === 'paid' && profile?.subscription?.plan_type === 'pro',
+      planType: 'pro'
+    },
+    {
+      name: "Free Trial",
+      price: "Free",
+      description: "14 days full access to Growth plan",
+      features: [
+        "All Growth plan features",
+        "Up to 1,000 messages/month",
+        "AI-powered responses",
+        "FAQ management",
+        "Basic analytics",
+        "Email support"
+      ],
+      icon: Clock,
+      color: "blue",
+      available: true,
+      current: profile?.user.role === 'free_trial' || profile?.user.role === 'normal',
+      trialDays: profile?.subscription?.trial_days_remaining,
+      isTrial: true
+    },
     {
       name: "Beta Access",
       price: "Free",
@@ -93,48 +225,11 @@ export default function PricingPage() {
         "Priority support",
         "Early access to new features"
       ],
-      icon: Crown,
+      icon: Star,
       color: "purple",
       available: profile?.user.is_beta_user || false,
-      current: profile?.user.role === 'beta'
-    },
-    {
-      name: "Free Trial",
-      price: "Free",
-      description: "14 days full access",
-      features: [
-        "All premium features",
-        "Up to 1,000 messages/month",
-        "AI-powered responses",
-        "FAQ management",
-        "Basic analytics",
-        "Email support"
-      ],
-      icon: Clock,
-      color: "blue",
-      available: true,
-      current: profile?.user.role === 'free_trial',
-      trialDays: profile?.subscription.trial_days_remaining
-    },
-    {
-      name: "Pro Plan",
-      price: "$29",
-      period: "/month",
-      description: "For growing businesses",
-      features: [
-        "Unlimited Instagram DM automation",
-        "Advanced AI responses",
-        "Custom FAQ training",
-        "Advanced analytics & insights",
-        "Multi-account management",
-        "Priority support",
-        "Custom integrations"
-      ],
-      icon: Zap,
-      color: "green",
-      available: true,
-      current: profile?.user.role === 'paid',
-      popular: true
+      current: profile?.user.role === 'beta',
+      isBeta: true
     }
   ];
 
@@ -153,6 +248,11 @@ export default function PricingPage() {
         <meta name="description" content="Choose the perfect plan for your Instagram automation needs" />
         <link rel="icon" href="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/logos/favicon_auto.svg" type="image/svg+xml" />
       </Head>
+
+      <Script
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        strategy="lazyOnload"
+      />
 
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="max-w-7xl mx-auto px-4 py-12">
@@ -249,12 +349,24 @@ export default function PricingPage() {
                       <div className="w-full py-3 px-4 bg-gray-100 text-gray-600 rounded-lg font-medium">
                         Current Plan
                       </div>
-                    ) : canUpgrade && plan.name === "Pro Plan" ? (
+                    ) : plan.isTrial ? (
+                      <div className="w-full py-3 px-4 bg-blue-100 text-blue-600 rounded-lg font-medium">
+                        {plan.trialDays ? `${plan.trialDays} days remaining` : 'Active Trial'}
+                      </div>
+                    ) : plan.isBeta ? (
+                      <div className="w-full py-3 px-4 bg-purple-100 text-purple-600 rounded-lg font-medium">
+                        {plan.available ? 'Beta Access' : 'Not Available'}
+                      </div>
+                    ) : canUpgrade && plan.id ? (
                       <button
-                        onClick={handleUpgrade}
-                        className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                        onClick={() => handleUpgrade(plan.id)}
+                        className={`w-full py-3 px-4 text-white rounded-lg font-medium transition-colors ${
+                          plan.popular
+                            ? 'bg-green-600 hover:bg-green-700'
+                            : 'bg-blue-600 hover:bg-blue-700'
+                        }`}
                       >
-                        Upgrade Now
+                        {plan.popular ? 'Choose Popular' : 'Subscribe Now'}
                       </button>
                     ) : !plan.available ? (
                       <div className="w-full py-3 px-4 bg-gray-100 text-gray-500 rounded-lg font-medium">

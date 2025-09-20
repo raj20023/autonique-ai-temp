@@ -41,6 +41,8 @@ class User(Base):
     faqs = relationship("FAQ", back_populates="user", cascade="all, delete-orphan")
     messages = relationship("Message", back_populates="user", cascade="all, delete-orphan")
     business_profile = relationship("BusinessProfile", back_populates="user", cascade="all, delete-orphan", uselist=False)
+    subscription = relationship("Subscription", back_populates="user", uselist=False)
+    payments = relationship("Payment", back_populates="user")
 
     def is_trial_expired(self):
         """Check if trial period has expired"""

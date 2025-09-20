@@ -27,7 +27,11 @@ class Settings(BaseSettings):
     CHROMA_API_KEY: str
     CHROMA_TENANT: str = "d3efa8ab-c029-47bf-afe9-4e0ca29bf288"
     CHROMA_DATABASE: str = "ig_bot"
-    
+
+    # Razorpay
+    RAZORPAY_KEY_ID: str = "rzp_live_RJqmheBoVjM38M"
+    RAZORPAY_KEY_SECRET: str = "rFuTDoy90yRSuOQsl3hkTMv4"
+
     # JWT
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"

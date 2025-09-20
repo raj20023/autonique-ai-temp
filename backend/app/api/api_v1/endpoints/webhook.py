@@ -486,6 +486,21 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
             # Try to find FAQ match for logging
             faq_match = await faq_service.find_matching_faq(db, user.id, message_text)
 
+            # Check subscription limits before sending
+            from app.models.subscription import Subscription, SubscriptionStatus
+            subscription = db.query(Subscription).filter(
+                Subscription.user_id == user.id,
+                Subscription.status == SubscriptionStatus.ACTIVE
+            ).first()
+
+            if subscription and not subscription.can_send_messages():
+                logger.warning(f"⚠️ User {user.id} has reached monthly message limit ({subscription.messages_used_this_month}/{subscription.plan.monthly_messages})")
+                # Still save the message but don't send auto-reply
+                message_record.auto_replied = False
+                message_record.response_text = "Monthly message limit reached"
+                db.commit()
+                return
+
             # Send reply via Instagram
             instagram_service = InstagramService()
 
@@ -575,6 +590,11 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
                 message_record.response_text = response_text
                 message_record.auto_replied = True
                 message_record.reply_sent_at = datetime.now(timezone.utc)
+
+                # Increment subscription usage counter
+                if subscription:
+                    subscription.messages_used_this_month += 1
+                    logger.info(f"📊 Updated usage: {subscription.messages_used_this_month}/{subscription.plan.monthly_messages}")
 
                 logger.info(f"Smart auto-reply sent to {sender_id} for message {message_id}")
             else:

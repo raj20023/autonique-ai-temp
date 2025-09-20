@@ -17,8 +17,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { isAuthenticated } from '@/utils/auth';
 import SubscriptionBanner from '@/components/SubscriptionBanner';
 import LimitedAccessBanner from '@/components/LimitedAccessBanner';
+import SubscriptionDashboard from '@/components/SubscriptionDashboard';
 import AutoMascot, { AutoLoader } from '@/components/ui/AutoMascot';
 import { useAutoExpressions } from '@/contexts/AutoContext';
+import { useSubscription } from '@/hooks/useSubscription';
 
 // API function to get user statistics
 const getUserStats = async () => {
@@ -43,6 +45,7 @@ export default function DashboardPage() {
   const { user, isLoggedIn } = useAuth();
   const [isClient, setIsClient] = useState(false);
   const { showSuccess } = useAutoExpressions();
+  const { currentSubscription, usageStats } = useSubscription();
 
 
 
@@ -85,6 +88,8 @@ export default function DashboardPage() {
 
   const activeFAQs = stats?.active_faqs || 0;
   const connectedPages = stats?.connected_pages || 0;
+  const messagesUsed = usageStats?.messages_used || 0;
+  const messagesLimit = usageStats?.messages_limit || 0;
 
   return (
     <>
