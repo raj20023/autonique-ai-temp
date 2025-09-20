@@ -28,12 +28,12 @@ export const useSubscription = () => {
   );
 
   // Get current subscription
-  const { 
-    data: currentSubscription, 
-    isLoading: subscriptionLoading, 
+  const {
+    data: currentSubscription,
+    isLoading: subscriptionLoading,
     error: subscriptionError,
     refetch: refetchSubscription
-  } = useQuery<Subscription>(
+  } = useQuery<Subscription | null>(
     'current-subscription',
     () => subscriptionApi.getCurrentSubscription(),
     {
@@ -60,15 +60,15 @@ export const useSubscription = () => {
   );
 
   // Get payment history
-  const { 
-    data: paymentHistory, 
-    isLoading: paymentsLoading, 
-    error: paymentsError 
+  const {
+    data: paymentHistory,
+    isLoading: paymentsLoading,
+    error: paymentsError
   } = useQuery<Payment[]>(
     'payment-history',
     () => subscriptionApi.getPaymentHistory(),
     {
-      enabled: isClient && isAuthenticated(),
+      enabled: isClient && isAuthenticated() && !!currentSubscription,
       staleTime: 5 * 60 * 1000, // 5 minutes
     }
   );

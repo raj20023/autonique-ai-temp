@@ -112,18 +112,18 @@ class SubscriptionApi {
     return response.json();
   }
 
-  async getCurrentSubscription(): Promise<Subscription> {
+  async getCurrentSubscription(): Promise<Subscription | null> {
     const response = await fetch(`${API_BASE_URL}/api/v1/subscription/current`, {
       headers: this.getAuthHeaders()
     });
-    
+
     if (!response.ok) {
       if (response.status === 404) {
-        throw new Error('No subscription found');
+        return null; // No subscription found is normal for new users
       }
       throw new Error('Failed to fetch subscription');
     }
-    
+
     return response.json();
   }
 
