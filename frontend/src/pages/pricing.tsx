@@ -121,10 +121,10 @@ export default function PricingPage() {
       }
 
       console.log('Creating order for plan:', planId);
-      console.log('API URL:', 'https://api.autonique.in');
+      console.log('API URL:', 'http://localhost:8000');
 
       // Create Razorpay order
-      const response = await fetch('https://api.autonique.in/api/v1/subscription/create-order', {
+      const response = await fetch('http://localhost:8000/api/v1/subscription/create-order', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -165,7 +165,7 @@ export default function PricingPage() {
         handler: async function (response: any) {
           // Verify payment
           try {
-            const verifyResponse = await fetch('https://api.autonique.in/api/v1/subscription/verify-payment', {
+            const verifyResponse = await fetch('http://localhost:8000/api/v1/subscription/verify-payment', {
               method: 'POST',
               headers: {
                 'Authorization': `Bearer ${localStorage.getItem('access_token')}`,

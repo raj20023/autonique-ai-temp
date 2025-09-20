@@ -27,7 +27,7 @@ class Plan(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)  # "Starter", "Growth", "Pro"
-    plan_type = Column(Enum(PlanType), nullable=False)
+    plan_type = Column(String, nullable=False)  # Use string instead of enum
     price = Column(Float, nullable=False)  # Price in INR
     currency = Column(String, default="INR")
     
@@ -62,7 +62,7 @@ class Subscription(Base):
     razorpay_plan_id = Column(String, nullable=True)
     
     # Subscription details
-    status = Column(Enum(SubscriptionStatus), default=SubscriptionStatus.PENDING)
+    status = Column(String, default="pending")  # Use string instead of enum to avoid conversion issues
     start_date = Column(DateTime(timezone=True), nullable=True)
     end_date = Column(DateTime(timezone=True), nullable=True)
     next_billing_date = Column(DateTime(timezone=True), nullable=True)
@@ -121,7 +121,7 @@ class Payment(Base):
     # Payment details
     amount = Column(Float, nullable=False)  # Amount in INR
     currency = Column(String, default="INR")
-    status = Column(Enum(PaymentStatus), default=PaymentStatus.PENDING)
+    status = Column(String, default="pending")  # Use string instead of enum to avoid conversion issues
     
     # Billing period
     billing_start = Column(DateTime(timezone=True), nullable=True)
