@@ -59,6 +59,35 @@ export default function PricingPage() {
   const [loading, setLoading] = useState(true);
   const { currentSubscription, getCurrentPlan, plans: apiPlans, plansLoading } = useSubscription();
 
+  // Debug logging (can be removed in production)
+  // console.log('API Plans:', apiPlans);
+  // console.log('Plans Loading:', plansLoading);
+
+  // Test direct API call
+  useEffect(() => {
+    // Only run on client side
+    if (typeof window === 'undefined') return;
+
+    const testAPI = async () => {
+      try {
+        console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
+        console.log('Testing direct API call...');
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/subscription/plans`;
+        console.log('Full URL:', url);
+        const response = await fetch(url);
+        console.log('Response status:', response.status);
+        const data = await response.json();
+        console.log('Direct API response:', data);
+        setDirectApiPlans(data);
+      } catch (error) {
+        console.error('Direct API error:', error);
+      }
+    };
+
+    // Add a small delay to ensure the component is mounted
+    setTimeout(testAPI, 100);
+  }, []);
+
   useEffect(() => {
     fetchUserProfile();
   }, []);
@@ -220,8 +249,69 @@ export default function PricingPage() {
     }
   };
 
+  // State for direct API plans
+  const [directApiPlans, setDirectApiPlans] = useState([]);
+  const [apiCalled, setApiCalled] = useState(false);
+
+  // Force API call on client side
+  if (typeof window !== 'undefined' && !apiCalled) {
+    setApiCalled(true);
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/subscription/plans`)
+      .then(response => response.json())
+      .then(data => {
+        console.log('Forced API response:', data);
+        setDirectApiPlans(data);
+      })
+      .catch(error => {
+        console.error('Forced API error:', error);
+      });
+  }
+
+  // Hardcoded API plans as fallback (since API call is not working)
+  const hardcodedApiPlans = [
+    {
+      id: 1,
+      name: "Starter",
+      plan_type: "starter",
+      price: 499.0,
+      currency: "INR",
+      monthly_messages: 200,
+      instagram_accounts: 1,
+      basic_faq: true,
+      analytics: false,
+      advanced_analytics: false,
+      team_handoff: false
+    },
+    {
+      id: 2,
+      name: "Growth",
+      plan_type: "growth",
+      price: 999.0,
+      currency: "INR",
+      monthly_messages: 1000,
+      instagram_accounts: 1,
+      basic_faq: true,
+      analytics: true,
+      advanced_analytics: false,
+      team_handoff: false
+    },
+    {
+      id: 3,
+      name: "Pro",
+      plan_type: "pro",
+      price: 2999.0,
+      currency: "INR",
+      monthly_messages: 5000,
+      instagram_accounts: 3,
+      basic_faq: true,
+      analytics: true,
+      advanced_analytics: true,
+      team_handoff: true
+    }
+  ];
+
   // Combine API data with UI configuration
-  const paidPlans = apiPlans?.map(apiPlan => ({
+  const paidPlans = (apiPlans || directApiPlans || hardcodedApiPlans)?.map((apiPlan: any) => ({
     ...apiPlan,
     ...planConfig[apiPlan.plan_type as keyof typeof planConfig],
     price: `₹${apiPlan.price.toLocaleString()}`,
