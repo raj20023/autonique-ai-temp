@@ -13,16 +13,27 @@ import {
   Star
 } from 'lucide-react';
 import { BetaUserBadge, AccessStatusIndicator } from '@/components/SubscriptionBanner';
+import { useSubscription } from '@/hooks/useSubscription';
 
 interface UserProfile {
   user: {
+    id: number;
+    name: string;
+    email?: string;
+    profile_picture?: string;
     role: string;
     is_beta_user: boolean;
     beta_user_number?: number;
-    name: string;
+    created_at: string;
+    last_login?: string;
   };
   subscription: {
+    status?: string;
+    trial_start_date?: string;
+    trial_end_date?: string;
     trial_days_remaining?: number;
+    subscription_start_date?: string;
+    subscription_end_date?: string;
   };
   access: {
     has_access: boolean;
@@ -30,12 +41,21 @@ interface UserProfile {
     trial_active?: boolean;
     trial_expired?: boolean;
     days_remaining?: number;
+    unlimited?: boolean;
+    role?: string;
+  };
+  usage?: {
+    total_messages: number;
+    auto_replies_sent: number;
+    active_faqs: number;
+    connected_pages: number;
   };
 }
 
 export default function PricingPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const { currentSubscription, getCurrentPlan } = useSubscription();
 
   useEffect(() => {
     fetchUserProfile();
@@ -128,7 +148,7 @@ export default function PricingPage() {
 
     } catch (error) {
       console.error('Upgrade failed:', error);
-      alert(`Failed to initiate payment: ${error.message}`);
+      alert(`Failed to initiate payment: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -149,7 +169,7 @@ export default function PricingPage() {
       icon: MessageCircle,
       color: "blue",
       available: true,
-      current: profile?.user.role === 'paid' && profile?.subscription?.plan_type === 'starter',
+      current: profile?.user.role === 'paid' && getCurrentPlan()?.plan_type === 'starter',
       planType: 'starter'
     },
     {
@@ -169,7 +189,7 @@ export default function PricingPage() {
       icon: BarChart3,
       color: "green",
       available: true,
-      current: profile?.user.role === 'paid' && profile?.subscription?.plan_type === 'growth',
+      current: profile?.user.role === 'paid' && getCurrentPlan()?.plan_type === 'growth',
       popular: true,
       planType: 'growth'
     },
@@ -191,7 +211,7 @@ export default function PricingPage() {
       icon: Crown,
       color: "purple",
       available: true,
-      current: profile?.user.role === 'paid' && profile?.subscription?.plan_type === 'pro',
+      current: profile?.user.role === 'paid' && getCurrentPlan()?.plan_type === 'pro',
       planType: 'pro'
     },
     {

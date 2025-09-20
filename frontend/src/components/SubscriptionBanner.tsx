@@ -13,14 +13,31 @@ interface SubscriptionStatus {
 
 interface UserProfile {
   user: {
+    id: number;
+    name: string;
+    email?: string;
+    profile_picture?: string;
     role: string;
     is_beta_user: boolean;
     beta_user_number?: number;
+    created_at: string;
+    last_login?: string;
   };
   subscription: {
+    status?: string;
+    trial_start_date?: string;
+    trial_end_date?: string;
     trial_days_remaining?: number;
+    subscription_start_date?: string;
+    subscription_end_date?: string;
   };
   access: SubscriptionStatus;
+  usage?: {
+    total_messages: number;
+    auto_replies_sent: number;
+    active_faqs: number;
+    connected_pages: number;
+  };
 }
 
 export default function SubscriptionBanner() {
