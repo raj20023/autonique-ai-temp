@@ -327,9 +327,9 @@ export default function PricingPage() {
           {/* Pricing Cards */}
           <div className="grid md:grid-cols-3 gap-8 mb-16">
             {plans.map((plan, index) => {
-              const Icon = plan.icon;
-              const isCurrentPlan = plan.current;
-              const canUpgrade = !isCurrentPlan && plan.available;
+              const Icon = (plan as any).icon || MessageCircle;
+              const isCurrentPlan = (plan as any).current;
+              const canUpgrade = !isCurrentPlan && (plan as any).available;
               
               return (
                 <motion.div
@@ -338,10 +338,10 @@ export default function PricingPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                   className={`relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg p-8 ${
-                    plan.popular ? 'ring-2 ring-purple-500' : ''
-                  } ${!plan.available ? 'opacity-60' : ''}`}
+                    (plan as any).popular ? 'ring-2 ring-purple-500' : ''
+                  } ${!(plan as any).available ? 'opacity-60' : ''}`}
                 >
-                  {plan.popular && (
+                  {(plan as any).popular && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                       <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center">
                         <Star className="h-4 w-4 mr-1" />
@@ -351,8 +351,8 @@ export default function PricingPage() {
                   )}
 
                   <div className="text-center mb-8">
-                    <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-${plan.color}-100 mb-4`}>
-                      <Icon className={`h-8 w-8 text-${plan.color}-600`} />
+                    <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-${(plan as any).color || 'blue'}-100 mb-4`}>
+                      <Icon className={`h-8 w-8 text-${(plan as any).color || 'blue'}-600`} />
                     </div>
                     
                     <h3 className="text-2xl font-bold text-white mb-2">
@@ -363,22 +363,22 @@ export default function PricingPage() {
                       <span className="text-4xl font-bold text-white">
                         {plan.price}
                       </span>
-                      {plan.period && (
-                        <span className="text-white/60">{plan.period}</span>
+                      {(plan as any).period && (
+                        <span className="text-white/60">{(plan as any).period}</span>
                       )}
                     </div>
 
-                    <p className="text-white/70">{plan.description}</p>
-                    
-                    {plan.trialDays !== undefined && (
+                    <p className="text-white/70">{(plan as any).description || `${plan.name} plan features`}</p>
+
+                    {(plan as any).trialDays !== undefined && (
                       <div className="mt-2 text-sm text-purple-400 font-medium">
-                        {plan.trialDays} days remaining
+                        {(plan as any).trialDays} days remaining
                       </div>
                     )}
                   </div>
 
                   <ul className="space-y-4 mb-8">
-                    {plan.features.map((feature, featureIndex) => (
+                    {((plan as any).features || []).map((feature: string, featureIndex: number) => (
                       <li key={featureIndex} className="flex items-start">
                         <Check className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
                         <span className="text-white/80">{feature}</span>
@@ -391,26 +391,26 @@ export default function PricingPage() {
                       <div className="w-full py-3 px-4 bg-white/10 text-white/80 rounded-lg font-medium border border-white/20">
                         Current Plan
                       </div>
-                    ) : plan.isTrial ? (
+                    ) : (plan as any).isTrial ? (
                       <div className="w-full py-3 px-4 bg-blue-500/20 text-blue-300 rounded-lg font-medium border border-blue-500/30">
-                        {plan.trialDays ? `${plan.trialDays} days remaining` : 'Active Trial'}
+                        {(plan as any).trialDays ? `${(plan as any).trialDays} days remaining` : 'Active Trial'}
                       </div>
-                    ) : plan.isBeta ? (
+                    ) : (plan as any).isBeta ? (
                       <div className="w-full py-3 px-4 bg-purple-500/20 text-purple-300 rounded-lg font-medium border border-purple-500/30">
                         {plan.available ? 'Beta Access' : 'Not Available'}
                       </div>
-                    ) : canUpgrade && plan.id ? (
+                    ) : canUpgrade && (plan as any).id ? (
                       <button
-                        onClick={() => handleUpgrade(plan.id)}
+                        onClick={() => handleUpgrade((plan as any).id)}
                         className={`w-full py-3 px-4 text-white rounded-lg font-medium transition-all duration-300 ${
-                          plan.popular
+                          (plan as any).popular
                             ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-lg shadow-purple-500/25'
                             : 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-lg shadow-blue-500/25'
                         }`}
                       >
-                        {plan.popular ? 'Choose Popular' : 'Subscribe Now'}
+                        {(plan as any).popular ? 'Choose Popular' : 'Subscribe Now'}
                       </button>
-                    ) : !plan.available ? (
+                    ) : !(plan as any).available ? (
                       <div className="w-full py-3 px-4 bg-white/5 text-white/40 rounded-lg font-medium border border-white/10">
                         Not Available
                       </div>
