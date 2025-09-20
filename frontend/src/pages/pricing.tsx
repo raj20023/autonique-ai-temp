@@ -123,9 +123,10 @@ export default function PricingPage() {
       console.log('Creating order for plan:', planId);
       console.log('API URL:', 'https://api.autonique.in');
 
-      // Check if user has existing subscription to determine endpoint
+      // Check if user has existing ACTIVE subscription to determine endpoint
       const currentPlan = getCurrentPlan();
-      const isUpgrade = currentPlan && currentPlan.id !== planId;
+      const hasActiveSubscription = currentSubscription && currentSubscription.status === 'active';
+      const isUpgrade = hasActiveSubscription && currentPlan && currentPlan.id !== planId;
 
       const endpoint = isUpgrade
         ? 'https://api.autonique.in/api/v1/subscription/upgrade'
