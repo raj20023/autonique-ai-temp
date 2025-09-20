@@ -1,5 +1,5 @@
-// Temporarily use local backend to test the enum fix
-const API_BASE_URL = 'http://localhost:8000';
+// Use production API URL
+const API_BASE_URL = 'https://api.autonique.in';
 
 export interface Plan {
   id: number;
