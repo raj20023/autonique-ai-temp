@@ -17,6 +17,10 @@ FACEBOOK_GRAPH_API_VERSION=v23.0
 # Google Gemini
 GOOGLE_API_KEY=AIzaSyBeQ8iKyP-_6r4F5QtOG2QU-jErZSNO7cc
 
+# Razorpay Payment Gateway
+RAZORPAY_KEY_ID=rzp_live_RJqmheBoVjM38M
+RAZORPAY_KEY_SECRET=rFuTDoy90yRSuOQsl3hkTMv4
+
 # JWT Security
 JWT_SECRET_KEY=your_super_secret_jwt_key_here
 JWT_ALGORITHM=HS256

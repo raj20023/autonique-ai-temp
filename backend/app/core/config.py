@@ -29,8 +29,8 @@ class Settings(BaseSettings):
     CHROMA_DATABASE: str = "ig_bot"
 
     # Razorpay
-    RAZORPAY_KEY_ID: str = "rzp_live_RJqmheBoVjM38M"
-    RAZORPAY_KEY_SECRET: str = "rFuTDoy90yRSuOQsl3hkTMv4"
+    RAZORPAY_KEY_ID: str = os.getenv("RAZORPAY_KEY_ID", "rzp_live_RJqmheBoVjM38M")
+    RAZORPAY_KEY_SECRET: str = os.getenv("RAZORPAY_KEY_SECRET", "rFuTDoy90yRSuOQsl3hkTMv4")
 
     # JWT
     JWT_SECRET_KEY: str
