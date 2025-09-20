@@ -25,7 +25,7 @@ export default function AdminTest() {
 
       addResult(`🔍 Token length: ${token.length} characters`);
 
-      // Use the same hardcoded API URL as the main app
+      // Use hardcoded production API URL (Railway env vars don't work well with frontend)
       const API_URL = 'https://api.autonique.in';
       addResult(`🌐 API URL: ${API_URL}`);
 

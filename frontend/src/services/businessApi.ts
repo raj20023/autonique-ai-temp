@@ -1,4 +1,4 @@
-// Force production API URL since Railway env vars aren't working
+// Use hardcoded production API URL (Railway env vars don't work well with frontend)
 const API_BASE_URL = 'https://api.autonique.in';
 
 export interface BusinessProfile {

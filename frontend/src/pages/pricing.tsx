@@ -63,16 +63,15 @@ export default function PricingPage() {
   // console.log('API Plans:', apiPlans);
   // console.log('Plans Loading:', plansLoading);
 
-  // Test direct API call
+  // Test direct API call with hardcoded production URL
   useEffect(() => {
     // Only run on client side
     if (typeof window === 'undefined') return;
 
     const testAPI = async () => {
       try {
-        console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
         console.log('Testing direct API call...');
-        const url = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/subscription/plans`;
+        const url = 'https://api.autonique.in/api/v1/subscription/plans';
         console.log('Full URL:', url);
         const response = await fetch(url);
         console.log('Response status:', response.status);
@@ -253,10 +252,10 @@ export default function PricingPage() {
   const [directApiPlans, setDirectApiPlans] = useState([]);
   const [apiCalled, setApiCalled] = useState(false);
 
-  // Force API call on client side
+  // Force API call on client side with hardcoded production URL
   if (typeof window !== 'undefined' && !apiCalled) {
     setApiCalled(true);
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/subscription/plans`)
+    fetch('https://api.autonique.in/api/v1/subscription/plans')
       .then(response => response.json())
       .then(data => {
         console.log('Forced API response:', data);
