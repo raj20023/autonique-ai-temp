@@ -1,12 +1,12 @@
 from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
-from app.models.subscription import PlanType, SubscriptionStatus, PaymentStatus
+# Removed enum imports since we're using strings now
 
 # Plan schemas
 class PlanBase(BaseModel):
     name: str
-    plan_type: PlanType
+    plan_type: str
     price: float
     currency: str = "INR"
     monthly_messages: int
@@ -41,7 +41,7 @@ class SubscriptionResponse(SubscriptionBase):
     user_id: int
     razorpay_subscription_id: Optional[str] = None
     razorpay_plan_id: Optional[str] = None
-    status: SubscriptionStatus
+    status: str
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
     next_billing_date: Optional[datetime] = None
@@ -73,7 +73,7 @@ class PaymentResponse(PaymentBase):
     razorpay_payment_id: Optional[str] = None
     razorpay_order_id: Optional[str] = None
     razorpay_signature: Optional[str] = None
-    status: PaymentStatus
+    status: str
     billing_start: Optional[datetime] = None
     billing_end: Optional[datetime] = None
     payment_method: Optional[str] = None

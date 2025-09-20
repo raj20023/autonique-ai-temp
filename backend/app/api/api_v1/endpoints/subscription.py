@@ -7,7 +7,7 @@ from app.core.database import get_db
 from app.core.config import settings
 from app.api.deps import get_current_active_user
 from app.models.user import User
-from app.models.subscription import Plan, Subscription, Payment, SubscriptionStatus
+from app.models.subscription import Plan, Subscription, Payment
 from app.schemas.subscription import (
     PlanResponse, SubscriptionResponse, PaymentResponse,
     SubscriptionCreateRequest, RazorpayPaymentVerification,

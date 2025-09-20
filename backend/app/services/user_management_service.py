@@ -125,7 +125,7 @@ class UserManagementService:
                     "reason": "Paid subscription",
                     "unlimited": False,
                     "role": "paid",
-                    "plan_type": subscription.plan.plan_type.value,
+                    "plan_type": subscription.plan.plan_type,
                     "messages_limit": subscription.plan.monthly_messages,
                     "messages_used": subscription.messages_used_this_month,
                     "days_remaining": subscription.days_remaining()
@@ -298,7 +298,7 @@ class UserManagementService:
         
         if setting:
             setting.value = value
-            setting.updated_at = datetime.utcnow()
+            setting.updated_at = datetime.now(timezone.utc)
         else:
             setting = AdminSettings(key=key, value=value)
             self.db.add(setting)

@@ -84,7 +84,7 @@ class Subscription(Base):
 
     def is_active(self):
         """Check if subscription is currently active"""
-        if self.status != SubscriptionStatus.ACTIVE:
+        if self.status != "active":
             return False
         if self.end_date and datetime.now(timezone.utc) > self.end_date:
             return False
