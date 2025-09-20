@@ -4,6 +4,7 @@ from typing import List
 import logging
 
 from app.core.database import get_db
+from app.core.config import settings
 from app.api.deps import get_current_active_user
 from app.models.user import User
 from app.models.subscription import Plan, Subscription, Payment, SubscriptionStatus
@@ -74,7 +75,7 @@ async def create_subscription_order(
             "currency": order_data["order"]["currency"],
             "plan_name": order_data["plan"].name,
             "plan_price": order_data["plan"].price,
-            "razorpay_key": "rzp_live_RJqmheBoVjM38M"  # Public key is safe to expose
+            "razorpay_key": settings.RAZORPAY_KEY_ID  # Use the configured key (test or live)
         }
         
     except Exception as e:

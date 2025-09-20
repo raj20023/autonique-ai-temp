@@ -1,8 +1,8 @@
 import axios, { AxiosResponse } from 'axios';
 import { AuthToken, User, Page, FAQ, FAQCreateData, FAQUpdateData } from '@/types';
 
-// Use hardcoded production API URL (Railway env vars don't work well with frontend)
-const API_BASE_URL = 'https://api.autonique.in';
+// Temporarily use local backend for testing the enum fix
+const API_BASE_URL = 'http://localhost:8000';
 
 // Create axios instance
 const api = axios.create({

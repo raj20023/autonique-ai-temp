@@ -25,8 +25,8 @@ export default function AdminTest() {
 
       addResult(`🔍 Token length: ${token.length} characters`);
 
-      // Use hardcoded production API URL (Railway env vars don't work well with frontend)
-      const API_URL = 'https://api.autonique.in';
+      // Temporarily use local backend for testing the enum fix
+      const API_URL = 'http://localhost:8000';
       addResult(`🌐 API URL: ${API_URL}`);
 
       const headers = { 'Authorization': `Bearer ${token}` };

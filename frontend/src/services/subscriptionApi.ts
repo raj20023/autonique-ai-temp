@@ -1,5 +1,5 @@
-// Subscription API service - use hardcoded production URL (Railway env vars don't work well with frontend)
-const API_BASE_URL = 'https://api.autonique.in';
+// Subscription API service - temporarily use local backend for testing the enum fix
+const API_BASE_URL = 'http://localhost:8000';
 
 export interface Plan {
   id: number;

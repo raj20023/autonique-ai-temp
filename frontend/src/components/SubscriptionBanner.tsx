@@ -51,7 +51,7 @@ export default function SubscriptionBanner() {
 
   const fetchUserProfile = async () => {
     try {
-      const response = await fetch('https://api.autonique.in/api/v1/user-management/profile', {
+      const response = await fetch('http://localhost:8000/api/v1/user-management/profile', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         }
