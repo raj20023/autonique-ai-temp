@@ -242,7 +242,7 @@ export default function PricingPage() {
       features: [
         "Up to 1,000 auto-replies/month",
         "1 Instagram account",
-        "FAQ setup + basic analytics",
+        "FAQ setup + basic analytics (message count, response rate)",
         "Response rate tracking",
         "Time to first response metrics",
         "Priority support"
@@ -254,7 +254,7 @@ export default function PricingPage() {
       features: [
         "Up to 5,000 auto-replies/month",
         "Up to 3 Instagram accounts",
-        "Advanced analytics & insights",
+        "Advanced analytics (customer insights, peak hours, sentiment analysis)",
         "Team handoff features",
         "Multi-brand management",
         "Dedicated support",
@@ -345,7 +345,7 @@ export default function PricingPage() {
         "Up to 1,000 messages/month",
         "AI-powered responses",
         "FAQ management",
-        "Basic analytics",
+        "Basic analytics (message count, response rate)",
         "Email support"
       ],
       icon: Clock,
@@ -363,7 +363,7 @@ export default function PricingPage() {
         "Unlimited Instagram DM automation",
         "AI-powered responses",
         "FAQ management",
-        "Real-time analytics",
+        "Real-time analytics & insights",
         "Priority support",
         "Early access to new features"
       ],
@@ -441,7 +441,7 @@ export default function PricingPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className={`relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg p-8 ${
+                  className={`relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg p-8 flex flex-col h-full ${
                     (plan as any).popular ? 'ring-2 ring-purple-500' : ''
                   } ${!(plan as any).available ? 'opacity-60' : ''}`}
                 >
@@ -481,7 +481,7 @@ export default function PricingPage() {
                     )}
                   </div>
 
-                  <ul className="space-y-4 mb-8">
+                  <ul className="space-y-4 mb-8 flex-grow">
                     {((plan as any).features || []).map((feature: string, featureIndex: number) => (
                       <li key={featureIndex} className="flex items-start">
                         <Check className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
@@ -490,7 +490,7 @@ export default function PricingPage() {
                     ))}
                   </ul>
 
-                  <div className="text-center">
+                  <div className="text-center mt-auto pt-4">
                     {isCurrentPlan ? (
                       <div className="w-full py-3 px-4 bg-white/10 text-white/80 rounded-lg font-medium border border-white/20">
                         Current Plan
@@ -584,32 +584,68 @@ export default function PricingPage() {
             className="text-center bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 mb-8"
           >
             <h2 className="text-2xl font-bold text-white mb-4">
-              Ready to Transform Your Instagram Business?
+              {profile?.user.role === 'paid'
+                ? 'Manage Your Subscription'
+                : profile?.user.role === 'beta'
+                ? 'Enjoying Your Beta Access?'
+                : 'Ready to Transform Your Instagram Business?'
+              }
             </h2>
             <p className="text-white/70 mb-6 max-w-2xl mx-auto">
-              Join thousands of businesses already using AutoniqueAI to automate their Instagram customer service and boost sales.
+              {profile?.user.role === 'paid'
+                ? 'You\'re all set! Manage your subscription or upgrade to unlock more features.'
+                : profile?.user.role === 'beta'
+                ? 'You have unlimited access during the beta period. Upgrade to a paid plan to continue after beta ends.'
+                : 'Join thousands of businesses already using AutoniqueAI to automate their Instagram customer service and boost sales.'
+              }
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Link href="/auth/login">
-                  <button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300">
-                    Start Free Trial
-                  </button>
-                </Link>
-              </motion.div>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Link href="/demo">
-                  <button className="bg-white/10 hover:bg-white/20 text-white px-8 py-3 rounded-full font-semibold border border-white/30 backdrop-blur-xl transition-all duration-300">
-                    View Demo
-                  </button>
-                </Link>
-              </motion.div>
+              {profile?.user.role === 'paid' ? (
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Link href="/dashboard/subscription">
+                    <button className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300">
+                      Manage Subscription
+                    </button>
+                  </Link>
+                </motion.div>
+              ) : profile?.user.role === 'beta' ? (
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Link href="/dashboard">
+                    <button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300">
+                      Go to Dashboard
+                    </button>
+                  </Link>
+                </motion.div>
+              ) : (
+                <>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Link href="/auth/login">
+                      <button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300">
+                        Start Free Trial
+                      </button>
+                    </Link>
+                  </motion.div>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Link href="/demo">
+                      <button className="bg-white/10 hover:bg-white/20 text-white px-8 py-3 rounded-full font-semibold border border-white/30 backdrop-blur-xl transition-all duration-300">
+                        View Demo
+                      </button>
+                    </Link>
+                  </motion.div>
+                </>
+              )}
             </div>
           </motion.div>
 
