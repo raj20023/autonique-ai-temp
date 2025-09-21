@@ -242,7 +242,7 @@ export default function PricingPage() {
       features: [
         "Up to 1,000 auto-replies/month",
         "1 Instagram account",
-        "FAQ setup + basic analytics (message count, response rate)",
+        "FAQ setup + message tracking",
         "Response rate tracking",
         "Time to first response metrics",
         "Priority support"
@@ -254,7 +254,7 @@ export default function PricingPage() {
       features: [
         "Up to 5,000 auto-replies/month",
         "Up to 3 Instagram accounts",
-        "Advanced analytics (customer insights, peak hours, sentiment analysis)",
+        "Real-time message monitoring & performance tracking",
         "Team handoff features",
         "Multi-brand management",
         "Dedicated support",
@@ -345,7 +345,7 @@ export default function PricingPage() {
         "Up to 1,000 messages/month",
         "AI-powered responses",
         "FAQ management",
-        "Basic analytics (message count, response rate)",
+        "Message tracking & response rates",
         "Email support"
       ],
       icon: Clock,
@@ -363,7 +363,7 @@ export default function PricingPage() {
         "Unlimited Instagram DM automation",
         "AI-powered responses",
         "FAQ management",
-        "Real-time analytics & insights",
+        "Live message monitoring",
         "Priority support",
         "Early access to new features"
       ],
