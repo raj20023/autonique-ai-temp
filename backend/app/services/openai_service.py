@@ -138,6 +138,9 @@ class OpenAIService:
             if faq_context != "No FAQ found":
                 system_prompt = f"""You are a helpful customer service assistant for an Instagram business.{business_info}
 
+IMPORTANT: Detect the language of the user's message and respond in the SAME language.
+If the user writes in Spanish, respond in Spanish. If in Hindi, respond in Hindi. If in English, respond in English, etc.
+
 Based on this FAQ information: "{faq_context}"
 
 Please provide a natural, conversational response that:
@@ -147,10 +150,14 @@ Please provide a natural, conversational response that:
 4. Incorporates business personality and tone if provided
 5. Maintains a friendly, professional tone consistent with the brand
 6. Feels like a continuation of the conversation, not a robotic response
+7. Responds in the same language as the user's message
 
 Keep the response concise and helpful."""
             else:
                 system_prompt = f"""You are a helpful customer service assistant for an Instagram business.{business_info}
+
+IMPORTANT: Detect the language of the user's message and respond in the SAME language.
+If the user writes in Spanish, respond in Spanish. If in Hindi, respond in Hindi. If in English, respond in English, etc.
 
 Since no specific FAQ matches this question, please provide a helpful response that:
 1. Acknowledges the conversation history if relevant
@@ -159,6 +166,7 @@ Since no specific FAQ matches this question, please provide a helpful response t
 4. Maintains conversation continuity
 5. Uses the business personality and communication style if provided
 6. Suggests they wait for a human representative if the query is complex
+7. Responds in the same language as the user's message
 
 Keep the response natural and conversational, reflecting the business brand."""
 

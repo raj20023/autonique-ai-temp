@@ -46,19 +46,25 @@ class LangChainManager:
             input_variables=["user_message", "faq_answer"],
             template="""You are a helpful customer service assistant for this Instagram business.
 
+            IMPORTANT: Detect the language of the user's message and respond in the SAME language.
+            If the user writes in Spanish, respond in Spanish. If in Hindi, respond in Hindi. If in English, respond in English, etc.
+
             Personalize the following FAQ answer to respond naturally to the user's message.
             Keep it friendly, conversational, and professional.
 
             User message: {user_message}
             FAQ answer: {faq_answer}
 
-            Personalized response:"""
+            Personalized response (in the same language as the user's message):"""
         )
 
         # Response with relevance check prompt
         self.relevance_response_prompt = PromptTemplate(
             input_variables=["user_message", "faq_answer", "faq_question"],
             template="""You are a helpful customer service assistant for this Instagram business.
+
+            IMPORTANT: Detect the language of the user's message and respond in the SAME language.
+            If the user writes in Spanish, respond in Spanish. If in Hindi, respond in Hindi. If in English, respond in English, etc.
 
             A user said: "{user_message}"
 
@@ -77,13 +83,16 @@ class LangChainManager:
 
             Be natural and conversational. Don't use the same response for everything.
 
-            Response:"""
+            Response (in the same language as the user's message):"""
         )
 
         # Smart fallback prompt for when no FAQ matches
         self.smart_fallback_prompt = PromptTemplate(
             input_variables=["user_message"],
             template="""You are a helpful customer service assistant for this Instagram business.
+
+            IMPORTANT: Detect the language of the user's message and respond in the SAME language.
+            If the user writes in Spanish, respond in Spanish. If in Hindi, respond in Hindi. If in English, respond in English, etc.
 
             A user said: "{user_message}"
 
@@ -96,7 +105,7 @@ class LangChainManager:
 
             Keep it friendly, natural, and helpful. Don't sound robotic.
 
-            Response:"""
+            Response (in the same language as the user's message):"""
         )
         
 
@@ -205,7 +214,7 @@ JSON:"""
 
         # Create conversation prompt with message history
         conversation_prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are a helpful AI assistant for Instagram customer service."),
+            ("system", "You are a helpful AI assistant for Instagram customer service. IMPORTANT: Always detect the language of the user's message and respond in the SAME language. If the user writes in Spanish, respond in Spanish. If in Hindi, respond in Hindi. If in English, respond in English, etc."),
             MessagesPlaceholder(variable_name="history"),
             ("human", "{input}")
         ])
