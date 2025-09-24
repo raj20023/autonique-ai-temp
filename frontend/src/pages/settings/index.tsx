@@ -44,6 +44,7 @@ export default function SettingsPage() {
   });
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [webhookLoading, setWebhookLoading] = useState<number | null>(null);
 
   // Get user's pages
   const { data: pages, isLoading: pagesLoading } = useQuery(
@@ -58,6 +59,35 @@ export default function SettingsPage() {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const handleWebhookSetup = async (pageId: number) => {
+    setWebhookLoading(pageId);
+    try {
+      const response = await fetch(`https://api.autonique.in/api/v1/pages/${pageId}/subscribe-webhook`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Show success message
+        alert(`✅ Webhook setup successful for ${data.page_name}! Your Instagram automation is now active.`);
+        // Refresh pages data to update webhook status
+        window.location.reload();
+      } else {
+        alert(`❌ Failed to setup webhook: ${data.detail || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Webhook setup error:', error);
+      alert('❌ Failed to setup webhook. Please check your internet connection and try again.');
+    } finally {
+      setWebhookLoading(null);
+    }
+  };
 
   useEffect(() => {
     if (isClient && !isAuthenticated()) {
@@ -460,8 +490,10 @@ export default function SettingsPage() {
                                     <Button
                                       variant="primary"
                                       size="sm"
+                                      onClick={() => handleWebhookSetup(page.id)}
+                                      disabled={webhookLoading === page.id}
                                     >
-                                      Setup Webhook
+                                      {webhookLoading === page.id ? 'Setting up...' : 'Setup Webhook'}
                                     </Button>
                                   )}
                                 </div>

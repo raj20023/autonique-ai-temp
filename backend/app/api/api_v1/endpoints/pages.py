@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 import logging
 import httpx
+from datetime import datetime
 
 from app.core.database import get_db
 from app.api.deps import get_current_active_user
@@ -166,15 +167,71 @@ async def subscribe_webhook(
 
         if is_subscribed:
             logger.info(f"✅ Webhook subscription verified for page {page.page_name}")
-            return {"message": "Webhook subscription successful and verified"}
+            return {
+                "message": "Webhook subscription successful and verified",
+                "page_name": page.page_name,
+                "instagram_username": page.instagram_username,
+                "status": "active"
+            }
         else:
             logger.warning(f"⚠️ Webhook subscription may have failed for page {page.page_name}")
-            return {"message": "Webhook subscription completed but verification failed"}
+            return {
+                "message": "Webhook subscription completed but verification failed",
+                "page_name": page.page_name,
+                "status": "pending_verification"
+            }
     else:
         logger.error(f"❌ Webhook subscription failed for page {page.page_name}")
         raise HTTPException(
             status_code=400,
-            detail="Failed to subscribe to webhooks"
+            detail=f"Failed to subscribe to webhooks for {page.page_name}. Please ensure your Instagram account is a Business account and connected to this Facebook Page."
+        )
+
+@router.get("/{page_id}/webhook-status")
+async def check_webhook_status(
+    page_id: int,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """Check webhook subscription status for a page"""
+    page = db.query(Page).filter(
+        Page.id == page_id,
+        Page.user_id == current_user.id
+    ).first()
+
+    if not page:
+        raise HTTPException(status_code=404, detail="Page not found")
+
+    try:
+        # Decrypt tokens
+        page_access_token = decrypt_token(page.page_access_token)
+        user_access_token = decrypt_token(current_user.access_token)
+
+        # Check actual webhook status with Facebook
+        facebook_service = FacebookService()
+        is_subscribed = await facebook_service.check_webhook_subscription(
+            page.fb_page_id, page_access_token, user_access_token
+        )
+
+        # Update our database if status has changed
+        if page.webhook_subscribed != is_subscribed:
+            page.webhook_subscribed = is_subscribed
+            db.commit()
+            logger.info(f"Updated webhook status for {page.page_name}: {is_subscribed}")
+
+        return {
+            "page_name": page.page_name,
+            "instagram_username": page.instagram_username,
+            "webhook_subscribed": is_subscribed,
+            "ig_business_id": page.ig_business_id,
+            "last_checked": datetime.utcnow().isoformat()
+        }
+
+    except Exception as e:
+        logger.error(f"Error checking webhook status: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to check webhook status"
         )
 
 @router.post("/{page_id}/refresh-webhook-status")

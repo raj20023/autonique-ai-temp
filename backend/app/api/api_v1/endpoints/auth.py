@@ -183,7 +183,7 @@ async def facebook_callback(
 
             # Create or update page record
             existing_page = db.query(Page).filter(Page.fb_page_id == page_id).first()
-            
+
             if not existing_page:
                 page = Page(
                     user_id=user.id,
@@ -196,12 +196,41 @@ async def facebook_callback(
                 )
                 db.add(page)
                 logger.info(f"✅ Created new page: {page_name}")
+
+                # Automatically set up webhook for new pages with Instagram accounts
+                if ig_business_id:
+                    try:
+                        webhook_success = await facebook_service.subscribe_to_webhooks(
+                            page_id, page_access_token, access_token
+                        )
+                        if webhook_success:
+                            page.webhook_subscribed = True
+                            logger.info(f"✅ Automatically set up webhook for {page_name}")
+                        else:
+                            logger.warning(f"⚠️ Failed to automatically set up webhook for {page_name}")
+                    except Exception as webhook_error:
+                        logger.error(f"❌ Webhook setup error for {page_name}: {webhook_error}")
+
             else:
                 existing_page.page_access_token = encrypt_token(page_access_token)
                 existing_page.ig_business_id = ig_business_id
                 existing_page.instagram_username = instagram_username
                 existing_page.is_active = True
                 logger.info(f"✅ Updated existing page: {page_name}")
+
+                # Try to set up webhook for existing pages if not already subscribed
+                if ig_business_id and not existing_page.webhook_subscribed:
+                    try:
+                        webhook_success = await facebook_service.subscribe_to_webhooks(
+                            page_id, page_access_token, access_token
+                        )
+                        if webhook_success:
+                            existing_page.webhook_subscribed = True
+                            logger.info(f"✅ Automatically set up webhook for existing page {page_name}")
+                        else:
+                            logger.warning(f"⚠️ Failed to automatically set up webhook for existing page {page_name}")
+                    except Exception as webhook_error:
+                        logger.error(f"❌ Webhook setup error for existing page {page_name}: {webhook_error}")
         
         db.commit()
         
