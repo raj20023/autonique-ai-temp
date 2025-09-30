@@ -20,7 +20,8 @@ import {
   TrendingUp,
   Globe,
   Target,
-  Cpu
+  Cpu,
+  Clock
 } from 'lucide-react';
 import { isAuthenticated } from '@/utils/auth';
 import Button from '@/components/ui/Button';
@@ -30,60 +31,80 @@ import { AutoHero } from '@/components/ui/AutoMascot';
 const features = [
   {
     icon: <Brain className="h-8 w-8" />,
-    title: 'AutoniqueAI Technology',
-    description: 'Advanced AI that understands context, emotion, and intent for human-like conversations',
+    title: 'Smart AI Responses',
+    description: 'AI that understands your customers and responds naturally to their questions',
     gradient: 'from-purple-500 via-pink-500 to-red-500',
     glowColor: 'shadow-purple-500/25'
   },
   {
     icon: <Zap className="h-8 w-8" />,
-    title: 'Quantum-Speed Processing',
-    description: 'Lightning-fast AI responses in milliseconds with quantum-inspired processing algorithms',
+    title: 'Instant Replies',
+    description: 'Respond to customer messages in seconds, even while you sleep',
     gradient: 'from-yellow-400 via-orange-500 to-red-500',
     glowColor: 'shadow-yellow-500/25'
   },
   {
     icon: <Shield className="h-8 w-8" />,
-    title: 'Military-Grade Security',
-    description: 'Bank-level encryption with zero-trust architecture and quantum-resistant cryptography',
+    title: 'Secure & Private',
+    description: 'Your data is encrypted and protected with enterprise-grade security',
     gradient: 'from-green-400 via-blue-500 to-purple-600',
     glowColor: 'shadow-green-500/25'
   },
   {
     icon: <BarChart3 className="h-8 w-8" />,
-    title: 'Predictive Analytics',
-    description: 'AI-powered insights that predict customer behavior and optimize engagement strategies',
+    title: 'Track Performance',
+    description: 'See how many messages you handle and track customer satisfaction',
     gradient: 'from-blue-400 via-purple-500 to-pink-500',
     glowColor: 'shadow-blue-500/25'
   },
   {
-    icon: <Globe className="h-8 w-8" />,
-    title: 'Global AI Network',
-    description: 'Distributed AI nodes across 50+ countries for ultra-low latency worldwide coverage',
+    icon: <Instagram className="h-8 w-8" />,
+    title: 'Easy Instagram Setup',
+    description: 'Connect your Instagram account in just a few clicks and start automating',
     gradient: 'from-cyan-400 via-blue-500 to-indigo-600',
     glowColor: 'shadow-cyan-500/25'
   },
   {
     icon: <Target className="h-8 w-8" />,
-    title: 'Precision Targeting',
-    description: 'Laser-focused customer segmentation with 99.7% accuracy using advanced ML algorithms',
+    title: 'Custom Answers',
+    description: 'Create your own FAQ library so AI answers exactly how you want',
     gradient: 'from-pink-400 via-red-500 to-orange-500',
     glowColor: 'shadow-pink-500/25'
   }
 ];
 
 const benefits = [
-  'Save 10+ hours weekly on customer service',
-  'Increase response rate by 300%',
-  'Improve customer satisfaction scores',
-  'Scale your business without hiring',
-  'Never miss a potential sale',
-  'Maintain consistent brand voice'
+  'Save 10+ hours every week on customer messages',
+  'Reply to customers 3x faster',
+  'Never miss a message, even at night',
+  'Grow your business without hiring more staff',
+  'Turn more conversations into sales',
+  'Keep your brand voice consistent'
+];
+
+const demoVideos = [
+  {
+    id: 'main-demo',
+    title: 'Complete Platform Demo',
+    description: 'See how AutoniqueAI works from setup to automation',
+    youtubeId: 'qxhFyY_hGF8',
+    duration: '15:30',
+    thumbnail: `https://img.youtube.com/vi/qxhFyY_hGF8/maxresdefault.jpg`
+  },
+  {
+    id: 'mobile-demo',
+    title: 'Mobile Experience',
+    description: 'Watch how AutoniqueAI works on mobile devices',
+    youtubeId: 'f7gC1Qog-Dc',
+    duration: '1:00',
+    thumbnail: `https://img.youtube.com/vi/f7gC1Qog-Dc/maxresdefault.jpg`
+  }
 ];
 
 export default function HomePage() {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthenticated()) {
@@ -93,6 +114,14 @@ export default function HomePage() {
 
   const handleGetStarted = () => {
     router.push('/auth/login');
+  };
+
+  const openVideo = (youtubeId: string) => {
+    setSelectedVideo(youtubeId);
+  };
+
+  const closeVideo = () => {
+    setSelectedVideo(null);
   };
 
   return (
@@ -362,21 +391,21 @@ export default function HomePage() {
                 </motion.h1>
               </AnimatedContainer>
 
-              {/* Futuristic Subtitle */}
+              {/* Clear Subtitle */}
               <AnimatedContainer
                 animation="morphGlow"
                 delay={0.6}
                 className="mb-16"
               >
                 <motion.p
-                  className="text-lg sm:text-xl lg:text-2xl text-white/80 mb-4 max-w-4xl mx-auto leading-relaxed drop-shadow-lg px-4 sm:px-0"
+                  className="text-lg sm:text-xl lg:text-2xl text-white/90 mb-4 max-w-4xl mx-auto leading-relaxed drop-shadow-lg px-4 sm:px-0"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 1, delay: 0.8 }}
                 >
-                  Harness the power of <span className="text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text font-bold drop-shadow-lg">AutoniqueAI</span>
+                  Let AI handle your Instagram messages automatically
                   <br />
-                  Save 10+ hours weekly while providing <span className="text-transparent bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text font-bold drop-shadow-lg">quantum-speed responses</span>
+                  <span className="text-white/70 text-lg sm:text-xl">Save 10+ hours every week with instant, intelligent responses</span>
                 </motion.p>
               </AnimatedContainer>
 
@@ -426,7 +455,7 @@ export default function HomePage() {
                 </StaggerItem>
               </StaggerContainer>
 
-              {/* Futuristic Trust Badge */}
+              {/* Trust Badge */}
               <motion.div
                 className="flex items-center justify-center space-x-3 text-white/90 backdrop-blur-xl bg-white/10 px-8 py-4 rounded-2xl border border-white/20 shadow-2xl inline-flex"
                 initial={{ opacity: 0, y: 20 }}
@@ -435,10 +464,10 @@ export default function HomePage() {
                 whileHover={{ scale: 1.02, y: -2 }}
               >
                 <CheckCircle className="h-6 w-6 text-emerald-400" />
-                <span className="font-semibold">14-day quantum trial • Zero risk • Instant activation</span>
+                <span className="font-semibold">60-day free trial • No credit card required • Cancel anytime</span>
               </motion.div>
 
-              {/* Epic Social Proof */}
+              {/* Social Proof */}
               <motion.div
                 className="mt-20 flex flex-col lg:flex-row items-center justify-center space-y-8 lg:space-y-0 lg:space-x-16 text-white/80"
                 initial={{ opacity: 0, y: 40 }}
@@ -466,8 +495,8 @@ export default function HomePage() {
                     ))}
                   </div>
                   <div>
-                    <p className="font-bold text-xl text-white">10,000+ AI Pioneers</p>
-                    <p className="text-white/60">revolutionizing customer service</p>
+                    <p className="font-bold text-xl text-white">Trusted by Businesses</p>
+                    <p className="text-white/60">automating Instagram messages</p>
                   </div>
                 </div>
 
@@ -486,8 +515,8 @@ export default function HomePage() {
                     ))}
                   </div>
                   <div>
-                    <p className="font-bold text-xl text-white">4.98/5 Quantum Rating</p>
-                    <p className="text-white/60">from 50,000+ customer reviews</p>
+                    <p className="font-bold text-xl text-white">Highly Rated</p>
+                    <p className="text-white/60">by satisfied customers</p>
                   </div>
                 </div>
               </motion.div>
@@ -495,7 +524,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Revolutionary Features Section */}
+        {/* Features Section */}
         <section id="features" className="py-32 bg-gradient-to-b from-slate-900 via-gray-900 to-black relative overflow-hidden">
 
           <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
@@ -511,11 +540,11 @@ export default function HomePage() {
                 viewport={{ once: true }}
               >
                 <span className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
-                  Revolutionary
+                  Everything You Need
                 </span>
                 <br />
                 <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
-                  AI Arsenal
+                  In One Place
                 </span>
               </motion.h2>
               <motion.p
@@ -525,7 +554,7 @@ export default function HomePage() {
                 transition={{ duration: 1, delay: 0.3 }}
                 viewport={{ once: true }}
               >
-                Unleash the most advanced AI technologies ever created for Instagram automation
+                Simple, powerful features to automate your Instagram customer service
               </motion.p>
             </AnimatedContainer>
 
@@ -589,7 +618,241 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Mind-Blowing Benefits Section */}
+        {/* Live Demo Section with GIF */}
+        <section className="py-32 bg-gradient-to-b from-black via-slate-900 to-indigo-900 relative overflow-hidden">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+            <AnimatedContainer
+              animation="morphGlow"
+              className="text-center mb-16"
+            >
+              <motion.h2
+                className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1 }}
+                viewport={{ once: true }}
+              >
+                <span className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+                  See It In
+                </span>
+                <br />
+                <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                  Action
+                </span>
+              </motion.h2>
+              <motion.p
+                className="text-xl text-white/70 max-w-3xl mx-auto leading-relaxed"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.3 }}
+                viewport={{ once: true }}
+              >
+                Watch how AutoniqueAI automates your Instagram messages and converts conversations into sales
+              </motion.p>
+            </AnimatedContainer>
+
+            {/* Live Conversation Demo */}
+            <motion.div
+              className="max-w-4xl mx-auto mb-20"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1 }}
+              viewport={{ once: true }}
+            >
+              <div className="relative backdrop-blur-2xl bg-white/10 p-8 lg:p-12 rounded-3xl border border-white/20 shadow-2xl">
+                {/* Glowing Background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-cyan-500/20 rounded-3xl blur-xl"></div>
+
+                <div className="relative grid lg:grid-cols-2 gap-8 items-center">
+                  {/* Left: Description */}
+                  <div className="text-center lg:text-left">
+                    <motion.div
+                      className="inline-flex items-center space-x-2 bg-emerald-500/20 text-emerald-400 px-4 py-2 rounded-full mb-6 border border-emerald-500/30"
+                      animate={{
+                        scale: [1, 1.05, 1],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    >
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                      <span className="font-semibold text-sm">Live Example</span>
+                    </motion.div>
+
+                    <h3 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+                      <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                        Urgent Order?
+                      </span>
+                      <br />
+                      <span className="text-white">No Problem!</span>
+                    </h3>
+
+                    <p className="text-white/80 text-lg mb-6 leading-relaxed">
+                      A customer needs an engagement ring for next week. Watch AutoniqueAI:
+                    </p>
+
+                    <div className="space-y-3 mb-6">
+                      {[
+                        'Understand the urgency instantly',
+                        'Provide helpful product information',
+                        'Answer questions naturally',
+                        'Convert to sale in seconds'
+                      ].map((item, index) => (
+                        <motion.div
+                          key={item}
+                          className="flex items-center space-x-3"
+                          initial={{ opacity: 0, x: -20 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.5, delay: index * 0.1 }}
+                          viewport={{ once: true }}
+                        >
+                          <CheckCircle className="h-5 w-5 text-emerald-400 flex-shrink-0" />
+                          <span className="text-white/90">{item}</span>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-emerald-500 to-green-500 text-white px-6 py-3 rounded-full font-bold shadow-lg">
+                      <CheckCircle className="h-5 w-5" />
+                      <span>Sale Completed ✓</span>
+                    </div>
+                  </div>
+
+                  {/* Right: Mobile Frame with GIF */}
+                  <div className="relative">
+                    <motion.div
+                      className="relative mx-auto max-w-sm"
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      {/* Mobile Device Frame */}
+                      <div className="relative bg-gradient-to-b from-slate-800 to-slate-900 rounded-[2.5rem] p-3 shadow-2xl border-4 border-slate-700">
+                        {/* Notch */}
+                        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-slate-900 rounded-b-2xl z-10"></div>
+
+                        {/* Screen */}
+                        <div className="relative bg-white rounded-[2rem] overflow-hidden shadow-inner" style={{ backgroundColor: '#13132b' }}>
+                          <img
+                            src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/content/YourBestJewellery.gif"
+                            alt="AutoniqueAI handling urgent jewelry order"
+                            className="w-full h-auto"
+                            style={{ minHeight: '500px' }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Floating Badges */}
+                      <motion.div
+                        className="absolute -top-4 -right-4 bg-purple-500 text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg"
+                        animate={{
+                          rotate: [0, 5, 0, -5, 0],
+                        }}
+                        transition={{
+                          duration: 3,
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }}
+                      >
+                        <Instagram className="h-4 w-4 inline mr-1" />
+                        Instagram DM
+                      </motion.div>
+
+                      <motion.div
+                        className="absolute -bottom-4 -left-4 bg-gradient-to-r from-emerald-500 to-green-500 text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg"
+                        animate={{
+                          y: [0, -5, 0],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }}
+                      >
+                        ⚡ Instant Reply
+                      </motion.div>
+                    </motion.div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Video Demos */}
+            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              {demoVideos.map((video, index) => (
+                <motion.div
+                  key={video.id}
+                  className="group relative bg-white/10 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/20 hover:border-purple-400/50 transition-all duration-300"
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: index * 0.2 }}
+                  viewport={{ once: true }}
+                  whileHover={{ scale: 1.02, y: -5 }}
+                >
+                  {/* Video Thumbnail */}
+                  <div className="relative aspect-video bg-gradient-to-br from-purple-600 to-pink-600">
+                    <img
+                      src={video.thumbnail}
+                      alt={video.title}
+                      className="w-full h-full object-cover"
+                    />
+
+                    {/* Play Button Overlay */}
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/20 transition-colors">
+                      <motion.button
+                        onClick={() => openVideo(video.youtubeId)}
+                        className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center text-purple-600 hover:bg-white hover:scale-110 transition-all duration-300"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <Play className="h-8 w-8 ml-1" fill="currentColor" />
+                      </motion.button>
+                    </div>
+
+                    {/* Duration Badge */}
+                    <div className="absolute bottom-4 right-4">
+                      <span className="px-3 py-1 bg-black/70 text-white text-sm font-medium rounded-lg backdrop-blur-sm">
+                        {video.duration}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Video Info */}
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all">
+                      {video.title}
+                    </h3>
+                    <p className="text-white/70 leading-relaxed">
+                      {video.description}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* View All Demos Link */}
+            <motion.div
+              className="text-center mt-12"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <Link href="/demo">
+                <motion.button
+                  className="text-white/80 hover:text-white font-semibold text-lg flex items-center space-x-2 mx-auto group"
+                  whileHover={{ x: 5 }}
+                >
+                  <span>View all demos and guides</span>
+                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </motion.button>
+              </Link>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Benefits Section */}
         <section id="benefits" className="py-32 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 relative overflow-hidden">
 
           <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
@@ -608,11 +871,11 @@ export default function HomePage() {
                   viewport={{ once: true }}
                 >
                   <span className="bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
-                    Why Choose
+                    Why Businesses
                   </span>
                   <br />
                   <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
-                    AutoniqueAI?
+                    Love AutoniqueAI
                   </span>
                 </motion.h2>
 
@@ -623,7 +886,7 @@ export default function HomePage() {
                   transition={{ duration: 1, delay: 0.4 }}
                   viewport={{ once: true }}
                 >
-                  Join <span className="text-transparent bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text font-bold">10,000+ visionary businesses</span> already revolutionizing their customer experience
+                  Join businesses already saving time and growing with automated Instagram messaging
                 </motion.p>
 
                 <StaggerContainer className="space-y-6" stagger={0.1}>
@@ -653,63 +916,73 @@ export default function HomePage() {
                 transition={{ duration: 1, delay: 0.3 }}
                 viewport={{ once: true }}
               >
-                {/* Holographic Demo Card */}
+                {/* Live Demo Card */}
                 <motion.div
-                  className="relative backdrop-blur-2xl bg-white/10 p-10 rounded-3xl border border-white/20 shadow-2xl"
+                  className="relative backdrop-blur-2xl bg-white/10 p-8 rounded-3xl border border-white/20 shadow-2xl"
                   whileHover={{ y: -10, scale: 1.02 }}
                   transition={{ duration: 0.3 }}
                 >
                   {/* Glowing Background */}
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-cyan-500/20 rounded-3xl blur-xl"></div>
 
-                  <div className="relative text-center">
-                    <motion.div
-                      className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl mb-8 shadow-2xl"
-                      animate={{
-                        y: [0, -10, 0],
-                        rotate: [0, 5, 0, -5, 0],
-                      }}
-                      transition={{
-                        duration: 4,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                    >
-                      <Play className="h-10 w-10 text-white" />
-                    </motion.div>
-
-                    <h3 className="text-3xl font-bold text-white mb-6">
+                  <div className="relative">
+                    <h3 className="text-2xl font-bold text-white mb-4 text-center">
                       <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                        AutoniqueAI in Action
+                        Real Conversation Example
                       </span>
                     </h3>
 
-                    <p className="text-white/80 mb-8 text-lg leading-relaxed">
-                      Watch AutoniqueAI seamlessly handle customer inquiries with <span className="text-cyan-400 font-bold">99.7% accuracy</span> and <span className="text-emerald-400 font-bold">sub-second response times</span>. See both desktop and <span className="text-purple-400 font-bold">mobile views</span> in action.
+                    <p className="text-white/80 text-center mb-6 text-sm">
+                      Watch AutoniqueAI handle an urgent jewelry order and convert it to a sale instantly
                     </p>
 
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Link href="/demo">
-                        <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl shadow-cyan-500/25">
-                          Watch Demo
-                        </Button>
-                      </Link>
-                    </motion.div>
+                    {/* Mobile Frame with GIF */}
+                    <div className="relative mx-auto max-w-sm">
+                      {/* Mobile Device Frame */}
+                      <div className="relative bg-gradient-to-b from-slate-800 to-slate-900 rounded-[2.5rem] p-3 shadow-2xl border-4 border-slate-700">
+                        {/* Notch */}
+                        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-slate-900 rounded-b-2xl z-10"></div>
+
+                        {/* Screen */}
+                        <div className="relative bg-white rounded-[2rem] overflow-hidden shadow-inner" style={{ backgroundColor: '#13132b' }}>
+                          <img
+                            src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/content/YourBestJewellery.gif"
+                            alt="AutoniqueAI handling jewelry customer inquiry"
+                            className="w-full h-auto"
+                            style={{ minHeight: '400px' }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Floating Badge */}
+                      <motion.div
+                        className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-emerald-500 to-green-500 text-white px-6 py-2 rounded-full font-bold text-sm shadow-lg whitespace-nowrap"
+                        animate={{
+                          y: [0, -5, 0],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }}
+                      >
+                        ✓ Converted to Sale
+                      </motion.div>
+                    </div>
+
+                    <p className="text-white/60 text-center mt-8 text-sm italic">
+                      Customer needed an engagement ring urgently - AutoniqueAI responded instantly and closed the sale
+                    </p>
                   </div>
-
-
                 </motion.div>
               </motion.div>
             </div>
           </div>
         </section>
 
-        {/* Epic Final CTA Section */}
+        {/* Final CTA Section */}
         <section className="py-32 bg-gradient-to-r from-black via-purple-900 to-black relative overflow-hidden">
-          {/* Cosmic Background */}
+          {/* Background */}
           <div className="absolute inset-0">
             <motion.div
               className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-cyan-500/10"
@@ -755,11 +1028,11 @@ export default function HomePage() {
               viewport={{ once: true }}
             >
               <span className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
-                Ready to
+                Ready to Start
               </span>
               <br />
               <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
-                Dominate?
+                Automating?
               </span>
             </motion.h2>
 
@@ -770,7 +1043,7 @@ export default function HomePage() {
               transition={{ duration: 1, delay: 0.3 }}
               viewport={{ once: true }}
             >
-              Join <span className="text-transparent bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text font-bold">10,000+ AI pioneers</span> already saving 10+ hours weekly with quantum automation
+              Start your <span className="text-transparent bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text font-bold">60-day free trial</span> and save 10+ hours every week
             </motion.p>
 
             <motion.div
@@ -792,7 +1065,7 @@ export default function HomePage() {
                 >
                   <div className="flex items-center justify-center space-x-3 sm:space-x-4">
                     <Instagram className="h-6 w-6 sm:h-8 sm:w-8 flex-shrink-0" />
-                    <span className="whitespace-nowrap">Launch AI Empire</span>
+                    <span className="whitespace-nowrap">Start Free Trial</span>
                     <ArrowRight className="h-6 w-6 sm:h-8 sm:w-8 flex-shrink-0" />
                   </div>
                 </Button>
@@ -810,7 +1083,7 @@ export default function HomePage() {
                 }}
               >
                 <Sparkles className="h-6 w-6 text-yellow-400" />
-                <span>Quantum setup in 90 seconds • Zero risk • Infinite potential</span>
+                <span>Setup in 5 minutes • No credit card • 60 days free</span>
               </motion.div>
             </motion.div>
 
@@ -823,9 +1096,9 @@ export default function HomePage() {
               viewport={{ once: true }}
             >
               {[
-                { number: "10,000+", label: "AI Pioneers", icon: <Users className="h-8 w-8" /> },
-                { number: "99.7%", label: "Success Rate", icon: <TrendingUp className="h-8 w-8" /> },
-                { number: "24/7", label: "Quantum Support", icon: <Cpu className="h-8 w-8" /> }
+                { number: "10+ Hours", label: "Saved Weekly", icon: <Clock className="h-8 w-8" /> },
+                { number: "Instant", label: "Responses", icon: <Zap className="h-8 w-8" /> },
+                { number: "24/7", label: "Always Active", icon: <Shield className="h-8 w-8" /> }
               ].map((stat, index) => (
                 <motion.div
                   key={stat.label}
@@ -849,7 +1122,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Futuristic Footer */}
+        {/* Footer */}
         <footer className="bg-black border-t border-white/10 py-16">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
@@ -871,7 +1144,7 @@ export default function HomePage() {
                   />
                 </motion.div>
                 <p className="text-white/70 text-lg leading-relaxed mb-4">
-                  Transform your Instagram customer service with AI automation. Save 10+ hours weekly while providing quantum-speed responses.
+                  Automate your Instagram customer service with AI. Save 10+ hours every week with instant, intelligent responses.
                 </p>
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
@@ -889,7 +1162,7 @@ export default function HomePage() {
                   <li><Link href="#features" className="text-white/60 hover:text-white transition-colors">Features</Link></li>
                   <li><Link href="/demo" className="text-white/60 hover:text-white transition-colors">Demo</Link></li>
                   <li><Link href="#benefits" className="text-white/60 hover:text-white transition-colors">Benefits</Link></li>
-                  <li><Link href="#pricing" className="text-white/60 hover:text-white transition-colors">Pricing</Link></li>
+                  <li><Link href="/pricing" className="text-white/60 hover:text-white transition-colors">Pricing</Link></li>
                   <li><Link href="/auth/login" className="text-white/60 hover:text-white transition-colors">Login</Link></li>
                 </ul>
               </div>
@@ -901,7 +1174,7 @@ export default function HomePage() {
                   <li><a href="mailto:support@autonique.in" className="text-white/60 hover:text-white transition-colors">Contact Support</a></li>
                   <li><Link href="/demo" className="text-white/60 hover:text-white transition-colors">Documentation</Link></li>
                   <li><Link href="/demo" className="text-white/60 hover:text-white transition-colors">Video Tutorials</Link></li>
-                  <li><span className="text-white/60">24/7 AI Support</span></li>
+                  <li><span className="text-white/60">24/7 Support</span></li>
                 </ul>
               </div>
             </div>
@@ -910,7 +1183,7 @@ export default function HomePage() {
             <div className="border-t border-white/10 pt-8">
               <div className="flex flex-col md:flex-row justify-between items-center">
                 <p className="text-white/40 text-lg mb-4 md:mb-0">
-                  © 2024 AutoniqueAI. Revolutionizing Instagram customer service.
+                  © 2024 AutoniqueAI. Automating Instagram customer service.
                 </p>
                 <motion.div
                   className="flex items-center space-x-6 text-white/20 text-sm"
@@ -925,7 +1198,7 @@ export default function HomePage() {
                 >
                   <span>Powered by AutoniqueAI</span>
                   <span>•</span>
-                  <span>Built for the Future</span>
+                  <span>Built with Care</span>
                   <span>•</span>
                   <span>Made with ❤️</span>
                 </motion.div>
@@ -933,6 +1206,41 @@ export default function HomePage() {
             </div>
           </div>
         </footer>
+
+        {/* Video Modal */}
+        <AnimatePresence>
+          {selectedVideo && (
+            <motion.div
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeVideo}
+            >
+              <motion.div
+                className="relative w-full max-w-6xl aspect-video bg-black rounded-xl overflow-hidden"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  onClick={closeVideo}
+                  className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+                <iframe
+                  src={`https://www.youtube.com/embed/${selectedVideo}?autoplay=1`}
+                  title="Demo Video"
+                  className="w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </>
   );
