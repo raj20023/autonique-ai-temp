@@ -464,7 +464,7 @@ export default function HomePage() {
                 whileHover={{ scale: 1.02, y: -2 }}
               >
                 <CheckCircle className="h-6 w-6 text-emerald-400" />
-                <span className="font-semibold">60-day free trial • No credit card required • Cancel anytime</span>
+                <span className="font-semibold">14-day free trial • No credit card required • Cancel anytime</span>
               </motion.div>
 
               {/* Social Proof */}
@@ -1043,7 +1043,7 @@ export default function HomePage() {
               transition={{ duration: 1, delay: 0.3 }}
               viewport={{ once: true }}
             >
-              Start your <span className="text-transparent bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text font-bold">60-day free trial</span> and save 10+ hours every week
+              Start your <span className="text-transparent bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text font-bold">14-day free trial</span> and save 10+ hours every week
             </motion.p>
 
             <motion.div
@@ -1083,7 +1083,7 @@ export default function HomePage() {
                 }}
               >
                 <Sparkles className="h-6 w-6 text-yellow-400" />
-                <span>Setup in 5 minutes • No credit card • 60 days free</span>
+                <span>Setup in 5 minutes • No credit card • 14 days free</span>
               </motion.div>
             </motion.div>
 
