@@ -462,7 +462,6 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
 
         # Enhanced safety check: See if this message text matches any recent response we sent
         # This catches cases where the bot message detection above might miss something
-        from datetime import timedelta
         recent_cutoff = datetime.now(timezone.utc) - timedelta(minutes=10)  # Extended to 10 minutes for better coverage
 
         # FIXED: Check for exact match with recent responses FROM THE SAME INSTAGRAM ACCOUNT
