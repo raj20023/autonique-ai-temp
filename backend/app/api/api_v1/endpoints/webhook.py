@@ -366,15 +366,74 @@ async def process_message_event(db: Session, user: User, page: Page, messaging_e
             logger.warning(f"Incomplete message data - Sender ID: {sender_id}, Message ID: {message_id}, Text: '{message_text}'")
             return
 
-        # IMPORTANT: Check for echo messages first (Instagram's built-in echo detection)
+        # IMPORTANT: Handle echo messages (messages sent BY the business)
+        # is_echo=true means the message was sent BY the business
+        # This could be either:
+        # 1. AI auto-reply (already stored when we sent it)
+        # 2. Manual reply from business owner (NOT stored yet, need to save for context)
         if is_echo:
-            logger.info(f"🔄 Ignoring echo message (is_echo=true): '{message_text}'")
-            return
+            logger.info(f"🔄 Echo message detected (sent by business): '{message_text}'")
+
+            # Check if we've already stored this message by ig_message_id
+            existing_message = db.query(Message).filter(
+                Message.ig_message_id == message_id
+            ).first()
+
+            if existing_message:
+                logger.info(f"✅ Echo message {message_id} already stored, skipping")
+                return
+
+            # Check if this is an echo of our recent AI auto-reply
+            # AI auto-replies are already stored with the original customer message
+            # We can detect them by checking if we recently sent this exact text to this customer
+            recent_cutoff = datetime.now(timezone.utc) - timedelta(seconds=30)
+            recent_ai_reply = db.query(Message).filter(
+                Message.user_id == user.id,
+                Message.ig_user_id == recipient_id,  # To this customer
+                Message.response_text == message_text,  # Same text
+                Message.auto_replied == True,  # Was AI auto-reply
+                Message.reply_sent_at >= recent_cutoff  # Within last 30 seconds
+            ).first()
+
+            if recent_ai_reply:
+                logger.info(f"🤖 Echo is from our AI auto-reply (already stored with original message), skipping")
+                return
+
+            # If we reach here, this is a MANUAL reply from business owner
+            # Store it for conversation context
+            logger.info(f"👤 Echo is a manual reply from business owner, storing for context")
+
+            # Get the last customer message to link this manual reply to
+            last_customer_message = db.query(Message).filter(
+                Message.user_id == user.id,
+                Message.ig_user_id == recipient_id,
+                Message.is_incoming == True
+            ).order_by(Message.created_at.desc()).first()
+
+            # Use the last customer's message text, or empty string if none found
+            customer_message_text = last_customer_message.message_text if last_customer_message else ""
+
+            manual_reply_record = Message(
+                user_id=user.id,
+                ig_user_id=recipient_id,  # The customer who received this reply
+                ig_message_id=message_id,
+                message_text=customer_message_text,  # The customer's message this is responding to
+                response_text=message_text,  # The manual reply text from business owner
+                is_incoming=False,  # This is an outgoing message (from business to customer)
+                auto_replied=False,  # This was a MANUAL reply, not auto-replied
+                reply_sent_at=datetime.fromtimestamp(timestamp / 1000, tz=timezone.utc) if timestamp else datetime.now(timezone.utc),
+                created_at=datetime.fromtimestamp(timestamp / 1000, tz=timezone.utc) if timestamp else datetime.now(timezone.utc)
+            )
+
+            db.add(manual_reply_record)
+            db.commit()
+            logger.info(f"✅ Stored manual reply for conversation context: '{message_text}' responding to customer message: '{customer_message_text}'")
+            return  # Don't trigger AI auto-reply for manual messages
 
         logger.info(f"✅ Message passed echo check, continuing processing...")
 
-        # IMPORTANT: Ignore messages sent by our own bot
-        # When we send a message, Instagram sends it back to our webhook with sender_id = our Instagram Business ID
+        # IMPORTANT: Ignore messages sent by our own bot (AI auto-replies)
+        # When we send a message via API, Instagram sends it back to our webhook with sender_id = our Instagram Business ID
         if sender_id == page.ig_business_id:
             logger.info(f"Ignoring message sent by our own bot (sender_id {sender_id} matches our IG Business ID {page.ig_business_id})")
             return

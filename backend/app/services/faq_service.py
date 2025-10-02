@@ -252,16 +252,19 @@ class FAQService:
             conversation = []
             for msg in reversed(recent_messages):
                 if msg.is_incoming:
+                    # Customer message
                     conversation.append({
                         "role": "customer",
                         "message": msg.message_text,
                         "timestamp": msg.created_at.isoformat()
                     })
-                if msg.response_text and msg.auto_replied:
+                # Include ALL responses (both AI auto-replies AND manual replies from business owner)
+                if msg.response_text:
                     conversation.append({
                         "role": "assistant",
                         "message": msg.response_text,
-                        "timestamp": msg.reply_sent_at.isoformat() if msg.reply_sent_at else msg.created_at.isoformat()
+                        "timestamp": msg.reply_sent_at.isoformat() if msg.reply_sent_at else msg.created_at.isoformat(),
+                        "is_manual": not msg.auto_replied  # Track if this was a manual reply
                     })
 
             logger.info(f"📜 Retrieved {len(conversation)} conversation entries for IG user {ig_user_id}")
