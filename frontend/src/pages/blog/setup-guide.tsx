@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import {
   ArrowLeft,
   Clock,
@@ -16,7 +17,12 @@ import {
   Shield,
   Globe,
   BarChart3,
-  Settings
+  Settings,
+  Smartphone,
+  Chrome,
+  Play,
+  Save,
+  AlertTriangle
 } from 'lucide-react';
 
 export default function SetupGuideBlog() {
@@ -25,37 +31,61 @@ export default function SetupGuideBlog() {
   const tableOfContents = [
     { id: 'introduction', title: 'Introduction', icon: MessageSquare },
     { id: 'prerequisites', title: 'Prerequisites', icon: CheckCircle },
-    { id: 'registration', title: 'Registration', icon: User },
-    { id: 'oauth', title: 'Facebook OAuth', icon: Facebook },
-    { id: 'business-setup', title: 'Business Setup', icon: Settings },
-    { id: 'faq-setup', title: 'FAQ Management', icon: MessageSquare },
-    { id: 'testing', title: 'Testing Setup', icon: Zap },
-    { id: 'going-live', title: 'Going Live', icon: Globe },
-    { id: 'advanced', title: 'Advanced Features', icon: BarChart3 },
-    { id: 'troubleshooting', title: 'Troubleshooting', icon: Shield }
+    { id: 'step1', title: 'Step 1: Link Instagram to Facebook', icon: Facebook },
+    { id: 'step2', title: 'Step 2: Login to Facebook', icon: Chrome },
+    { id: 'step3', title: 'Step 3: Open AutoniqueAI', icon: Globe },
+    { id: 'step4', title: 'Step 4: Start Free Trial', icon: Play },
+    { id: 'step5', title: 'Step 5: Launch Instagram Empire', icon: Zap },
+    { id: 'step6', title: 'Step 6: Select Facebook Page', icon: Settings },
+    { id: 'step7', title: 'Step 7: Choose Business Account', icon: User },
+    { id: 'step8', title: 'Step 8: Connect & Save', icon: Save },
+    { id: 'step9', title: 'Step 9: Enable Message Access', icon: Smartphone },
+    { id: 'extra-setup', title: 'Extra Setup', icon: AlertTriangle },
+    { id: 'final-thoughts', title: 'Final Thoughts', icon: CheckCircle }
   ];
+
+  const scrollToSection = (sectionId: string) => {
+    setActiveSection(sectionId);
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
 
   return (
     <>
       <Head>
-        <title>Complete AutoniqueAI Setup Guide - Instagram Automation Tutorial</title>
-        <meta name="description" content="Learn how to set up AutoniqueAI for Instagram automation in 15 minutes. Complete step-by-step guide with screenshots and best practices." />
-        <meta name="keywords" content="AutoniqueAI setup, Instagram automation, Instagram chatbot, social media automation, customer service automation" />
+        <title>How to Set Up AutoniqueAI With Your Instagram Business Account (Step-by-Step Guide)</title>
+        <meta name="description" content="Learn how to set up AutoniqueAI with your Instagram Business Account in 9 easy steps. Automate Instagram DMs, save time, and never miss a customer." />
+        <meta name="keywords" content="AutoniqueAI setup, Instagram automation, Instagram DM automation, Instagram business account, social media automation, customer service automation" />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="How to Set Up AutoniqueAI With Your Instagram Business Account" />
+        <meta property="og:description" content="Learn how to set up AutoniqueAI with your Instagram Business Account in 9 easy steps. Automate Instagram DMs, save time, and never miss a customer." />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content="https://autonique.in/blog/setup-guide" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="How to Set Up AutoniqueAI With Your Instagram Business Account" />
+        <meta name="twitter:description" content="Learn how to set up AutoniqueAI with your Instagram Business Account in 9 easy steps. Automate Instagram DMs, save time, and never miss a customer." />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
-        {/* Background Effects */}
-        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+      <div className="min-h-screen bg-white">
+        {/* Subtle Background Pattern */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-white">
+          <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-5"></div>
+        </div>
         
         {/* Navigation */}
-        <nav className="relative z-10 bg-white/10 backdrop-blur-xl border-b border-white/20">
+        <nav className="relative z-10 bg-white border-b border-gray-200 shadow-sm">
           <div className="max-w-7xl mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
-              <Link href="/demo" className="flex items-center space-x-2 text-white hover:text-purple-300 transition-colors">
+              <Link href="/demo" className="flex items-center space-x-2 text-gray-600 hover:text-purple-600 transition-colors duration-300">
                 <ArrowLeft className="h-5 w-5" />
-                <span>Back to Demo & Guides</span>
+                <span className="font-medium">Back to Demo & Guides</span>
               </Link>
-              <Link href="/" className="text-2xl font-bold text-white">
+              <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-purple-600 transition-colors duration-300">
                 AutoniqueAI
               </Link>
             </div>
@@ -68,19 +98,19 @@ export default function SetupGuideBlog() {
             {/* Table of Contents - Sidebar */}
             <div className="lg:col-span-1">
               <div className="sticky top-8">
-                <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-6">
-                  <h3 className="text-lg font-bold text-white mb-4">Table of Contents</h3>
+                <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">Table of Contents</h3>
                   <nav className="space-y-2">
                     {tableOfContents.map((item) => {
                       const Icon = item.icon;
                       return (
                         <button
                           key={item.id}
-                          onClick={() => setActiveSection(item.id)}
+                          onClick={() => scrollToSection(item.id)}
                           className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-all duration-200 ${
                             activeSection === item.id
-                              ? 'bg-purple-500/30 text-white border border-purple-400/50'
-                              : 'text-white/70 hover:text-white hover:bg-white/5'
+                              ? 'bg-purple-50 text-purple-700 border border-purple-200'
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                           }`}
                         >
                           <Icon className="h-4 w-4 flex-shrink-0" />
@@ -95,40 +125,40 @@ export default function SetupGuideBlog() {
 
             {/* Main Content */}
             <div className="lg:col-span-3">
-              <article className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-8">
+              <article className="bg-white rounded-xl border border-gray-200 p-8 shadow-lg">
                 
                 {/* Article Header */}
                 <header className="mb-8">
-                  <motion.h1 
-                    className="text-4xl lg:text-5xl font-bold text-white mb-4"
+                  <motion.h1
+                    className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                   >
-                    How to Set Up AutoniqueAI: Complete Instagram Automation Guide
+                    How to Set Up AutoniqueAI With Your Instagram Business Account (Step-by-Step Guide)
                   </motion.h1>
-                  
-                  <motion.p 
-                    className="text-xl text-white/80 mb-6"
+
+                  <motion.p
+                    className="text-xl text-gray-600 mb-6"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
                   >
-                    Transform your Instagram customer service with AI-powered auto-replies in just 15 minutes
+                    Learn how to set up AutoniqueAI with your Instagram Business Account in 9 easy steps. Automate Instagram DMs, save time, and never miss a customer.
                   </motion.p>
 
-                  <motion.div 
-                    className="flex items-center space-x-6 text-white/60 text-sm"
+                  <motion.div
+                    className="flex items-center space-x-6 text-gray-600 text-sm"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
                   >
                     <div className="flex items-center space-x-2">
                       <Calendar className="h-4 w-4" />
-                      <span>Updated January 2024</span>
+                      <span>Updated January 2025</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Clock className="h-4 w-4" />
-                      <span>15 min read</span>
+                      <span>10 min read</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <User className="h-4 w-4" />
@@ -142,470 +172,504 @@ export default function SetupGuideBlog() {
                   
                   {/* Introduction Section */}
                   <section id="introduction" className="mb-12">
-                    <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
-                      <MessageSquare className="h-8 w-8 mr-3 text-purple-400" />
-                      Why Instagram Automation Matters
-                    </h2>
-                    <div className="text-white/80 space-y-4">
-                      <p>
-                        In today's digital landscape, <strong>Instagram customer service automation</strong> has become essential for businesses looking to scale their social media presence. With over 2 billion monthly active users on Instagram, managing direct messages manually can quickly become overwhelming.
-                      </p>
-                      <p>
-                        That's where <strong>AutoniqueAI</strong> comes in – a powerful Instagram automation tool that uses artificial intelligence to respond to customer inquiries instantly, 24/7.
-                      </p>
-                      
-                      <div className="bg-purple-500/20 border border-purple-400/30 rounded-lg p-6 my-6">
-                        <h3 className="text-xl font-bold text-white mb-4">What You'll Learn</h3>
-                        <ul className="space-y-2 text-white/80">
-                          <li className="flex items-center space-x-2">
-                            <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
-                            <span>Complete AutoniqueAI setup in under 15 minutes</span>
-                          </li>
-                          <li className="flex items-center space-x-2">
-                            <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
-                            <span>Facebook OAuth integration and permissions</span>
-                          </li>
-                          <li className="flex items-center space-x-2">
-                            <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
-                            <span>Creating effective FAQ responses</span>
-                          </li>
-                          <li className="flex items-center space-x-2">
-                            <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
-                            <span>Testing and optimizing your automation</span>
-                          </li>
-                          <li className="flex items-center space-x-2">
-                            <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
-                            <span>Advanced features and troubleshooting</span>
-                          </li>
-                        </ul>
+                    <motion.h2
+                      className="text-3xl font-bold text-gray-900 mb-6 flex items-center"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      <div className="p-2 bg-purple-100 rounded-lg mr-3">
+                        <MessageSquare className="h-8 w-8 text-purple-600" />
                       </div>
-                    </div>
+                      <span>Introduction</span>
+                    </motion.h2>
+                    <motion.div
+                      className="text-gray-700 space-y-4"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                    >
+                      <p className="text-lg leading-relaxed">
+                        If you run a business on Instagram, you already know how overwhelming DMs can get. Customers want instant replies — but you can't be online 24/7.
+                      </p>
+                      <p className="text-lg leading-relaxed">
+                        That's exactly where <strong className="text-purple-600">AutoniqueAI</strong> helps. It's an AI-powered Instagram DM automation tool that replies instantly, saves time, and makes sure you never lose a sale because of a missed message.
+                      </p>
+                      <p className="text-lg leading-relaxed">
+                        In this step-by-step guide, I'll show you exactly how to set up AutoniqueAI with your Instagram Business Account — even if you're not tech-savvy.
+                      </p>
+                    </motion.div>
                   </section>
 
-                  {/* Key Features */}
-                  <section className="mb-12">
-                    <h3 className="text-2xl font-bold text-white mb-6">AutoniqueAI Key Features</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {[
-                        { icon: Zap, title: 'AI-Powered Responses', desc: 'Uses Google Gemini 2.0 Flash with LangChain' },
-                        { icon: Globe, title: 'Multilingual Support', desc: 'Responds in customer\'s native language' },
-                        { icon: MessageSquare, title: 'Real-time Automation', desc: 'Instant response to incoming DMs' },
-                        { icon: BarChart3, title: 'Analytics Dashboard', desc: 'Track response rates and engagement' },
-                        { icon: Shield, title: 'Secure Integration', desc: 'Enterprise-grade security with Facebook OAuth' },
-                        { icon: Settings, title: 'Easy Management', desc: 'User-friendly dashboard for FAQ management' }
-                      ].map((feature, index) => {
-                        const Icon = feature.icon;
-                        return (
-                          <div key={index} className="bg-white/5 rounded-lg p-4 border border-white/10">
-                            <div className="flex items-start space-x-3">
-                              <Icon className="h-6 w-6 text-purple-400 flex-shrink-0 mt-1" />
-                              <div>
-                                <h4 className="font-semibold text-white mb-1">{feature.title}</h4>
-                                <p className="text-white/70 text-sm">{feature.desc}</p>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </section>
 
-                  {/* CTA Section */}
-                  <section className="mb-12">
-                    <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 rounded-xl p-8 text-center">
-                      <h3 className="text-2xl font-bold text-white mb-4">Ready to Get Started?</h3>
-                      <p className="text-white/80 mb-6">
-                        Follow this comprehensive guide to set up AutoniqueAI for your Instagram business automation.
-                      </p>
-                      <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Link href="/auth/login">
-                          <motion.button 
-                            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                          >
-                            Start Free Trial
-                          </motion.button>
-                        </Link>
-                        <Link href="/demo">
-                          <motion.button 
-                            className="bg-white/10 hover:bg-white/20 text-white px-8 py-3 rounded-full font-semibold border border-white/30 backdrop-blur-xl transition-all duration-300"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                          >
-                            Watch Demo
-                          </motion.button>
-                        </Link>
-                      </div>
-                    </div>
-                  </section>
 
                   {/* Prerequisites Section */}
                   <section id="prerequisites" className="mb-12">
-                    <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
-                      <CheckCircle className="h-8 w-8 mr-3 text-green-400" />
-                      Prerequisites: What You Need
-                    </h2>
-                    <div className="text-white/80 space-y-4">
-                      <p>Before setting up AutoniqueAI, ensure you have:</p>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                          <h4 className="font-bold text-white mb-3 flex items-center">
-                            <Instagram className="h-5 w-5 mr-2 text-pink-400" />
-                            Instagram Requirements
-                          </h4>
-                          <ul className="space-y-2 text-sm">
-                            <li className="flex items-center space-x-2">
-                              <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
-                              <span>Instagram Business Account (not personal)</span>
-                            </li>
-                            <li className="flex items-center space-x-2">
-                              <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
-                              <span>Admin access to your Instagram account</span>
-                            </li>
-                            <li className="flex items-center space-x-2">
-                              <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
-                              <span>Active Instagram business profile</span>
-                            </li>
-                          </ul>
-                        </div>
-
-                        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                          <h4 className="font-bold text-white mb-3 flex items-center">
-                            <Facebook className="h-5 w-5 mr-2 text-blue-400" />
-                            Facebook Requirements
-                          </h4>
-                          <ul className="space-y-2 text-sm">
-                            <li className="flex items-center space-x-2">
-                              <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
-                              <span>Facebook Page connected to Instagram</span>
-                            </li>
-                            <li className="flex items-center space-x-2">
-                              <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
-                              <span>Admin access to Facebook Page</span>
-                            </li>
-                            <li className="flex items-center space-x-2">
-                              <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
-                              <span>Facebook Developer Account (free)</span>
-                            </li>
-                          </ul>
-                        </div>
+                    <motion.h2
+                      className="text-3xl font-bold text-gray-900 mb-6 flex items-center"
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <div className="p-2 bg-green-100 rounded-lg mr-3">
+                        <CheckCircle className="h-8 w-8 text-green-600" />
                       </div>
+                      <span>Prerequisites for Connecting AutoniqueAI to Instagram</span>
+                    </motion.h2>
+                    <div className="text-gray-700 space-y-4">
+                      <p className="text-gray-800 font-medium">Before we start, make sure you have:</p>
 
-                      <div className="bg-yellow-500/20 border border-yellow-400/30 rounded-lg p-6 mt-6">
-                        <h4 className="font-bold text-white mb-2">📱 Converting to Instagram Business Account</h4>
-                        <p className="text-white/80 mb-3">If you don't have an Instagram Business account yet:</p>
-                        <ol className="list-decimal list-inside space-y-1 text-sm text-white/80">
-                          <li>Open Instagram app on your mobile device</li>
-                          <li>Go to <strong>Settings → Account → Switch to Professional Account</strong></li>
-                          <li>Select <strong>Business</strong> (not Creator)</li>
-                          <li>Connect to your Facebook Page</li>
-                          <li>Complete your business profile information</li>
+                      <motion.div
+                        className="bg-gray-50 rounded-xl p-6 border border-gray-200"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                      >
+                        <ol className="list-decimal list-inside space-y-3 text-gray-800 text-lg">
+                          <li className="text-gray-800"><strong className="text-gray-900">An Instagram Business Account</strong></li>
+                          <li className="text-gray-800"><strong className="text-gray-900">A Facebook Page linked with that Instagram account</strong></li>
                         </ol>
+                        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                          <p className="text-sm text-gray-700">
+                            <strong className="text-blue-700">Note:</strong> Required because Instagram automation only works for business accounts connected with a Facebook page.
+                          </p>
+                        </div>
+                      </motion.div>
+
+                      <motion.div
+                        className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                      >
+                        <div className="flex items-center justify-center mb-4">
+                          <div className="relative w-48 h-96 rounded-2xl overflow-hidden shadow-lg border-4 border-gray-200 hover:shadow-xl transition-shadow duration-300">
+                            <Image
+                              src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/blogs/how-to-setup-autoniqueai/business+account.jpg"
+                              alt="Instagram business account setup screen"
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        </div>
+                        <p className="text-center text-sm text-gray-600 font-medium">Screenshot of Instagram "Switch to Business Account" screen</p>
+                      </motion.div>
+                    </div>
+                  </section>
+
+                  {/* Step-by-Step Guide Header */}
+                  <motion.section
+                    className="mb-12"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <div className="bg-purple-50 border border-purple-200 rounded-xl p-8 text-center">
+                      <h2 className="text-3xl font-bold text-gray-900 mb-4">Step-by-Step Guide: Connect AutoniqueAI With Instagram</h2>
+                      <p className="text-gray-700 text-lg">
+                        Follow these 9 simple steps to set up your Instagram automation
+                      </p>
+                    </div>
+                  </motion.section>
+
+                  {/* Step 1 */}
+                  <section id="step1" className="mb-12">
+                    <motion.h2
+                      className="text-3xl font-bold text-gray-900 mb-6 flex items-center"
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <div className="p-2 bg-blue-100 rounded-lg mr-3">
+                        <Facebook className="h-8 w-8 text-blue-600" />
+                      </div>
+                      <span>Step 1: Link Your Instagram Business Account to a Facebook Page</span>
+                    </motion.h2>
+                    <div className="text-gray-700 space-y-4">
+                      <ul className="list-disc list-inside space-y-2 text-gray-800">
+                        <li className="text-gray-800">Open Instagram Settings.</li>
+                        <li className="text-gray-800">Connect your account to the Facebook Page that represents your business.</li>
+                      </ul>
+
+                      <motion.div
+                        className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                      >
+                        <div className="flex items-center justify-center mb-4">
+                          <div className="relative w-48 h-96 rounded-2xl overflow-hidden shadow-lg border-4 border-gray-200 hover:shadow-xl transition-shadow duration-300">
+                            <Image
+                              src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/blogs/how-to-setup-autoniqueai/Step+1.jpg"
+                              alt="Connect Instagram Business Account with Facebook Page"
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        </div>
+                        <p className="text-center text-sm text-gray-600 font-medium">Instagram screen showing "Connect to Facebook Page"</p>
+                      </motion.div>
+                    </div>
+                  </section>
+
+                  {/* Step 2 */}
+                  <section id="step2" className="mb-12">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                      <div className="p-2 bg-blue-100 rounded-lg mr-3">
+                        <Chrome className="h-8 w-8 text-blue-600" />
+                      </div>
+                      Step 2: Log Into Facebook on Chrome
+                    </h2>
+                    <div className="text-gray-700 space-y-4">
+                      <ul className="list-disc list-inside space-y-2 text-gray-800">
+                        <li className="text-gray-800">Open Google Chrome.</li>
+                        <li className="text-gray-800">Log in with the Facebook account that manages your business page.</li>
+                      </ul>
+
+                      <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                        <div className="flex items-center justify-center mb-4">
+                          <div className="relative w-48 h-96 rounded-2xl overflow-hidden shadow-lg border-4 border-gray-200 hover:shadow-xl transition-shadow duration-300">
+                            <Image
+                              src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/blogs/how-to-setup-autoniqueai/Step+2.jpg"
+                              alt="Login Facebook Chrome Browser"
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        </div>
+                        <p className="text-center text-sm text-gray-600 font-medium">Chrome browser showing Facebook login page</p>
                       </div>
                     </div>
                   </section>
 
-                  {/* Registration Section */}
-                  <section id="registration" className="mb-12">
-                    <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
-                      <User className="h-8 w-8 mr-3 text-blue-400" />
-                      Step 1: Register for AutoniqueAI
+                  {/* Step 3 */}
+                  <section id="step3" className="mb-12">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                      <div className="p-2 bg-green-100 rounded-lg mr-3">
+                        <Globe className="h-8 w-8 text-green-600" />
+                      </div>
+                      Step 3: Open AutoniqueAI Website
                     </h2>
-                    <div className="text-white/80 space-y-4">
-                      <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                        <h4 className="font-bold text-white mb-4">Getting Started</h4>
-                        <ol className="list-decimal list-inside space-y-3">
-                          <li>Visit <a href="https://autonique.in/demo" className="text-purple-400 hover:text-purple-300 underline">AutoniqueAI Demo Page</a></li>
-                          <li>Watch the complete demo video to understand the platform</li>
-                          <li>Click <strong>"Start Free Trial"</strong> to begin registration</li>
-                          <li>You'll be redirected to the Facebook OAuth login</li>
-                        </ol>
+                    <div className="text-gray-700 space-y-4">
+                      <ul className="list-disc list-inside space-y-2 text-gray-800">
+                        <li className="text-gray-800">Visit <a href="https://autonique.in" className="text-purple-600 hover:text-purple-700 underline">autonique.in</a> in the same browser.</li>
+                      </ul>
+
+                      <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                        <div className="flex items-center justify-center mb-4">
+                          <div className="relative w-48 h-96 rounded-2xl overflow-hidden shadow-lg border-4 border-gray-200 hover:shadow-xl transition-shadow duration-300">
+                            <Image
+                              src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/blogs/how-to-setup-autoniqueai/Step+3.jpg"
+                              alt="AutoniqueAI homepage for Instagram automation"
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        </div>
+                        <p className="text-center text-sm text-gray-600 font-medium">AutoniqueAI homepage screenshot</p>
                       </div>
                     </div>
                   </section>
 
-                  {/* OAuth Section */}
-                  <section id="oauth" className="mb-12">
-                    <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
-                      <Facebook className="h-8 w-8 mr-3 text-blue-400" />
-                      Step 2: Facebook OAuth Integration
+                  {/* Step 4 */}
+                  <section id="step4" className="mb-12">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                      <div className="p-2 bg-purple-100 rounded-lg mr-3">
+                        <Play className="h-8 w-8 text-purple-600" />
+                      </div>
+                      Step 4: Click Start Free Trial
                     </h2>
-                    <div className="text-white/80 space-y-4">
-                      <p>AutoniqueAI uses Facebook's secure OAuth system to connect with your Instagram account:</p>
+                    <div className="text-gray-700 space-y-4">
+                      <ul className="list-disc list-inside space-y-2 text-gray-800">
+                        <li className="text-gray-800">Hit the <strong className="text-gray-900">Start Free Trial</strong> button.</li>
+                        <li className="text-gray-800">This opens the login screen.</li>
+                      </ul>
 
-                      <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                        <h4 className="font-bold text-white mb-4">OAuth Process</h4>
-                        <ol className="list-decimal list-inside space-y-3">
-                          <li><strong>Click "Connect with Facebook"</strong> on the login page</li>
-                          <li><strong>Grant permissions</strong> for:
-                            <ul className="list-disc list-inside ml-6 mt-2 space-y-1 text-sm">
-                              <li><code className="bg-purple-500/20 px-2 py-1 rounded text-purple-300">pages_messaging</code>: Send auto-reply messages</li>
-                              <li><code className="bg-purple-500/20 px-2 py-1 rounded text-purple-300">instagram_basic</code>: Access Instagram account information</li>
-                              <li><code className="bg-purple-500/20 px-2 py-1 rounded text-purple-300">instagram_manage_messages</code>: Receive and send Instagram DMs</li>
+                      <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                        <div className="flex items-center justify-center mb-4">
+                          <div className="relative w-48 h-96 rounded-2xl overflow-hidden shadow-lg border-4 border-gray-200 hover:shadow-xl transition-shadow duration-300">
+                            <Image
+                              src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/blogs/how-to-setup-autoniqueai/Step+4.jpg"
+                              alt="Start free trial on AutoniqueAI website"
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        </div>
+                        <p className="text-center text-sm text-gray-600 font-medium">Highlighted Start Free Trial button</p>
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* Step 5 */}
+                  <section id="step5" className="mb-12">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                      <div className="p-2 bg-yellow-100 rounded-lg mr-3">
+                        <Zap className="h-8 w-8 text-yellow-600" />
+                      </div>
+                      Step 5: Launch Instagram Empire
+                    </h2>
+                    <div className="text-gray-700 space-y-4">
+                      <ul className="list-disc list-inside space-y-2 text-gray-800">
+                        <li className="text-gray-800">Scroll down and click <strong className="text-gray-900">Launch Instagram Empire</strong>.</li>
+                        <li className="text-gray-800">If you're not logged into Facebook, it will ask you to log in.</li>
+                      </ul>
+
+                      <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                        <div className="flex items-center justify-center mb-4">
+                          <div className="relative w-48 h-96 rounded-2xl overflow-hidden shadow-lg border-4 border-gray-200 hover:shadow-xl transition-shadow duration-300">
+                            <Image
+                              src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/blogs/how-to-setup-autoniqueai/Step+5.jpg"
+                              alt="AutoniqueAI launch Instagram empire button"
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        </div>
+                        <p className="text-center text-sm text-gray-600 font-medium">Launch Instagram Empire button</p>
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* Step 6 */}
+                  <section id="step6" className="mb-12">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                      <div className="p-2 bg-purple-100 rounded-lg mr-3">
+                        <Settings className="h-8 w-8 text-purple-600" />
+                      </div>
+                      Step 6: Select Your Facebook Page
+                    </h2>
+                    <div className="text-gray-700 space-y-4">
+                      <ul className="list-disc list-inside space-y-2 text-gray-800">
+                        <li className="text-gray-800">Choose the Facebook Page linked to your Instagram business account.</li>
+                        <li className="text-gray-800">Click <strong className="text-gray-900">Continue</strong>.</li>
+                      </ul>
+
+                      <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                        <div className="flex items-center justify-center mb-4">
+                          <div className="relative w-48 h-96 rounded-2xl overflow-hidden shadow-lg border-4 border-gray-200 hover:shadow-xl transition-shadow duration-300">
+                            <Image
+                              src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/blogs/how-to-setup-autoniqueai/Step+6.jpg"
+                              alt="Select Facebook Page for AutoniqueAI connection"
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        </div>
+                        <p className="text-center text-sm text-gray-600 font-medium">Facebook authentication screen with pages listed</p>
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* Step 7 */}
+                  <section id="step7" className="mb-12">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                      <div className="p-2 bg-blue-100 rounded-lg mr-3">
+                        <User className="h-8 w-8 text-blue-600" />
+                      </div>
+                      Step 7: Choose Your Business Account
+                    </h2>
+                    <div className="text-gray-700 space-y-4">
+                      <ul className="list-disc list-inside space-y-2 text-gray-800">
+                        <li className="text-gray-800">Pick the Facebook Business Account that manages your page.</li>
+                      </ul>
+
+                      <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                        <div className="flex items-center justify-center mb-4">
+                          <div className="relative w-48 h-96 rounded-2xl overflow-hidden shadow-lg border-4 border-gray-200 hover:shadow-xl transition-shadow duration-300">
+                            <Image
+                              src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/blogs/how-to-setup-autoniqueai/Step+7.jpg"
+                              alt="Select Facebook Business Account for Instagram automation"
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        </div>
+                        <p className="text-center text-sm text-gray-600 font-medium">Facebook screen showing Business Account selection</p>
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* Step 8 */}
+                  <section id="step8" className="mb-12">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                      <div className="p-2 bg-green-100 rounded-lg mr-3">
+                        <Save className="h-8 w-8 text-green-600" />
+                      </div>
+                      Step 8: Connect Instagram Account & Save
+                    </h2>
+                    <div className="text-gray-700 space-y-4">
+                      <ul className="list-disc list-inside space-y-2 text-gray-800">
+                        <li className="text-gray-800">Select your Instagram Business Account.</li>
+                        <li className="text-gray-800">Click <strong className="text-gray-900">Save</strong>.</li>
+                        <li className="text-gray-800">You'll see a confirmation message.</li>
+                        <li className="text-gray-800">AutoniqueAI will redirect you to the dashboard, and your 14-day free trial starts automatically.</li>
+                      </ul>
+
+                      <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                        <div className="flex items-center justify-center mb-4">
+                          <div className="relative w-48 h-96 rounded-2xl overflow-hidden shadow-lg border-4 border-gray-200 hover:shadow-xl transition-shadow duration-300">
+                            <Image
+                              src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/blogs/how-to-setup-autoniqueai/Step+8.jpg"
+                              alt="AutoniqueAI Instagram connection success screen"
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        </div>
+                        <p className="text-center text-sm text-gray-600 font-medium">Success confirmation screen</p>
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* Step 9 */}
+                  <section id="step9" className="mb-12">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                      <div className="p-2 bg-pink-100 rounded-lg mr-3">
+                        <Smartphone className="h-8 w-8 text-pink-600" />
+                      </div>
+                      Step 9: Add FAQs & Enable Message Access on Instagram
+                    </h2>
+                    <div className="text-gray-700 space-y-4">
+                      <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                        <ol className="list-decimal list-inside space-y-3 text-gray-800">
+                          <li className="text-gray-800">Inside your AutoniqueAI Dashboard, add the FAQs you want automated replies for.</li>
+                          <li className="text-gray-800">On your Instagram mobile app (not desktop):
+                            <ul className="list-disc list-inside ml-6 mt-2 space-y-1 text-sm text-gray-800">
+                              <li className="text-gray-800">Go to <strong className="text-gray-900">Settings & Activity → Message and Story Replies → Message Requests</strong>.</li>
+                              <li className="text-gray-800">Enable <strong className="text-gray-900">Allow Access to Messages</strong>.</li>
                             </ul>
                           </li>
-                          <li><strong>Select your Facebook Page</strong> that's connected to Instagram</li>
-                          <li><strong>Authorize the connection</strong></li>
                         </ol>
                       </div>
 
-                      <div className="bg-green-500/20 border border-green-400/30 rounded-lg p-6">
-                        <h4 className="font-bold text-white mb-2">🔒 Security & Privacy</h4>
-                        <p className="text-white/80">
-                          AutoniqueAI only requests minimal permissions necessary for Instagram automation.
-                          Your data remains secure and private. We never store your Facebook password or access personal information.
-                        </p>
+                      <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                        <div className="flex items-center justify-center mb-4">
+                          <div className="relative w-48 h-96 rounded-2xl overflow-hidden shadow-lg border-4 border-gray-200 hover:shadow-xl transition-shadow duration-300">
+                            <Image
+                              src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/blogs/how-to-setup-autoniqueai/Step+9.jpg"
+                              alt="Allow access to messages in Instagram settings"
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        </div>
+                        <p className="text-center text-sm text-gray-600 font-medium">Instagram phone settings for message access</p>
                       </div>
                     </div>
                   </section>
 
-                  {/* Business Setup Section */}
-                  <section id="business-setup" className="mb-12">
-                    <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
-                      <Settings className="h-8 w-8 mr-3 text-purple-400" />
-                      Step 3: Business Profile Setup
-                    </h2>
-                    <div className="text-white/80 space-y-6">
-                      <p>After successful OAuth connection, you'll enter the <strong>Business Onboarding</strong> process:</p>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                          <h4 className="font-bold text-white mb-3">📋 Business Basics</h4>
-                          <ul className="space-y-2 text-sm">
-                            <li><strong>Business Name:</strong> Your company or brand name</li>
-                            <li><strong>Business Type:</strong> E-commerce, Service, Restaurant, etc.</li>
-                            <li><strong>Industry:</strong> Select your industry category</li>
-                          </ul>
-                        </div>
-
-                        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                          <h4 className="font-bold text-white mb-3">🎨 Brand Personality</h4>
-                          <ul className="space-y-2 text-sm">
-                            <li><strong>Business Description:</strong> Brief description of your business</li>
-                            <li><strong>Brand Personality:</strong> Friendly, Professional, Casual, etc.</li>
-                            <li><strong>Target Audience:</strong> Who are your typical customers?</li>
-                          </ul>
-                        </div>
-
-                        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                          <h4 className="font-bold text-white mb-3">💬 Communication Style</h4>
-                          <ul className="space-y-2 text-sm">
-                            <li><strong>Communication Tone:</strong> Formal, Casual, Enthusiastic</li>
-                            <li><strong>Response Style:</strong> Brief, Detailed, Conversational</li>
-                            <li><strong>Greeting Style:</strong> How you want to greet customers</li>
-                            <li><strong>Use Emojis:</strong> Enable/disable emoji usage</li>
-                          </ul>
-                        </div>
-
-                        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                          <h4 className="font-bold text-white mb-3">🏢 Business Operations</h4>
-                          <ul className="space-y-2 text-sm">
-                            <li><strong>Business Hours:</strong> When you're typically available</li>
-                            <li><strong>Location:</strong> Your business location (optional)</li>
-                            <li><strong>Website:</strong> Your business website URL</li>
-                          </ul>
-                        </div>
+                  {/* Extra Setup Section */}
+                  <section id="extra-setup" className="mb-12">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                      <div className="p-2 bg-orange-100 rounded-lg mr-3">
+                        <AlertTriangle className="h-8 w-8 text-orange-600" />
                       </div>
-                    </div>
-                  </section>
-
-                  {/* FAQ Setup Section */}
-                  <section id="faq-setup" className="mb-12">
-                    <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
-                      <MessageSquare className="h-8 w-8 mr-3 text-green-400" />
-                      Step 4: FAQ Setup and Management
+                      Extra Setup (Precautionary Step)
                     </h2>
-                    <div className="text-white/80 space-y-6">
-                      <p>The heart of AutoniqueAI is its intelligent FAQ system:</p>
+                    <div className="text-gray-700 space-y-4">
+                      <p className="text-gray-800 font-medium">If AutoniqueAI isn't showing your Instagram as "Active":</p>
 
-                      <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                        <h4 className="font-bold text-white mb-4">Creating Your First FAQ</h4>
-                        <ol className="list-decimal list-inside space-y-3">
-                          <li><strong>Navigate to FAQ Management</strong> in your dashboard</li>
-                          <li><strong>Add your first FAQ:</strong>
-                            <ul className="list-disc list-inside ml-6 mt-2 space-y-1 text-sm">
-                              <li><strong>Question:</strong> Common customer inquiry</li>
-                              <li><strong>Answer:</strong> Your desired response</li>
-                              <li><strong>Keywords:</strong> Related terms for better matching</li>
-                            </ul>
-                          </li>
-                        </ol>
-                      </div>
-
-                      <div className="bg-blue-500/20 border border-blue-400/30 rounded-lg p-6">
-                        <h4 className="font-bold text-white mb-4">💡 Best Practices for FAQ Creation</h4>
-                        <ul className="space-y-2 text-sm">
-                          <li>• Start with 5-10 most common questions</li>
-                          <li>• Use natural language in both questions and answers</li>
-                          <li>• Include variations of the same question</li>
-                          <li>• Keep answers concise but helpful</li>
-                          <li>• Test responses before going live</li>
+                      <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                        <ul className="list-disc list-inside space-y-2 text-gray-800">
+                          <li className="text-gray-800">Go to <strong className="text-gray-900">Dashboard → Settings → Instagram</strong></li>
+                          <li className="text-gray-800">Click <strong className="text-gray-900">Setup Webhook</strong> to activate</li>
+                          <li className="text-gray-800">If it's still inactive, contact support at <a href="mailto:autonique.ai@gmail.com" className="text-purple-600 hover:text-purple-700 underline">autonique.ai@gmail.com</a></li>
                         </ul>
                       </div>
 
-                      <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                        <h4 className="font-bold text-white mb-4">📝 Example FAQs</h4>
-                        <div className="space-y-4 text-sm">
-                          <div className="border-l-4 border-purple-400 pl-4">
-                            <p><strong>Q:</strong> What are your business hours?</p>
-                            <p><strong>A:</strong> We're open Monday-Friday 9 AM to 6 PM EST. For urgent inquiries outside business hours, please leave a message and we'll respond first thing in the morning! 🕘</p>
-                          </div>
-                          <div className="border-l-4 border-green-400 pl-4">
-                            <p><strong>Q:</strong> How can I track my order?</p>
-                            <p><strong>A:</strong> You can track your order using the tracking link sent to your email. If you need help finding it, please share your order number and I'll assist you! 📦</p>
-                          </div>
-                          <div className="border-l-4 border-blue-400 pl-4">
-                            <p><strong>Q:</strong> Do you offer refunds?</p>
-                            <p><strong>A:</strong> Yes! We offer a 30-day money-back guarantee. If you're not satisfied with your purchase, contact us within 30 days for a full refund. 💯</p>
+                      <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                        <div className="flex items-center justify-center mb-4">
+                          <div className="relative w-48 h-96 rounded-2xl overflow-hidden shadow-lg border-4 border-gray-200 hover:shadow-xl transition-shadow duration-300">
+                            <Image
+                              src="https://autonique-ai.s3.ap-northeast-3.amazonaws.com/blogs/how-to-setup-autoniqueai/Extra+Step.jpg"
+                              alt="AutoniqueAI dashboard Instagram settings tab"
+                              fill
+                              className="object-cover"
+                            />
                           </div>
                         </div>
+                        <p className="text-center text-sm text-gray-600 font-medium">AutoniqueAI dashboard settings tab</p>
                       </div>
                     </div>
                   </section>
 
-                  {/* Testing Section */}
-                  <section id="testing" className="mb-12">
-                    <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
-                      <Zap className="h-8 w-8 mr-3 text-yellow-400" />
-                      Step 5: Testing Your Setup
+                  {/* Final Thoughts Section */}
+                  <section id="final-thoughts" className="mb-12">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                      <div className="p-2 bg-green-100 rounded-lg mr-3">
+                        <CheckCircle className="h-8 w-8 text-green-600" />
+                      </div>
+                      Final Thoughts
                     </h2>
-                    <div className="text-white/80 space-y-4">
-                      <p>Before going live, thoroughly test your automation:</p>
-
-                      <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                        <h4 className="font-bold text-white mb-4">Testing Process</h4>
-                        <ol className="list-decimal list-inside space-y-3">
-                          <li><strong>Use the FAQ Test Feature</strong> in your dashboard</li>
-                          <li><strong>Send test messages</strong> to your Instagram account from another account</li>
-                          <li><strong>Monitor the Live Messages</strong> page to see real-time activity</li>
-                          <li><strong>Adjust FAQ responses</strong> based on test results</li>
-                        </ol>
-                      </div>
-                    </div>
-                  </section>
-
-                  {/* Going Live Section */}
-                  <section id="going-live" className="mb-12">
-                    <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
-                      <Globe className="h-8 w-8 mr-3 text-green-400" />
-                      Step 6: Going Live
-                    </h2>
-                    <div className="text-white/80 space-y-4">
-                      <p>Once you're satisfied with your setup:</p>
-
-                      <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                        <ol className="list-decimal list-inside space-y-3">
-                          <li><strong>Enable Auto-Reply</strong> in your dashboard</li>
-                          <li><strong>Monitor initial responses</strong> closely</li>
-                          <li><strong>Adjust FAQs</strong> based on real customer interactions</li>
-                          <li><strong>Review analytics</strong> regularly to optimize performance</li>
-                        </ol>
-                      </div>
-                    </div>
-                  </section>
-
-                  {/* Advanced Features Section */}
-                  <section id="advanced" className="mb-12">
-                    <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
-                      <BarChart3 className="h-8 w-8 mr-3 text-purple-400" />
-                      Advanced Features
-                    </h2>
-                    <div className="text-white/80 space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                          <h4 className="font-bold text-white mb-3">🌍 Multilingual Support</h4>
-                          <p className="text-sm">AutoniqueAI automatically detects customer language and responds accordingly:</p>
-                          <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
-                            <li>Spanish customers get Spanish responses</li>
-                            <li>Hindi customers get Hindi responses</li>
-                            <li>English customers get English responses</li>
-                            <li>Supports 50+ languages automatically</li>
-                          </ul>
-                        </div>
-
-                        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                          <h4 className="font-bold text-white mb-3">📊 Analytics and Monitoring</h4>
-                          <p className="text-sm">Track your automation performance with:</p>
-                          <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
-                            <li>Response Rate: % of messages that received auto-replies</li>
-                            <li>Message Volume: Daily, weekly, monthly counts</li>
-                            <li>FAQ Usage: Which FAQs are used most frequently</li>
-                            <li>Customer Satisfaction: Monitor response effectiveness</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </section>
-
-                  {/* Troubleshooting Section */}
-                  <section id="troubleshooting" className="mb-12">
-                    <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
-                      <Shield className="h-8 w-8 mr-3 text-red-400" />
-                      Troubleshooting Common Issues
-                    </h2>
-                    <div className="text-white/80 space-y-6">
-                      <div className="space-y-4">
-                        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                          <h4 className="font-bold text-white mb-2">❌ Issue: "No Facebook Pages Found"</h4>
-                          <p className="text-sm"><strong>Solution:</strong> Ensure your Instagram account is connected to a Facebook Page and you have admin access to both.</p>
-                        </div>
-
-                        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                          <h4 className="font-bold text-white mb-2">❌ Issue: "Webhook Connection Failed"</h4>
-                          <p className="text-sm"><strong>Solution:</strong> Check that your Instagram account is a Business account (not Personal or Creator).</p>
-                        </div>
-
-                        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                          <h4 className="font-bold text-white mb-2">❌ Issue: "Messages Not Auto-Replying"</h4>
-                          <div className="text-sm">
-                            <p><strong>Solution:</strong></p>
-                            <ol className="list-decimal list-inside mt-2 space-y-1">
-                              <li>Verify FAQ setup is complete</li>
-                              <li>Check that auto-reply is enabled</li>
-                              <li>Ensure your FAQs cover the customer's question</li>
-                            </ol>
-                          </div>
-                        </div>
-
-                        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                          <h4 className="font-bold text-white mb-2">❌ Issue: "Permission Denied"</h4>
-                          <p className="text-sm"><strong>Solution:</strong> Re-authorize the Facebook connection and ensure all required permissions are granted.</p>
-                        </div>
-                      </div>
-                    </div>
-                  </section>
-
-                  {/* Final CTA */}
-                  <section className="text-center py-8">
-                    <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 rounded-xl p-8">
-                      <h3 className="text-2xl font-bold text-white mb-4">Ready to Transform Your Instagram Customer Service?</h3>
-                      <p className="text-white/80 mb-6">
-                        Start your free 60-day trial and join thousands of businesses already using AutoniqueAI to scale their social media presence.
+                    <div className="text-gray-700 space-y-6">
+                      <p className="text-lg">
+                        And that's it — you've successfully connected AutoniqueAI to your Instagram Business Account.
                       </p>
-                      <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Link href="/auth/login">
-                          <motion.button
-                            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+
+                      <motion.div
+                        className="bg-green-50 border border-green-200 rounded-xl p-6"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                      >
+                        <h3 className="text-xl font-bold text-gray-900 mb-4">From here, your DMs are on autopilot:</h3>
+                        <ul className="space-y-3">
+                          <motion.li
+                            className="flex items-center space-x-3"
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.4, delay: 0.3 }}
                           >
-                            Start Free Trial
-                          </motion.button>
-                        </Link>
-                        <Link href="/pricing">
-                          <motion.button
-                            className="bg-white/10 hover:bg-white/20 text-white px-8 py-3 rounded-full font-semibold border border-white/30 backdrop-blur-xl transition-all duration-300"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                            <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                            <span className="text-gray-700">FAQs answered instantly</span>
+                          </motion.li>
+                          <motion.li
+                            className="flex items-center space-x-3"
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.4, delay: 0.4 }}
                           >
-                            View Pricing
-                          </motion.button>
-                        </Link>
-                      </div>
+                            <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                            <span className="text-gray-700">Customers engaged 24/7</span>
+                          </motion.li>
+                          <motion.li
+                            className="flex items-center space-x-3"
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.4, delay: 0.5 }}
+                          >
+                            <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                            <span className="text-gray-700">More leads and sales without extra effort</span>
+                          </motion.li>
+                        </ul>
+                      </motion.div>
+
+                      <motion.div
+                        className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.6 }}
+                      >
+                        <p className="text-center text-lg font-semibold text-gray-900 mb-4">
+                          No more missed messages. No more stress. Just smooth automation that saves you hours every week.
+                        </p>
+                        <div className="text-center">
+                          <Link href="/auth/login">
+                            <motion.button
+                              className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center space-x-2"
+                              whileHover={{ scale: 1.05, y: -2 }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              <span>Start your free trial now at AutoniqueAI</span>
+                            </motion.button>
+                          </Link>
+                        </div>
+                      </motion.div>
                     </div>
                   </section>
+
+
 
                 </div>
               </article>
