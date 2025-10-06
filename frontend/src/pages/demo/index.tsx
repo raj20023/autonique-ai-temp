@@ -42,6 +42,24 @@ const DemoPage = () => {
       url: '/blog/setup-guide'
     },
     {
+      id: 'instagram-leads-lost',
+      title: 'Why 80% of Instagram Leads Are Lost in the DMs',
+      description: 'Learn why businesses lose leads in Instagram DMs and how AutoniqueAI helps capture every opportunity, 24/7',
+      type: 'Written Guide',
+      readTime: '8 min read',
+      status: 'Available',
+      url: '/blog/instagram-leads-lost'
+    },
+    {
+      id: 'psychology-fast-replies',
+      title: 'The Psychology of Fast Replies',
+      description: 'Discover the psychological triggers behind fast replies and how instant responses build trust and convert more customers',
+      type: 'Written Guide',
+      readTime: '7 min read',
+      status: 'Available',
+      url: '/blog/psychology-fast-replies'
+    },
+    {
       id: 'faq-guide',
       title: 'Creating Effective FAQs',
       description: 'Best practices for creating FAQs that improve customer satisfaction',
