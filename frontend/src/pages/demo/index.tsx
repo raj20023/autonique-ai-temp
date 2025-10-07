@@ -60,6 +60,15 @@ const DemoPage = () => {
       url: '/blog/psychology-fast-replies'
     },
     {
+      id: 'meet-auto',
+      title: 'Meet Auto: The Friendly AI Assistant',
+      description: 'Meet Auto, the heart and voice of AutoniqueAI. Learn how this friendly AI makes automation feel human and personal',
+      type: 'Written Guide',
+      readTime: '6 min read',
+      status: 'Available',
+      url: '/blog/meet-auto'
+    },
+    {
       id: 'faq-guide',
       title: 'Creating Effective FAQs',
       description: 'Best practices for creating FAQs that improve customer satisfaction',
