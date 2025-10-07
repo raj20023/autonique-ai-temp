@@ -69,6 +69,15 @@ const DemoPage = () => {
       url: '/blog/meet-auto'
     },
     {
+      id: 'chaos-to-calm',
+      title: 'From Chaos to Calm: Real Success Stories',
+      description: 'Read inspiring real stories of small business owners who transformed their Instagram DM chaos into calm with AutoniqueAI',
+      type: 'Written Guide',
+      readTime: '8 min read',
+      status: 'Available',
+      url: '/blog/chaos-to-calm'
+    },
+    {
       id: 'faq-guide',
       title: 'Creating Effective FAQs',
       description: 'Best practices for creating FAQs that improve customer satisfaction',
