@@ -78,6 +78,15 @@ const DemoPage = () => {
       url: '/blog/chaos-to-calm'
     },
     {
+      id: 'best-instagram-automation-tools-2025',
+      title: 'Best Instagram Automation Tools for Small Businesses (2025)',
+      description: 'Compare the top Instagram DM automation tools in 2025 and pick the right one for your small business—fast replies, warm tone, and real results',
+      type: 'Comparison Guide',
+      readTime: '12 min read',
+      status: 'Available',
+      url: '/blog/best-instagram-automation-tools-2025'
+    },
+    {
       id: 'faq-guide',
       title: 'Creating Effective FAQs',
       description: 'Best practices for creating FAQs that improve customer satisfaction',
